@@ -22,5 +22,4 @@ pub trait NCategory {
     fn get_cell(&self, cellId: &Self::CellId) -> Option<&Self::Cell>;
 
     fn commute(left: &Self::CellId, right: &Self::CellId) -> bool;
-
 }

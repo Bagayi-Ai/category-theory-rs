@@ -7,7 +7,7 @@ pub trait NCategoryTestHelper {
     fn get_mut_category(&mut self) -> &mut Self::category;
     fn generate_object_id(&self) -> <Self::category as NCategory>::ObjectId;
     fn generate_cell_id(&self) -> <Self::category as NCategory>::CellId;
-    fn generate_object(&self) -> <Self::category as NCategory>::Object;
+    fn generate_object(&mut self) -> <Self::category as NCategory>::Object;
 
     fn expected_category_level(&self) -> isize;
 }

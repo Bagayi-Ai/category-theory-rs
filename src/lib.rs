@@ -1,7 +1,5 @@
-mod generic_category;
 
 mod core {
-    pub mod category;
     pub mod uuid_id;
 
     pub mod ncategory;
@@ -11,6 +9,8 @@ mod core {
     pub mod category0;
 
     pub mod dynamic_ncategory;
+
+    pub mod generic_id;
 
     #[cfg(test)]
     mod tests {

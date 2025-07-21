@@ -12,7 +12,7 @@ pub trait NCategory {
 
     fn target(&self, cell_id: &Self::CellId) -> &Self::ObjectId;
 
-    fn add_object(&mut self, object: Self::Object) -> &Self::ObjectId;
+    fn add_object(&mut self, object: Self::Object) -> Self::ObjectId;
 
     fn add_object_with_id(&mut self, objectId: Self::ObjectId, object: Self::Object);
 
@@ -48,7 +48,7 @@ impl NCategory for () {
 
     fn source(&self, _cell_id: &Self::CellId) -> &Self::Object { self }
     fn target(&self, _cell_id: &Self::CellId) -> &Self::Object { self }
-    fn add_object(&mut self, _object: Self::Object) -> &Self::ObjectId { self }
+    fn add_object(&mut self, _object: Self::Object) -> Self::ObjectId { *self }
     fn add_object_with_id(&mut self, _object_id: Self::ObjectId, _object: Self::Object) {}
     fn add_cell(&mut self, _cell: Self::Cell) {}
     fn get_object(&self, _id: &Self::ObjectId) -> Option<&Self::Object> { Some(self) }

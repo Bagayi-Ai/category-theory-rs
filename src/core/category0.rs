@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use std::hash::Hash;
 use crate::core::ncategory::NCategory;
 
-struct Category0<T> {
+pub struct Category0<T> {
     objects: HashSet<T>
 }
 
@@ -30,9 +30,9 @@ impl<T: Eq + Clone + Hash + Debug> NCategory for Category0<T> {
         self.get_object(cell).unwrap()
     }
 
-    fn add_object(&mut self, object: Self::Object) -> &Self::ObjectId {
+    fn add_object(&mut self, object: Self::Object) -> Self::ObjectId {
         self.objects.insert(object.clone());
-        self.objects.get(&object).unwrap()
+        self.objects.get(&object).unwrap().clone()
     }
 
     fn add_object_with_id(&mut self, objectId: Self::ObjectId, object: Self::Object) {
@@ -110,7 +110,7 @@ mod tests {
             random_string(5)
         }
 
-        fn generate_object(&self) -> <Self::category as NCategory>::Object {
+        fn generate_object(&mut self) -> <Self::category as NCategory>::Object {
             random_string(5)
         }
 

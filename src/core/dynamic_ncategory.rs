@@ -31,7 +31,7 @@ where
         todo!()
     }
 
-    fn add_object(&mut self, o: Self::Object) -> &Self::ObjectId {
+    fn add_object(&mut self, o: Self::Object) -> Self::ObjectId {
         todo!()
     }
 

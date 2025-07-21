@@ -1,4 +1,4 @@
-use crate::core::ncategory::NCategory;
+use crate::core::ncategory::{NCategory, NCategoryError};
 
 #[derive(Clone, Debug)]
 struct CellDynamic<T> {
@@ -23,46 +23,43 @@ where
     type Cell = CellDynamic<Self::ObjectId>;
     type BaseCategory = Self;
 
-    fn source(&self, cell_id: &Self::CellId) -> &Self::ObjectId {
+    fn source(&self, cell_id: &Self::CellId) -> Result<&Self::ObjectId, NCategoryError> {
         todo!()
     }
 
-    fn target(&self, cell_id: &Self::CellId) -> &Self::ObjectId {
+    fn target(&self, cell_id: &Self::CellId) -> Result<&Self::ObjectId, NCategoryError> {
         todo!()
     }
 
-    fn add_object(&mut self, o: Self::Object) -> Self::ObjectId {
+    fn add_object(&mut self, object: Self::Object) -> Result<Self::ObjectId, NCategoryError> {
         todo!()
     }
 
-    fn add_object_with_id(&mut self, objectId: Self::ObjectId, object: Self::Object) -> Self::ObjectId {
+    fn add_object_with_id(&mut self, objectId: Self::ObjectId, object: Self::Object) -> Result<(), NCategoryError> {
         todo!()
     }
 
-    fn add_cell(&mut self, m: Self::Cell) {
+    fn add_cell(&mut self, cell: Self::Cell) -> Result<Self::CellId, NCategoryError> {
         todo!()
     }
 
-    fn get_object(&self, id: &Self::ObjectId) -> Option<&Self::Object> {
+    fn get_object(&self, objectId: &Self::ObjectId) -> Result<&Self::Object, NCategoryError> {
         todo!()
     }
 
-    fn get_cell(&self, id: &Self::CellId) -> Option<&Self::Cell> {
+    fn get_object_cells(&self, objectId: &Self::ObjectId) -> Result<Vec<&Self::CellId>, NCategoryError> {
         todo!()
     }
 
-    fn commute(left: &Self::CellId, right: &Self::CellId) -> bool {
-        todo!()
-    }
-    
-    fn get_object_cells(
-        &self,
-        objectId: &Self::ObjectId,
-    ) -> Vec<&Self::CellId> {
+    fn get_cell(&self, cell_id: &Self::CellId) -> Result<&Self::Cell, NCategoryError> {
         todo!()
     }
 
-    fn base_object(&self, object_id: &Self::ObjectId) -> &Self::BaseCategory {
-        self
+    fn commute(left_cell_id: &Self::CellId, right_cell_id: &Self::CellId) -> Result<bool, NCategoryError> {
+        todo!()
+    }
+
+    fn base_object(&self, object_id: &Self::ObjectId) -> Result<&Self::BaseCategory, NCategoryError> {
+        todo!()
     }
 }

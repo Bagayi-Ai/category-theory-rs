@@ -1,6 +1,14 @@
 use std::hash::Hash;
 use std::fmt::Debug;
 
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum NCategoryError {
+    CellAlreadyExists,
+    CellNotFound,
+    ObjectNotFound,
+}
+
 pub trait NCategory {
     type Object;
     type ObjectId: Eq + Hash + Clone + Debug;
@@ -8,28 +16,39 @@ pub trait NCategory {
     type Cell;
     type BaseCategory: NCategory;
 
-    fn source(&self, cell_id: &Self::CellId) -> &Self::ObjectId;
+    fn source(&self, cell_id: &Self::CellId) -> Result<&Self::ObjectId, NCategoryError>;
 
-    fn target(&self, cell_id: &Self::CellId) -> &Self::ObjectId;
+    fn target(&self, cell_id: &Self::CellId) -> Result<&Self::ObjectId, NCategoryError>;
 
-    fn add_object(&mut self, object: Self::Object) -> Self::ObjectId;
+    fn add_object(&mut self, object: Self::Object) -> Result<Self::ObjectId, NCategoryError>;
 
-    fn add_object_with_id(&mut self, objectId: Self::ObjectId, object: Self::Object);
+    fn add_object_with_id(&mut self, object_id: Self::ObjectId, object: Self::Object) -> Result<(), NCategoryError>;
 
-    fn add_cell(&mut self, cell: Self::Cell);
+    fn add_cell(&mut self, cell: Self::Cell) -> Result<Self::CellId, NCategoryError>;
 
-    fn get_object(&self, objectId: &Self::ObjectId) -> Option<&Self::Object>;
+    fn get_object(&self, object_id: &Self::ObjectId) -> Result<&Self::Object, NCategoryError>;
 
     fn get_object_cells(
         &self,
-        objectId: &Self::ObjectId,
-    ) -> Vec<&Self::CellId>;
+        object_id: &Self::ObjectId,
+    ) -> Result<Vec<&Self::CellId>, NCategoryError>;
 
-    fn get_cell(&self, cell_id: &Self::CellId) -> Option<&Self::Cell>;
+    fn get_object_targets(
+        &self,
+        object_id: &Self::ObjectId,
+    ) -> Result<Vec<&Self::ObjectId>, NCategoryError> {
+        self.get_object_cells(object_id)
+            .unwrap()
+            .iter()
+            .map(|cell_id| self.target(cell_id))
+            .collect()
+    }
 
-    fn commute(left_cell_id: &Self::CellId, right_cell_id: &Self::CellId) -> bool;
+    fn get_cell(&self, cell_id: &Self::CellId) -> Result<&Self::Cell, NCategoryError>;
 
-    fn base_object(&self, object_id: &Self::ObjectId) -> &Self::BaseCategory;
+    fn commute(left_cell_id: &Self::CellId, right_cell_id: &Self::CellId) -> Result<bool, NCategoryError>;
+
+    fn base_object(&self, object_id: &Self::ObjectId) -> Result<&Self::BaseCategory, NCategoryError>;
 
     fn category_level() -> isize
     where
@@ -46,18 +65,18 @@ impl NCategory for () {
     type Cell = ();
     type BaseCategory = ();
 
-    fn source(&self, _cell_id: &Self::CellId) -> &Self::Object { self }
-    fn target(&self, _cell_id: &Self::CellId) -> &Self::Object { self }
-    fn add_object(&mut self, _object: Self::Object) -> Self::ObjectId { *self }
-    fn add_object_with_id(&mut self, _object_id: Self::ObjectId, _object: Self::Object) {}
-    fn add_cell(&mut self, _cell: Self::Cell) {}
-    fn get_object(&self, _id: &Self::ObjectId) -> Option<&Self::Object> { Some(self) }
-    fn get_object_cells(&self, _object_id: &Self::ObjectId) -> Vec<&Self::Cell> { vec![self] }
-    fn get_cell(&self, _cell_id: &Self::CellId) -> Option<&Self::Cell> { Some(self) }
-    fn commute(_left: &Self::Cell, _right: &Self::Cell) -> bool { true }
+    fn source(&self, _cell_id: &Self::CellId) -> Result<&Self::Object, NCategoryError> { Ok(self) }
+    fn target(&self, _cell_id: &Self::CellId) -> Result<&Self::Object, NCategoryError> { Ok(self) }
+    fn add_object(&mut self, _object: Self::Object) -> Result<Self::ObjectId, NCategoryError> { Ok(*self) }
+    fn add_object_with_id(&mut self, _object_id: Self::ObjectId, _object: Self::Object)-> Result<(), NCategoryError>{Ok(())}
+    fn add_cell(&mut self, _cell: Self::Cell) -> Result<Self::CellId, NCategoryError> {Ok(())}
+    fn get_object(&self, _id: &Self::ObjectId) -> Result<&Self::Object, NCategoryError> { Ok(self) }
+    fn get_object_cells(&self, _object_id: &Self::ObjectId) -> Result<Vec<&Self::Cell>, NCategoryError> { Ok(vec![self]) }
+    fn get_cell(&self, _cell_id: &Self::CellId) -> Result<&Self::Cell, NCategoryError> { Ok(self) }
+    fn commute(_left: &Self::Cell, _right: &Self::Cell) -> Result<bool, NCategoryError> { Ok(true) }
     
-    fn base_object(&self, object_id: &Self::ObjectId) -> &Self::BaseCategory {
-        self
+    fn base_object(&self, _object_id: &Self::ObjectId) -> Result<&Self::BaseCategory, NCategoryError> {
+        Ok(self)
     }
 
     fn category_level() -> isize { -1 }

@@ -1,5 +1,5 @@
 use rand::{distributions::Alphanumeric, Rng};
-use crate::core::ncategory::NCategory;
+use crate::core::ncategory::{NCategory};
 
 pub trait NCategoryTestHelper {
     type category: NCategory;

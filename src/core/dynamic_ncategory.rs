@@ -62,7 +62,7 @@ where
         todo!()
     }
 
-    fn base_category(&self) -> &Self::BaseCategory {
+    fn base_object(&self, object_id: &Self::ObjectId) -> &Self::BaseCategory {
         self
     }
 }

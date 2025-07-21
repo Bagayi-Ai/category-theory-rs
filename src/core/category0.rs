@@ -68,7 +68,7 @@ impl<T: Eq + Clone + Hash + Debug> NCategory for Category0<T> {
         false
     }
 
-    fn base_category(&self) -> &Self::BaseCategory {
+    fn base_object(&self, object_id: &Self::ObjectId) -> &Self::BaseCategory {
         &()
     }
 }

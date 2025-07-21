@@ -29,7 +29,7 @@ pub trait NCategory {
 
     fn commute(left_cell_id: &Self::CellId, right_cell_id: &Self::CellId) -> bool;
 
-    fn base_category(&self) -> &Self::BaseCategory;
+    fn base_object(&self, object_id: &Self::ObjectId) -> &Self::BaseCategory;
 }
 
 impl NCategory for () {
@@ -49,7 +49,7 @@ impl NCategory for () {
     fn get_cell(&self, _cell_id: &Self::CellId) -> Option<&Self::Cell> { Some(self) }
     fn commute(_left: &Self::Cell, _right: &Self::Cell) -> bool { true }
     
-    fn base_category(&self) -> &Self::BaseCategory {
+    fn base_object(&self, object_id: &Self::ObjectId) -> &Self::BaseCategory {
         self
     }
 }

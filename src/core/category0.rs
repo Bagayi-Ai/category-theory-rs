@@ -114,6 +114,10 @@ mod tests {
             random_string(5)
         }
 
+        fn expected_category_level(&self) -> isize {
+            0
+        }
+
     }
     #[test]
     pub fn test_base_scenarios() {

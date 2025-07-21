@@ -8,6 +8,8 @@ pub trait NCategoryTestHelper {
     fn generate_object_id(&self) -> <Self::category as NCategory>::ObjectId;
     fn generate_cell_id(&self) -> <Self::category as NCategory>::CellId;
     fn generate_object(&self) -> <Self::category as NCategory>::Object;
+
+    fn expected_category_level(&self) -> isize;
 }
 
 
@@ -19,7 +21,7 @@ pub fn random_string(len: usize) -> String {
         .collect()
 }
 
-pub fn basic_object_cell_test(mut category_test_helper: impl NCategoryTestHelper){
+pub fn basic_object_cell_test<CategoryTestHelper: NCategoryTestHelper>(mut category_test_helper: CategoryTestHelper){
     // add object 1
     let object1_id = category_test_helper.generate_object_id();
     let object1 = category_test_helper.generate_object();
@@ -76,4 +78,7 @@ pub fn basic_object_cell_test(mut category_test_helper: impl NCategoryTestHelper
         assert_eq!(category.source(cell), &object3_id);
         assert_eq!(category.target(cell), &object3_id);
     }
+
+    let level = <<CategoryTestHelper as NCategoryTestHelper>::category as NCategory>::category_level();
+    assert_eq!(level, category_test_helper.expected_category_level());
 }

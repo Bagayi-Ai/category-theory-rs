@@ -30,6 +30,13 @@ pub trait NCategory {
     fn commute(left_cell_id: &Self::CellId, right_cell_id: &Self::CellId) -> bool;
 
     fn base_object(&self, object_id: &Self::ObjectId) -> &Self::BaseCategory;
+
+    fn category_level() -> isize
+    where
+        Self: Sized,
+    {
+        1 + <Self::BaseCategory as NCategory>::category_level()
+    }
 }
 
 impl NCategory for () {
@@ -52,4 +59,6 @@ impl NCategory for () {
     fn base_object(&self, object_id: &Self::ObjectId) -> &Self::BaseCategory {
         self
     }
+
+    fn category_level() -> isize { -1 }
 }

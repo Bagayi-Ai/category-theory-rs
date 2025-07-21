@@ -57,6 +57,7 @@ impl<T: Eq + Clone + Hash + Debug> NCategory for Category0<T> {
 }
 
 
+ #[cfg(test)]
 mod tests {
     use super::*;
     use crate::core::tests::ncategory_test_helper::*;
@@ -99,7 +100,7 @@ mod tests {
     }
     #[test]
     pub fn test_base_scenarios() {
-        let mut category_test_helper = GenericCategory0TestHelper::new();
+        let category_test_helper = GenericCategory0TestHelper::new();
         basic_object_cell_test(category_test_helper);
     }
 }

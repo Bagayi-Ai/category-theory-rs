@@ -100,8 +100,10 @@ mod tests {
     use crate::core::category0::Category0;
     use crate::core::uuid_id::UuidCategoryObjectId;
 
+    type Category0String = Category0<String>;
+
     struct GenericCategory1TestHelper {
-        category: GenericNCategory<UuidCategoryObjectId, Category0<Cell<String>>>,
+        category: GenericNCategory<UuidCategoryObjectId, Category0String>,
     }
 
     impl GenericCategory1TestHelper {
@@ -117,7 +119,7 @@ mod tests {
     }
 
     impl NCategoryTestHelper for GenericCategory1TestHelper {
-        type category = GenericNCategory<UuidCategoryObjectId, Category0<Cell<String>>>;
+        type category = GenericNCategory<UuidCategoryObjectId, Category0String>;
 
         fn get_category(&self) -> &Self::category {
             &self.category
@@ -137,13 +139,8 @@ mod tests {
 
         fn generate_object(&mut self) -> <Self::category as NCategory>::Object {
             let random_string = random_string(5);
-            let random_cell = Cell {
-                from: random_string.clone(),
-                to: random_string.clone(),
-                name: random_string.clone(),
-            };
             let mut object = Category0::new();
-            object.add_object(random_cell);
+            object.add_object(random_string);
             object
         }
 

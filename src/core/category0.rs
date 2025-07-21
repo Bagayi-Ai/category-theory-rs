@@ -73,8 +73,27 @@ impl<T: Eq + Clone + Hash + Debug> NCategory for Category0<T> {
     }
 }
 
+impl From<String> for Category0<String> {
+    fn from(object: String) -> Self {
+        let mut category = Category0::new();
+        category.add_object(object);
+        category
+    }
+}
 
- #[cfg(test)]
+impl <T: Eq + Clone + Hash + Debug> From<Vec<T>> for Category0<T>
+{
+    fn from(objects: Vec<T>) -> Self {
+        let mut category = Category0::new();
+        for object in objects {
+            category.add_object(object);
+        }
+        category
+    }
+}
+
+
+#[cfg(test)]
 mod tests {
     use super::*;
     use crate::core::tests::ncategory_test_helper::*;

@@ -28,6 +28,14 @@ pub fn basic_object_cell_test(mut category_test_helper: impl NCategoryTestHelper
         let category = category_test_helper.get_mut_category();
         category.add_object_with_id(object1_id.clone(), object1);
         assert!(category.get_object(&object1_id).is_some());
+
+        // check identity morphism
+        let cell = category.get_object_cells(&object1_id);
+        assert_eq!(cell.len(), 1);
+        let cell = cell.first().unwrap();
+        assert_eq!(category.source(cell), &object1_id);
+        assert_eq!(category.target(cell), &object1_id);
+
         // TODO: implement comparison of the object assert_eq!(category.get_object(&object1_id).unwrap(), &object);
 
         // check object 2 does not exist yet
@@ -40,6 +48,13 @@ pub fn basic_object_cell_test(mut category_test_helper: impl NCategoryTestHelper
         let category = category_test_helper.get_mut_category();
         category.add_object_with_id(object2_id.clone(), object2);
         assert!(category.get_object(&object2_id).is_some());
+
+        // check identity morphism
+        let cell = category.get_object_cells(&object2_id);
+        assert_eq!(cell.len(), 1);
+        let cell = cell.first().unwrap();
+        assert_eq!(category.source(cell), &object2_id);
+        assert_eq!(category.target(cell), &object2_id);
     }
 
     // add object 3 without id
@@ -53,5 +68,12 @@ pub fn basic_object_cell_test(mut category_test_helper: impl NCategoryTestHelper
     {
         let category = category_test_helper.get_category();
         assert!(category.get_object(&object3_id).is_some());
+
+        // check identity morphism
+        let cell = category.get_object_cells(&object3_id);
+        assert_eq!(cell.len(), 1);
+        let cell = cell.first().unwrap();
+        assert_eq!(category.source(cell), &object3_id);
+        assert_eq!(category.target(cell), &object3_id);
     }
 }

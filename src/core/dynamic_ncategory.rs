@@ -21,14 +21,14 @@ where
     type ObjectId = ();
     type CellId = ();
     type Cell = CellDynamic<Self::ObjectId>;
-    type Higher = Self;
+    type BaseCategory = Self;
 
-    fn source(m: &Self::Cell) -> &Self::ObjectId {
-        &m.from
+    fn source(&self, cell_id: &Self::CellId) -> &Self::ObjectId {
+        todo!()
     }
 
-    fn target(m: &Self::Cell) -> &Self::ObjectId {
-        &m.to
+    fn target(&self, cell_id: &Self::CellId) -> &Self::ObjectId {
+        todo!()
     }
 
     fn add_object(&mut self, o: Self::Object) -> &Self::ObjectId {
@@ -53,5 +53,16 @@ where
 
     fn commute(left: &Self::CellId, right: &Self::CellId) -> bool {
         todo!()
+    }
+    
+    fn get_object_cells(
+        &self,
+        objectId: &Self::ObjectId,
+    ) -> Vec<&Self::CellId> {
+        todo!()
+    }
+
+    fn base_category(&self) -> &Self::BaseCategory {
+        self
     }
 }

@@ -1,8 +1,11 @@
-use std::collections::HashSet;
 use std::hash::Hash;
-use uuid::Uuid;
+use std::fmt::Debug;
 
 use crate::core::ncategory::{NCategory};
+
+pub trait CategoryLevel {
+    fn level() -> usize;
+}
 
 #[derive(Clone)]
 struct Cell<ObjectId> {
@@ -11,29 +14,31 @@ struct Cell<ObjectId> {
     name: String,
 }
 
-struct GenericNCategory<ObjectId, Object, CellId, H: NCategory<Object = Cell<ObjectId>>> {
-    _phantom: std::marker::PhantomData<(Object, H, CellId)>
+
+struct GenericNCategory<ObjectId, Object, CellId, BaseCategory: NCategory<Object = Cell<ObjectId>>> {
+    base_category: BaseCategory,
+    _phantom: std::marker::PhantomData<(Object, CellId)>
 }
 
-impl<ObjectId, Object, CellId, H: NCategory> NCategory for GenericNCategory<ObjectId, Object, CellId, H>
+impl<ObjectId, Object, CellId, BaseCategory: NCategory> NCategory for GenericNCategory<ObjectId, Object, CellId, BaseCategory>
 where
-    ObjectId: Clone + PartialEq + Eq + Hash,
-    CellId: Clone + PartialEq + Eq + Hash,
-    H: NCategory<Object = Cell<ObjectId>>,
+    ObjectId: Clone + PartialEq + Eq + Hash + Debug,
+    CellId: Clone + PartialEq + Eq + Hash + Debug,
+    BaseCategory: NCategory<Object = Cell<ObjectId>>,
 {
     type Object = Object;
     type ObjectId = ObjectId;
     type CellId = CellId;
     type Cell = Cell<ObjectId>;
 
-    type Higher = H;
+    type BaseCategory = BaseCategory;
 
-    fn source(m: &Self::Cell) -> &Self::ObjectId {
+    fn source(&self, cell_id: &Self::CellId) -> &Self::ObjectId {
         // Placeholder implementation
         unimplemented!()
     }
 
-    fn target(m: &Self::Cell) -> &Self::ObjectId {
+    fn target(&self, cell_id: &Self::CellId) -> &Self::ObjectId {
         // Placeholder implementation
         unimplemented!()
     }
@@ -54,6 +59,10 @@ where
         todo!()
     }
 
+    fn get_object_cells(&self, objectId: &Self::ObjectId) -> Vec<&Self::CellId> {
+        todo!()
+    }
+
     fn get_cell(&self, id: &Self::CellId) -> Option<&Self::Cell> {
         todo!()
     }
@@ -62,5 +71,9 @@ where
     fn commute(left: &Self::CellId, right: &Self::CellId) -> bool {
         // Placeholder implementation
         unimplemented!()
+    }
+
+    fn base_category(&self) -> &Self::BaseCategory {
+        &self.base_category
     }
 }

@@ -18,16 +18,16 @@ impl<T: Eq + Clone + Hash> Category0<T> {
 impl<T: Eq + Clone + Hash + Debug> NCategory for Category0<T> {
     type Object = T;
     type ObjectId = T;
-    type CellId = ();
-    type Cell = ();
-    type Higher = Self;
+    type CellId = T;
+    type Cell = T;
+    type BaseCategory = ();
 
-    fn source(cell: &Self::Cell) -> &Self::Object {
-        panic!("No cells in Category0")
+    fn source(&self, cell_id: &Self::CellId) -> &Self::Object {
+        self.get_object(cell_id).unwrap()
     }
 
-    fn target(_m: &Self::Cell) -> &Self::Object {
-        panic!("No cells in Category0")
+    fn target(&self, cell: &Self::CellId) -> &Self::Object {
+        self.get_object(cell).unwrap()
     }
 
     fn add_object(&mut self, object: Self::Object) -> &Self::ObjectId {
@@ -47,12 +47,29 @@ impl<T: Eq + Clone + Hash + Debug> NCategory for Category0<T> {
         self.objects.get(id)
     }
 
-    fn get_cell(&self, id: &Self::CellId) -> Option<&Self::Cell> {
-        panic!("No cells in Category0")
+    fn get_object_cells(&self, objectId: &Self::ObjectId) -> Vec<&Self::Cell> {
+        // only cell in 0-category is the identity cell.
+        if self.objects.contains(objectId) {
+            vec![self.objects.get(objectId).unwrap()]
+        } else {
+            vec![]
+        }
+    }
+
+    fn get_cell(&self, cell_id: &Self::CellId) -> Option<&Self::Cell> {
+        if self.objects.contains(cell_id) {
+            Some(self.objects.get(cell_id).unwrap())
+        } else {
+            None
+        }
     }
 
     fn commute(_left: &Self::Cell, _right: &Self::Cell) -> bool {
-        true
+        false
+    }
+
+    fn base_category(&self) -> &Self::BaseCategory {
+        &()
     }
 }
 
@@ -90,7 +107,7 @@ mod tests {
         }
 
         fn generate_cell_id(&self) -> <Self::category as NCategory>::CellId {
-            ()
+            random_string(5)
         }
 
         fn generate_object(&self) -> <Self::category as NCategory>::Object {

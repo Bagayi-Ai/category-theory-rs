@@ -2,30 +2,64 @@ use std::hash::Hash;
 use std::fmt::Debug;
 use std::collections::{HashMap, HashSet};
 
-use crate::core::ncategory::{NCategory, NCategoryError};
+use crate::core::ncategory::{NCategory, NCategoryError, CellTrait, RecursiveCellMap};
 use crate::core::generic_id::GenericObjectIdTrait;
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
-struct Cell<CellId, ObjectId> {
+struct Cell<CellId, ObjectId, BaseCategory: NCategory>
+where
+    BaseCategory: NCategory<CellId = ObjectId>
+{
     id: CellId,
     from: ObjectId,
     to: ObjectId,
     name: String,
+    _phantom: std::marker::PhantomData<BaseCategory>,
+}
+
+impl <CellId, ObjectId, BaseCategory: NCategory> CellTrait for Cell<CellId, ObjectId, BaseCategory>
+where
+    BaseCategory: NCategory<CellId = ObjectId>
+{
+    type BaseCategory = BaseCategory;
+    type CurrentCategoryCellId = ObjectId;
+
+    fn id(&self) -> &Self::CurrentCategoryCellId {
+        todo!()
+    }
+
+    fn base_cell_id(&self) -> Result<<Self::BaseCategory as NCategory>::CellId, NCategoryError> {
+        todo!()
+    }
+
+    fn apply_cell_id(&self, _cell_id: &<Self::BaseCategory as NCategory>::CellId) -> Result<<Self::BaseCategory as NCategory>::CellId, NCategoryError> {
+        todo!()
+    }
+
+    fn apply_to_object(&self, _object_id: &<Self::BaseCategory as NCategory>::ObjectId) -> Result<<Self::BaseCategory as NCategory>::ObjectId, NCategoryError> {
+        todo!()
+    }
 }
 
 
-struct GenericNCategory<ObjectId: GenericObjectIdTrait, BaseCategory: NCategory> {
+#[derive(Clone)]
+struct GenericNCategory<ObjectId: GenericObjectIdTrait, BaseCategory: NCategory>
+where
+    BaseCategory: NCategory<CellId = ObjectId>
+{
     objects: HashMap<ObjectId, BaseCategory>,
     object_mapping: HashMap<ObjectId, HashMap<ObjectId, HashSet<ObjectId>>>,
-    cells: HashMap<ObjectId, Cell<ObjectId, ObjectId>>,
+    cells: HashMap<ObjectId, Cell<ObjectId, ObjectId, BaseCategory>>,
 }
 
-impl<ObjectId: GenericObjectIdTrait, BaseCategory: NCategory> NCategory for GenericNCategory<ObjectId, BaseCategory>
+impl<ObjectId: GenericObjectIdTrait, BaseCategory: NCategory<BaseCategory = BaseCategory>> NCategory for GenericNCategory<ObjectId, BaseCategory>
+where
+    BaseCategory: NCategory<CellId = ObjectId>,
 {
     type Object = BaseCategory;
     type ObjectId = ObjectId;
     type CellId = ObjectId;
-    type Cell = Cell<ObjectId, ObjectId>;
+    type Cell = Cell<ObjectId, ObjectId, BaseCategory>;
 
     type BaseCategory = BaseCategory;
 
@@ -51,6 +85,56 @@ impl<ObjectId: GenericObjectIdTrait, BaseCategory: NCategory> NCategory for Gene
         Ok(object_id)
     }
 
+    fn apply_cells_recursive(
+        &self,
+        cell_id: &Self::CellId,
+        cell_id_to_map: &Self::CellId
+    ) -> Result<
+        RecursiveCellMap<Self::CellId>,
+        NCategoryError
+    > {
+
+        if self.is_zero_category() {
+            return Ok(RecursiveCellMap::Leaf);
+        }
+
+        let mut object_map: HashMap<
+            Self::CellId,
+            (Self::CellId, Option<Vec<RecursiveCellMap<Self::CellId>>>)> = HashMap::new();
+
+
+        let source_object_id = self.source(cell_id)?;
+
+        // we traverse both source and target object all the way to 0-category
+        // then start building up recursively the mapping between the objects from 0-category
+        // all the way to the current category
+
+        let source_base_category = self.base_object(source_object_id)?;
+        let source_objects = source_base_category.get_all_objects()?;
+
+        let cell = self.get_cell(cell_id)?;
+        let base_cell = cell.base_cell_id()?;
+
+
+        let mut cell_maps = Vec::new();
+        for object_id in &source_objects {
+            let cell_ids_to_map = source_base_category.get_object_cells(object_id)?;
+
+            for cell_id_to_map in cell_ids_to_map {
+                let cell_map = source_base_category.apply_cells_recursive(&base_cell, cell_id_to_map)?;
+                cell_maps.push(cell_map);
+            }
+        }
+
+        // map the cell id to target id
+        let mapped_cell_id = cell.apply_cell_id(cell_id_to_map)?;
+        // confirm the cell exists
+        self.get_cell(&mapped_cell_id)?;
+        object_map.insert(cell_id.clone(), (mapped_cell_id.clone(), Some(cell_maps)));
+
+        Ok(RecursiveCellMap::Node(object_map))
+    }
+
     fn add_object_with_id(&mut self, object_id: Self::ObjectId, object: Self::Object) -> Result<(), NCategoryError> {
         self.objects.insert(object_id.clone(), object);
         let identity_cell = Cell {
@@ -58,6 +142,7 @@ impl<ObjectId: GenericObjectIdTrait, BaseCategory: NCategory> NCategory for Gene
             from: object_id.clone(),
             to: object_id.clone(),
             name: "identity".to_string(),
+            _phantom: std::marker::PhantomData,
         };
         self.add_cell(identity_cell).unwrap();
         Ok(())
@@ -67,14 +152,15 @@ impl<ObjectId: GenericObjectIdTrait, BaseCategory: NCategory> NCategory for Gene
         if self.cells.contains_key(&cell.id) {
             return Err(NCategoryError::CellAlreadyExists);
         }
-        self.cells.insert(cell.id.clone(), cell.clone());
         self.object_mapping
             .entry(cell.from.clone())
             .or_default()
             .entry(cell.to.clone())
             .or_default()
             .insert(cell.id.clone());
-        Ok(cell.id)
+        let cell_id = cell.id.clone();
+        self.cells.insert(cell.id.clone(), cell);
+        Ok(cell_id)
     }
 
     fn get_object(&self, id: &Self::ObjectId) -> Result<&Self::Object, NCategoryError> {
@@ -83,6 +169,18 @@ impl<ObjectId: GenericObjectIdTrait, BaseCategory: NCategory> NCategory for Gene
         } else {
             Err(NCategoryError::ObjectNotFound)
         }
+    }
+
+    fn get_identity_cell(&self, _object_id: &Self::ObjectId) -> Result<&Self::CellId, NCategoryError> {
+        todo!()
+    }
+
+    fn get_all_objects(&self) -> Result<HashSet<&Self::ObjectId>, NCategoryError> {
+        Ok(self.objects.keys().collect())
+    }
+
+    fn get_all_cells(&self) -> Result<HashSet<&Self::CellId>, NCategoryError> {
+        Ok(self.cells.keys().collect())
     }
 
     fn get_object_cells(&self, object_id: &Self::ObjectId) -> Result<Vec<&Self::CellId>, NCategoryError> {
@@ -107,97 +205,7 @@ impl<ObjectId: GenericObjectIdTrait, BaseCategory: NCategory> NCategory for Gene
         todo!()
     }
 
-
-    fn commute(_left: &Self::CellId, _right: &Self::CellId) -> Result<bool, NCategoryError> {
-        // Placeholder implementation
-        unimplemented!()
-    }
-
     fn base_object(&self, _object_id: &Self::ObjectId) -> Result<&Self::BaseCategory, NCategoryError> {
         todo!()
-    }
-}
-
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::core::tests::ncategory_test_helper::*;
-    use crate::core::category0::Category0;
-    use crate::core::uuid_id::UuidCategoryObjectId;
-
-    type Category0String = Category0<String>;
-
-    struct GenericCategory1TestHelper {
-        category: GenericNCategory<UuidCategoryObjectId, Category0String>,
-    }
-
-    impl GenericCategory1TestHelper {
-        pub fn new() -> Self {
-            GenericCategory1TestHelper {
-                category: GenericNCategory {
-                    objects: HashMap::new(),
-                    object_mapping: HashMap::new(),
-                    cells: HashMap::new(),
-                },
-            }
-        }
-    }
-
-    impl NCategoryTestHelper for GenericCategory1TestHelper {
-        type Category = GenericNCategory<UuidCategoryObjectId, Category0String>;
-
-        fn get_category(&self) -> &Self::Category {
-            &self.category
-        }
-
-        fn get_mut_category(&mut self) -> &mut Self::Category {
-            &mut self.category
-        }
-
-        fn generate_object_id(&self) -> <Self::Category as NCategory>::ObjectId {
-            UuidCategoryObjectId::new()
-        }
-
-        fn generate_cell_id(&self) -> <Self::Category as NCategory>::CellId {
-            UuidCategoryObjectId::new()
-        }
-
-        fn generate_cell(&mut self) -> <Self::Category as NCategory>::CellId {
-            let object1 = self.generate_object();
-            let object2 = self.generate_object();
-            let object1_id = self.get_mut_category().add_object(object1).unwrap();
-            let object2_id = self.get_mut_category().add_object(object2).unwrap();
-            let cell_id = self.generate_cell_id();
-            let cell = Cell {
-                id: cell_id.clone(),
-                from: object1_id,
-                to: object2_id,
-                name: "test_cell".to_string(),
-            };
-            self.get_mut_category().add_cell(cell).unwrap();
-            cell_id
-        }
-
-        fn generate_commuting_cell(&self) -> (<Self::Category as NCategory>::CellId, <Self::Category as NCategory>::CellId) {
-            todo!()
-        }
-
-        fn generate_object(&mut self) -> <Self::Category as NCategory>::Object {
-            let random_string = random_string(5);
-            let mut object = Category0::new();
-            object.add_object(random_string).unwrap();
-            object
-        }
-
-        fn expected_category_level(&self) -> isize {
-            1
-        }
-
-    }
-    #[test]
-    pub fn test_base_scenarios() {
-        let category_test_helper = GenericCategory1TestHelper::new();
-        basic_object_cell_test(category_test_helper);
     }
 }

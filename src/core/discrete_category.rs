@@ -1,25 +1,51 @@
 use std::collections::HashSet;
 use std::fmt::Debug;
 use std::hash::Hash;
-use crate::core::ncategory::{NCategory, NCategoryError};
+use crate::core::ncategory::{NCategory, NCategoryError, CellTrait, RecursiveCellMap};
 
-pub struct Category0<T> {
+pub struct DiscreteCategory<T> {
     objects: HashSet<T>
 }
 
-impl<T: Eq + Clone + Hash> Category0<T> {
+impl<T: Eq + Clone + Hash> DiscreteCategory<T> {
     pub fn new() -> Self {
-        Category0 {
+        DiscreteCategory {
             objects: HashSet::new(),
         }
     }
 }
 
-impl<T: Eq + Clone + Hash + Debug> NCategory for Category0<T> {
+pub struct DiscreteCategoryCell<T> {
+    _object_id: T,
+}
+
+impl<T: Eq + Hash + Clone + Debug> CellTrait for DiscreteCategoryCell<T> {
+    type BaseCategory = ();
+    type CurrentCategoryCellId = T;
+
+    fn id(&self) -> &Self::CurrentCategoryCellId {
+        todo!()
+    }
+
+    fn base_cell_id(&self) -> Result<<Self::BaseCategory as NCategory>::CellId, NCategoryError> {
+        todo!()
+    }
+
+    fn apply_cell_id(&self, _cell_id: &<Self::BaseCategory as NCategory>::CellId) -> Result<<Self::BaseCategory as NCategory>::CellId, NCategoryError> {
+        todo!()
+    }
+
+    fn apply_to_object(&self, _object_id: &<Self::BaseCategory as NCategory>::ObjectId) -> Result<<Self::BaseCategory as NCategory>::ObjectId, NCategoryError> {
+        todo!()
+    }
+}
+
+
+impl<T: Eq + Clone + Hash + Debug> NCategory for DiscreteCategory<T> {
     type Object = T;
     type ObjectId = T;
     type CellId = T;
-    type Cell = T;
+    type Cell = DiscreteCategoryCell<T>;
     type BaseCategory = ();
 
     fn source(&self, cell_id: &Self::CellId) -> Result<&Self::Object, NCategoryError> {
@@ -50,7 +76,11 @@ impl<T: Eq + Clone + Hash + Debug> NCategory for Category0<T> {
     }
 
     fn add_cell(&mut self, _cell: Self::Cell) -> Result<Self::CellId, NCategoryError> {
-        panic!("No cells in Category0")
+        panic!("No cells in DiscreteCategory")
+    }
+
+    fn is_zero_category(&self) -> bool {
+        true
     }
 
     fn get_object(&self, id: &Self::ObjectId) -> Result<&Self::Object, NCategoryError> {
@@ -61,7 +91,16 @@ impl<T: Eq + Clone + Hash + Debug> NCategory for Category0<T> {
         }
     }
 
-    fn get_object_cells(&self, object_id: &Self::ObjectId) -> Result<Vec<&Self::Cell>, NCategoryError> {
+    fn get_all_objects(&self) -> Result<HashSet<&Self::ObjectId>, NCategoryError> {
+        Ok(self.objects.iter().collect())
+    }
+
+    fn get_all_cells(&self) -> Result<HashSet<&Self::CellId>, NCategoryError> {
+        // In DiscreteCategory, there are no cells, so we return an empty set.
+        Ok(HashSet::new())
+    }
+
+    fn get_object_cells(&self, object_id: &Self::ObjectId) -> Result<Vec<&Self::CellId>, NCategoryError> {
         // only cell in 0-category is the identity cell.
         if let Some(object) = self.objects.get(object_id) {
             Ok(vec![object])
@@ -70,35 +109,39 @@ impl<T: Eq + Clone + Hash + Debug> NCategory for Category0<T> {
         }
     }
 
-    fn get_cell(&self, cell_id: &Self::CellId) -> Result<&Self::Cell, NCategoryError> {
-        if let Some(cell) = self.objects.get(cell_id) {
-            Ok(cell)
-        } else {
-            Err(NCategoryError::CellNotFound)
-        }
+    fn get_cell(&self, _cell_id: &Self::CellId) -> Result<&Self::Cell, NCategoryError> {
+        todo!()
     }
 
-    fn commute(_left: &Self::Cell, _right: &Self::Cell) -> Result<bool, NCategoryError> {
+    fn commute(&self, _left: Vec<&Self::CellId>, _right: Vec<&Self::CellId>) -> Result<bool, NCategoryError> {
         Ok(false)
     }
 
     fn base_object(&self, _object_id: &Self::ObjectId) -> Result<&Self::BaseCategory, NCategoryError> {
         Ok(&())
     }
+
+    fn get_identity_cell(&self, _object_id: &Self::ObjectId) -> Result<&Self::CellId, NCategoryError> {
+        todo!()
+    }
+
+    fn apply_cells_recursive(&self, _cell_id: &Self::CellId, _cell_id_to_map: &Self::CellId) -> Result<RecursiveCellMap<Self::CellId>, NCategoryError> {
+        todo!()
+    }
 }
 
-impl From<String> for Category0<String> {
+impl From<String> for DiscreteCategory<String> {
     fn from(object: String) -> Self {
-        let mut category = Category0::new();
+        let mut category = DiscreteCategory::new();
         category.add_object(object).unwrap();
         category
     }
 }
 
-impl <T: Eq + Clone + Hash + Debug> From<Vec<T>> for Category0<T>
+impl <T: Eq + Clone + Hash + Debug> From<Vec<T>> for DiscreteCategory<T>
 {
     fn from(objects: Vec<T>) -> Self {
-        let mut category = Category0::new();
+        let mut category = DiscreteCategory::new();
         for object in objects {
             category.add_object(object).unwrap();
         }
@@ -113,19 +156,19 @@ mod tests {
     use crate::core::tests::ncategory_test_helper::*;
 
     struct GenericCategory0TestHelper {
-        category: Category0<String>,
+        category: DiscreteCategory<String>,
     }
 
     impl GenericCategory0TestHelper {
         pub fn new() -> Self {
             GenericCategory0TestHelper {
-                category: Category0::new(),
+                category: DiscreteCategory::new(),
             }
         }
     }
 
     impl NCategoryTestHelper for GenericCategory0TestHelper {
-        type Category = Category0<String>;
+        type Category = DiscreteCategory<String>;
 
         fn get_category(&self) -> &Self::Category {
             &self.category
@@ -147,9 +190,14 @@ mod tests {
             todo!()
         }
 
-        fn generate_commuting_cell(&self) -> (<Self::Category as NCategory>::CellId, <Self::Category as NCategory>::CellId) {
+        fn generate_commuting_cell(&mut self) -> (Vec<<Self::Category as NCategory>::CellId>, Vec<<Self::Category as NCategory>::CellId>) {
             todo!()
         }
+
+        fn generate_non_commuting_cell(&mut self) -> (Vec<<Self::Category as NCategory>::CellId>, Vec<<Self::Category as NCategory>::CellId>) {
+            todo!()
+        }
+
 
         fn generate_object(&mut self) -> <Self::Category as NCategory>::Object {
             random_string(5)

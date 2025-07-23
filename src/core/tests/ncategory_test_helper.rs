@@ -10,8 +10,12 @@ pub trait NCategoryTestHelper {
     fn generate_cell(&mut self) -> <Self::Category as NCategory>::CellId;
 
     fn generate_commuting_cell(
-        &self
-    ) -> (<Self::Category as NCategory>::CellId,<Self::Category as NCategory>::CellId);
+        &mut self
+    ) -> (Vec<<Self::Category as NCategory>::CellId>, Vec<<Self::Category as NCategory>::CellId>);
+
+    fn generate_non_commuting_cell(
+        &mut self
+    ) -> (Vec<<Self::Category as NCategory>::CellId>, Vec<<Self::Category as NCategory>::CellId>);
 
     fn generate_object(&mut self) -> <Self::Category as NCategory>::Object;
 
@@ -101,11 +105,39 @@ pub fn basic_object_cell_test<CategoryTestHelper: NCategoryTestHelper>(mut categ
         return;
     }
 
-    // now we add two objects and a cell between them
-    let cell_id = category_test_helper.generate_cell();
-    let category = category_test_helper.get_category();
-    let source_id = category.source(&cell_id);
-    let target_id = category.target(&cell_id);
-    assert!(category.get_object(source_id.unwrap()).is_ok());
-    assert!(category.get_object(target_id.unwrap()).is_ok());
+
+    {
+        // now we add two objects and a cell between them
+        let cell_id = category_test_helper.generate_cell();
+        let category = category_test_helper.get_category();
+        let source_id = category.source(&cell_id);
+        let target_id = category.target(&cell_id);
+        assert!(category.get_object(source_id.unwrap()).is_ok());
+        assert!(category.get_object(target_id.unwrap()).is_ok());
+    }
+
+    {
+        // now we test for the commuting cells
+        let (commuting_cell1, commuting_cell2) = category_test_helper.generate_commuting_cell();
+        let commute_result = category_test_helper.get_category().commute(
+            commuting_cell1.iter().collect(),
+            commuting_cell2.iter().collect()
+        );
+        assert!(commute_result.is_ok());
+        let commute_result = commute_result.unwrap();
+        assert!(commute_result);
+    }
+
+    {
+        // now we test for the non-commuting cells
+        let (commuting_cell1, commuting_cell2) = category_test_helper.generate_non_commuting_cell();
+        let commute_result = category_test_helper.get_category().commute(
+            commuting_cell1.iter().collect(),
+            commuting_cell2.iter().collect()
+        );
+        assert!(commute_result.is_ok());
+        let commute_result = commute_result.unwrap();
+        assert!(!commute_result);
+    }
+
 }

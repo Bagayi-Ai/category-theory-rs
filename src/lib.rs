@@ -6,15 +6,14 @@ mod core {
 
     pub mod generic_ncategory;
 
-    pub mod category0;
-
-    pub mod dynamic_ncategory;
+    pub mod discrete_category;
 
     pub mod generic_id;
 
     #[cfg(test)]
     mod tests {
         pub mod ncategory_test_helper;
+        pub mod test_generic_ncategory;
     }
 }
 

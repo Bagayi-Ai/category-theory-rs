@@ -6,7 +6,7 @@ use crate::core::ncategory::{NCategory, NCategoryError, CellTrait, RecursiveCell
 use crate::core::generic_id::GenericObjectIdTrait;
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
-struct Cell<CellId, ObjectId, BaseCategory: NCategory>
+pub struct Cell<CellId, ObjectId, BaseCategory: NCategory>
 where
     BaseCategory: NCategory<CellId = ObjectId>
 {
@@ -15,6 +15,21 @@ where
     to: ObjectId,
     name: String,
     _phantom: std::marker::PhantomData<BaseCategory>,
+}
+
+impl <CellId, ObjectId, BaseCategory: NCategory> Cell<CellId, ObjectId, BaseCategory>
+where
+    BaseCategory: NCategory<CellId = ObjectId>
+{
+    pub fn new(id: CellId, from: ObjectId, to: ObjectId, name: String) -> Self {
+        Cell {
+            id,
+            from,
+            to,
+            name,
+            _phantom: std::marker::PhantomData,
+        }
+    }
 }
 
 impl <CellId, ObjectId, BaseCategory: NCategory> CellTrait for Cell<CellId, ObjectId, BaseCategory>
@@ -43,7 +58,7 @@ where
 
 
 #[derive(Clone)]
-struct GenericNCategory<ObjectId: GenericObjectIdTrait, BaseCategory: NCategory>
+pub struct GenericNCategory<ObjectId: GenericObjectIdTrait, BaseCategory: NCategory>
 where
     BaseCategory: NCategory<CellId = ObjectId>
 {
@@ -52,7 +67,21 @@ where
     cells: HashMap<ObjectId, Cell<ObjectId, ObjectId, BaseCategory>>,
 }
 
-impl<ObjectId: GenericObjectIdTrait, BaseCategory: NCategory<BaseCategory = BaseCategory>> NCategory for GenericNCategory<ObjectId, BaseCategory>
+
+impl <ObjectId: GenericObjectIdTrait, BaseCategory: NCategory> GenericNCategory<ObjectId, BaseCategory>
+where
+    BaseCategory: NCategory<CellId = ObjectId>
+{
+    pub fn new() -> Self {
+        GenericNCategory {
+            objects: HashMap::new(),
+            object_mapping: HashMap::new(),
+            cells: HashMap::new(),
+        }
+    }
+}
+
+impl<ObjectId: GenericObjectIdTrait, BaseCategory: NCategory> NCategory for GenericNCategory<ObjectId, BaseCategory>
 where
     BaseCategory: NCategory<CellId = ObjectId>,
 {

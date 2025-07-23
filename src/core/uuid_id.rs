@@ -41,3 +41,10 @@ impl GenericObjectIdTrait for UuidCategoryObjectId {
         UuidCategoryObjectId::new()
     }
 }
+
+
+impl GenericObjectIdTrait for String {
+    fn new() -> Self {
+        Uuid::new_v4().to_string()
+    }
+}

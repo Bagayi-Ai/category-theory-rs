@@ -7,7 +7,7 @@ pub trait NCategoryTestHelper {
     type Category: NCategory;
     fn get_category(&self) -> &Self::Category;
     fn get_mut_category(&mut self) -> &mut Self::Category;
-    fn generate_cell(&mut self) -> <Self::Category as NCategory>::Cell;
+    fn generate_cell(&mut self) -> <Self::Category as NCategory>::Identifier;
 
     fn generate_identifier(&self) -> <Self::Category as NCategory>::Identifier {
         <Self::Category as NCategory>::Identifier::generate()
@@ -101,19 +101,24 @@ pub fn basic_object_cell_test<CategoryTestHelper: NCategoryTestHelper>(mut categ
         assert_eq!(cell.target_object_id(), &object3_id);
     }
 
-    let level = <<CategoryTestHelper as NCategoryTestHelper>::Category as NCategory>::nested_level();
-    assert_eq!(level, category_test_helper.expected_nested_level());
+    let nested_level = <<CategoryTestHelper as NCategoryTestHelper>::Category as NCategory>::nested_level();
+    assert_eq!(nested_level, category_test_helper.expected_nested_level());
 
+    if nested_level <= 1{
+        // Todo : Add tests for DiscreteCategory later
+        return;
+    }
 
-    // {
-    //     // now we add two objects and a cell between them
-    //     let cell_id = category_test_helper.generate_cell();
-    //     let category = category_test_helper.get_category();
-    //     let source_id = category.source(&cell_id);
-    //     let target_id = category.target(&cell_id);
-    //     assert!(category.get_object(source_id.unwrap()).is_ok());
-    //     assert!(category.get_object(target_id.unwrap()).is_ok());
-    // }
+    {
+        // now we add two objects and a cell between them
+        let cell_id = category_test_helper.generate_cell();
+        let category = category_test_helper.get_category();
+        let cell = category.get_cell(&cell_id).unwrap();
+        let source_id = cell.source_object_id();
+        let target_id = cell.target_object_id();
+        assert!(category.get_object(source_id).is_ok());
+        assert!(category.get_object(target_id).is_ok());
+    }
     //
     // {
     //     // now we test for the commuting cells

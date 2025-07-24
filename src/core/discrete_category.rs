@@ -207,7 +207,7 @@ mod tests {
             &mut self.category
         }
 
-        fn generate_cell(&mut self) -> <Self::Category as NCategory>::Cell {
+        fn generate_cell(&mut self) -> <Self::Category as NCategory>::Identifier {
             todo!()
         }
 

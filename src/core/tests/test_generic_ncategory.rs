@@ -28,8 +28,19 @@ impl NCategoryTestHelper for GenericCategory1TestHelper {
         &mut self.category
     }
 
-    fn generate_cell(&mut self) -> <Self::Category as NCategory>::Cell {
-        todo!()
+    fn generate_cell(&mut self) -> <Self::Category as NCategory>::Identifier {
+        let object1 = self.generate_object();
+        let object2 = self.generate_object();
+        let object1_id = self.get_mut_category().add_object(object1).unwrap();
+        let object2_id = self.get_mut_category().add_object(object2).unwrap();
+        let cell_id = self.generate_identifier();
+        let cell = GenericNCell::new(
+            cell_id.clone(),
+            object1_id,
+            object2_id,
+            "test_cell".to_string());
+        self.get_mut_category().add_cell(cell).unwrap();
+        cell_id
     }
 
     fn generate_commuting_cell(&mut self) -> (Vec<<Self::Category as NCategory>::Cell>, Vec<<Self::Category as NCategory>::Cell>) {
@@ -47,20 +58,6 @@ impl NCategoryTestHelper for GenericCategory1TestHelper {
         object
     }
 
-    // fn generate_cell(&mut self) -> <Self::Category as NCategory>::Cell {
-        // let object1 = self.generate_object();
-        // let object2 = self.generate_object();
-        // let object1_id = self.get_mut_category().add_object(object1).unwrap();
-        // let object2_id = self.get_mut_category().add_object(object2).unwrap();
-        // let cell_id = self.generate_cell_id();
-        // let cell = Cell::new(
-        //     cell_id.clone(),
-        //     object1_id,
-        //     object2_id,
-        //     "test_cell".to_string());
-        // self.get_mut_category().add_cell(cell).unwrap();
-        // cell_id
-    // }
 
     // fn generate_commuting_cell(&mut self) -> (Vec<<Self::Category as NCategory>::CellId>, Vec<<Self::Category as NCategory>::CellId>) {
     //     // have 3 DiscreteCategory objects A, B, C

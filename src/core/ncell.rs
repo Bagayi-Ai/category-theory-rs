@@ -21,19 +21,11 @@ where
 
     fn id(&self) -> &<Self::Category as NCategory>::Identifier;
 
-    fn source_category(&self) -> &Self::Category;
-
     fn source_category_id(&self) -> &<Self::Category as NCategory>::Identifier;
-
-    fn source_object(&self) -> &<Self::Category as NCategory>::Object;
 
     fn source_object_id(&self) -> &<Self::Category as NCategory>::Identifier;
 
-    fn target_category(&self) -> &Self::Category;
-
     fn target_category_id(&self) -> &<Self::Category as NCategory>::Identifier;
-
-    fn target_object(&self) -> &<Self::Category as NCategory>::Object;
 
     fn target_object_id(&self) -> &<Self::Category as NCategory>::Identifier;
 
@@ -61,8 +53,8 @@ where
         //
         // // now we need to map cells for the base source object to the base target object
         // let base_cell = self.base_cell();
-       todo!()
 
+        todo!()
     }
 }
 
@@ -75,15 +67,7 @@ impl <T: Identifier> NCell for UnitCategory<T> {
         todo!()
     }
 
-    fn source_category(&self) -> &Self::Category {
-        todo!()
-    }
-
     fn source_category_id(&self) -> &<Self::Category as NCategory>::Identifier {
-        todo!()
-    }
-
-    fn source_object(&self) -> &<Self::Category as NCategory>::Object {
         todo!()
     }
 
@@ -91,15 +75,7 @@ impl <T: Identifier> NCell for UnitCategory<T> {
         todo!()
     }
 
-    fn target_category(&self) -> &Self::Category {
-        todo!()
-    }
-
     fn target_category_id(&self) -> &<Self::Category as NCategory>::Identifier {
-        todo!()
-    }
-
-    fn target_object(&self) -> &<Self::Category as NCategory>::Object {
         todo!()
     }
 

@@ -11,21 +11,19 @@ use crate::core::ncell::NCell;
 pub struct GenericNCell<Id: Identifier, Category: NCategory<Identifier = Id>>
 {
     id: Id,
-    from: Id,
-    to: Id,
+    source_id: Category::Identifier,
+    target_id: Category::Identifier,
     name: String,
-    _phantom: std::marker::PhantomData<Category>,
 }
 
 impl <Id: Identifier, Category: NCategory<Identifier = Id>> GenericNCell<Id, Category>
 {
-    pub fn new(id: Id, from: Id, to: Id, name: String) -> Self {
+    pub fn new(id: Id, source_id: Id, target_id: Id, name: String) -> Self {
         GenericNCell {
             id,
-            from,
-            to,
+            source_id,
+            target_id,
             name,
-            _phantom: std::marker::PhantomData,
         }
     }
 }
@@ -42,36 +40,19 @@ where
         todo!()
     }
 
-    fn source_category(&self) -> &Self::Category {
-        todo!()
-    }
-
     fn source_category_id(&self) -> &<Self::Category as NCategory>::Identifier {
         todo!()
     }
-
-    fn source_object(&self) -> &<Self::Category as NCategory>::Object {
-        todo!()
-    }
-
     fn source_object_id(&self) -> &<Self::Category as NCategory>::Identifier {
-        &self.from
-    }
-
-    fn target_category(&self) -> &Self::Category {
-        todo!()
+        &self.source_id
     }
 
     fn target_category_id(&self) -> &<Self::Category as NCategory>::Identifier {
         todo!()
     }
 
-    fn target_object(&self) -> &<Self::Category as NCategory>::Object {
-        todo!()
-    }
-
     fn target_object_id(&self) -> &<Self::Category as NCategory>::Identifier {
-        &self.to
+        &self.target_id
     }
 
     fn category_id(&self) -> &<Self::Category as NCategory>::Identifier {
@@ -126,13 +107,6 @@ impl <Id: Identifier, BaseCategory: NCategory<Identifier = Id>> NCategory for Ge
 
     fn add_object_with_id(&mut self, object_id: Self::Identifier, object: Self::Object) -> Result<(), NCategoryError> {
         self.objects.insert(object_id.clone(), object);
-        // let identity_cell = GenericNCell {
-        //     id: object_id.clone(),
-        //     from: object_id.clone(),
-        //     to: object_id.clone(),
-        //     name: "identity".to_string(),
-        //     _phantom: std::marker::PhantomData,
-        // };
         let identity_cell: GenericNCell<Self::Identifier, Self> = GenericNCell::new(
             object_id.clone(),
             object_id.clone(),
@@ -148,9 +122,9 @@ impl <Id: Identifier, BaseCategory: NCategory<Identifier = Id>> NCategory for Ge
             return Err(NCategoryError::CellAlreadyExists);
         }
         self.object_mapping
-            .entry(cell.from.clone())
+            .entry(cell.source_id.clone())
             .or_default()
-            .entry(cell.to.clone())
+            .entry(cell.target_id.clone())
             .or_default()
             .insert(cell.id.clone());
         let cell_id = cell.id.clone();
@@ -184,7 +158,7 @@ impl <Id: Identifier, BaseCategory: NCategory<Identifier = Id>> NCategory for Ge
             for (_to, cell_set) in cells {
                 for cell_id in cell_set {
                     if let Some(cell) = self.cells.get(cell_id) {
-                        if &cell.from == object_id {
+                        if &cell.source_id == object_id {
                             cell_ids.push(&cell.id);
                         }
                     }

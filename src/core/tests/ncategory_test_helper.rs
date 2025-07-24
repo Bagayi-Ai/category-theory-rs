@@ -118,8 +118,9 @@ pub fn basic_object_cell_test<CategoryTestHelper: NCategoryTestHelper>(mut categ
         let target_id = cell.target_object_id();
         assert!(category.get_object(source_id).is_ok());
         assert!(category.get_object(target_id).is_ok());
+
     }
-    //
+
     // {
     //     // now we test for the commuting cells
     //     let (commuting_cell1, commuting_cell2) = category_test_helper.generate_commuting_cell();

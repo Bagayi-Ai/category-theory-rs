@@ -1,8 +1,8 @@
-use std::fmt::Debug;
+use std::fmt::{Debug, Display};
 use std::hash::Hash;
 use uuid::Uuid;
 
-pub trait Identifier: Clone + Eq + Hash + Debug {
+pub trait Identifier: Clone + Eq + Hash + Debug + Display {
     type Id: Eq + Hash + Clone + Debug;
 
     fn id(&self) -> &Self::Id;

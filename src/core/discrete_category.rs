@@ -113,15 +113,7 @@ impl<T: Eq + Clone + Hash + Debug + Identifier> NCell for DiscreteCategory<T> {
         todo!()
     }
 
-    fn source_category(&self) -> &Self::Category {
-        todo!()
-    }
-
     fn source_category_id(&self) -> &<Self::Category as NCategory>::Identifier {
-        todo!()
-    }
-
-    fn source_object(&self) -> &<Self::Category as NCategory>::Object {
         todo!()
     }
 
@@ -129,15 +121,7 @@ impl<T: Eq + Clone + Hash + Debug + Identifier> NCell for DiscreteCategory<T> {
         &self.category_id
     }
 
-    fn target_category(&self) -> &Self::Category {
-        todo!()
-    }
-
     fn target_category_id(&self) -> &<Self::Category as NCategory>::Identifier {
-        todo!()
-    }
-
-    fn target_object(&self) -> &<Self::Category as NCategory>::Object {
         todo!()
     }
 

@@ -1,144 +1,173 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::hash::Hash;
-use crate::core::ncategory::{NCategory, NCategoryError, CellTrait, RecursiveCellMap};
+use crate::core::identifier::Identifier;
+use crate::core::ncategory::{NCategory, NCategoryError, UnitCategory};
+use crate::core::ncell::NCell;
 
 pub struct DiscreteCategory<T> {
-    objects: HashSet<T>
+    category_id: T,
+    // TODO: Find a way of avoiding storing identity cells
+    // as we could derive them from the objects.
+    cells: Option<HashMap<T ,Self>>
+
 }
 
-impl<T: Eq + Clone + Hash> DiscreteCategory<T> {
+impl<T: Eq + Clone + Debug + Hash + Identifier> DiscreteCategory<T> {
     pub fn new() -> Self {
         DiscreteCategory {
-            objects: HashSet::new(),
+            category_id: T::generate(),
+            cells: Some(HashMap::new()),
+        }
+    }
+
+    pub fn new_with_id(category_id: T) -> Self {
+        DiscreteCategory {
+            category_id,
+            cells: None
         }
     }
 }
 
-pub struct DiscreteCategoryCell<T> {
-    _object_id: T,
-}
-
-impl<T: Eq + Hash + Clone + Debug> CellTrait for DiscreteCategoryCell<T> {
-    type BaseCategory = ();
-    type CurrentCategoryCellId = T;
-
-    fn id(&self) -> &Self::CurrentCategoryCellId {
-        todo!()
-    }
-
-    fn base_cell_id(&self) -> Result<<Self::BaseCategory as NCategory>::CellId, NCategoryError> {
-        todo!()
-    }
-
-    fn apply_cell_id(&self, _cell_id: &<Self::BaseCategory as NCategory>::CellId) -> Result<<Self::BaseCategory as NCategory>::CellId, NCategoryError> {
-        todo!()
-    }
-
-    fn apply_to_object(&self, _object_id: &<Self::BaseCategory as NCategory>::ObjectId) -> Result<<Self::BaseCategory as NCategory>::ObjectId, NCategoryError> {
-        todo!()
-    }
-}
-
-
-impl<T: Eq + Clone + Hash + Debug> NCategory for DiscreteCategory<T> {
+impl<T: Eq + Clone + Hash + Debug + Identifier> NCategory for DiscreteCategory<T>
+{
+    type Identifier = T;
     type Object = T;
-    type ObjectId = T;
-    type CellId = T;
-    type Cell = DiscreteCategoryCell<T>;
-    type BaseCategory = ();
+    type Cell = Self;
+    type BaseCategory = UnitCategory<T>;
 
-    fn source(&self, cell_id: &Self::CellId) -> Result<&Self::Object, NCategoryError> {
-        if let Ok(object) = self.get_object(cell_id) {
-            Ok(object)
+    fn id(&self) -> &Self::Identifier {
+        &self.category_id
+    }
+
+    fn add_object(&mut self, object: Self::Object) -> Result<Self::Identifier, NCategoryError> {
+        let cell = Self::new_with_id(object.clone());
+        if let Some(cells) = &mut self.cells {
+            cells.insert(object.clone(), cell);
         } else {
-            Err(NCategoryError::ObjectNotFound)
+            self.cells = Some(HashMap::new());
+            self.cells.as_mut().unwrap().insert(object.clone(), cell);
         }
+        Ok(object)
     }
 
-    fn target(&self, cell: &Self::CellId) -> Result<&Self::Object, NCategoryError> {
-        if let Ok(object) = self.get_object(cell) {
-            Ok(object)
-        }
-        else {
-            Err(NCategoryError::ObjectNotFound)
-        }
-    }
-
-    fn add_object(&mut self, object: Self::Object) -> Result<Self::ObjectId, NCategoryError> {
-        self.objects.insert(object.clone());
-        Ok(self.objects.get(&object).unwrap().clone())
-    }
-
-    fn add_object_with_id(&mut self, object_id: Self::ObjectId, _object: Self::Object) -> Result<(), NCategoryError> {
-        self.objects.insert(object_id.clone());
+    fn add_object_with_id(&mut self, object_id: Self::Identifier, _object: Self::Object) -> Result<(), NCategoryError> {
+        self.add_object(object_id)?;
         Ok(())
     }
 
-    fn add_cell(&mut self, _cell: Self::Cell) -> Result<Self::CellId, NCategoryError> {
-        panic!("No cells in DiscreteCategory")
+    fn add_cell(&mut self, _cell: Self::Cell) -> Result<Self::Identifier, NCategoryError> {
+        Err(NCategoryError::OnlyIdentityCellDiscreteCategory)
     }
 
-    fn is_zero_category(&self) -> bool {
-        true
+    fn get_object(&self, object_id: &Self::Identifier) -> Result<&Self::Object, NCategoryError> {
+        if let Some(cells) = &self.cells {
+            if let Some((key, _value)) = cells.get_key_value(object_id) {
+                return Ok(key);
+            }
+        }
+        Err(NCategoryError::ObjectNotFound)
     }
 
-    fn get_object(&self, id: &Self::ObjectId) -> Result<&Self::Object, NCategoryError> {
-        if let Some(object) = self.objects.get(id) {
-            Ok(object)
+    fn get_identity_cell(&self, object_id: &Self::Identifier) -> Result<&Self::Identifier, NCategoryError> {
+        self.get_object(object_id)
+    }
+
+    fn get_all_objects(&self) -> Result<HashSet<&Self::Identifier>, NCategoryError> {
+        if let Some(cells) = &self.cells {
+            Ok(cells.keys().collect())
         } else {
-            Err(NCategoryError::ObjectNotFound)
+            Err(NCategoryError::NoObjectsInCategory)
         }
     }
 
-    fn get_all_objects(&self) -> Result<HashSet<&Self::ObjectId>, NCategoryError> {
-        Ok(self.objects.iter().collect())
+    fn get_all_cells(&self) -> Result<HashSet<&Self::Identifier>, NCategoryError> {
+        // In discrete the cells are only identity cells
+        Ok(self.get_all_objects()?)
     }
 
-    fn get_all_cells(&self) -> Result<HashSet<&Self::CellId>, NCategoryError> {
-        // In DiscreteCategory, there are no cells, so we return an empty set.
-        Ok(HashSet::new())
+    fn get_object_cells(&self, object_id: &Self::Identifier) -> Result<Vec<&Self::Identifier>, NCategoryError> {
+        // only cell in discrete category is the identity cell.
+        Ok(vec![self.get_identity_cell(object_id)?])
     }
 
-    fn get_object_cells(&self, object_id: &Self::ObjectId) -> Result<Vec<&Self::CellId>, NCategoryError> {
-        // only cell in 0-category is the identity cell.
-        if let Some(object) = self.objects.get(object_id) {
-            Ok(vec![object])
-        } else {
-            Err(NCategoryError::ObjectNotFound)
+    fn get_cell(&self, cell_id: &Self::Identifier) -> Result<&Self::Cell, NCategoryError> {
+        if let Some(cells) = &self.cells {
+            if let Some(cell) = cells.get(cell_id) {
+                return Ok(cell);
+            }
         }
+        Err(NCategoryError::CellNotFound)
     }
 
-    fn get_cell(&self, _cell_id: &Self::CellId) -> Result<&Self::Cell, NCategoryError> {
-        todo!()
-    }
-
-    fn commute(&self, _left: Vec<&Self::CellId>, _right: Vec<&Self::CellId>) -> Result<bool, NCategoryError> {
-        Ok(false)
-    }
-
-    fn base_object(&self, _object_id: &Self::ObjectId) -> Result<&Self::BaseCategory, NCategoryError> {
-        Ok(&())
-    }
-
-    fn get_identity_cell(&self, _object_id: &Self::ObjectId) -> Result<&Self::CellId, NCategoryError> {
-        todo!()
-    }
-
-    fn apply_cells_recursive(&self, _cell_id: &Self::CellId, _cell_id_to_map: &Self::CellId) -> Result<RecursiveCellMap<Self::CellId>, NCategoryError> {
+    fn base_object(&self, _object_id: &Self::Identifier) -> Result<&Self::BaseCategory, NCategoryError> {
         todo!()
     }
 }
 
-impl From<String> for DiscreteCategory<String> {
-    fn from(object: String) -> Self {
+impl<T: Eq + Clone + Hash + Debug + Identifier> NCell for DiscreteCategory<T> {
+    type Category = Self;
+    type BaseCell = UnitCategory<T>;
+
+    fn id(&self) -> &<Self::Category as NCategory>::Identifier {
+        todo!()
+    }
+
+    fn source_category(&self) -> &Self::Category {
+        todo!()
+    }
+
+    fn source_category_id(&self) -> &<Self::Category as NCategory>::Identifier {
+        todo!()
+    }
+
+    fn source_object(&self) -> &<Self::Category as NCategory>::Object {
+        todo!()
+    }
+
+    fn source_object_id(&self) -> &<Self::Category as NCategory>::Identifier {
+        &self.category_id
+    }
+
+    fn target_category(&self) -> &Self::Category {
+        todo!()
+    }
+
+    fn target_category_id(&self) -> &<Self::Category as NCategory>::Identifier {
+        todo!()
+    }
+
+    fn target_object(&self) -> &<Self::Category as NCategory>::Object {
+        todo!()
+    }
+
+    fn target_object_id(&self) -> &<Self::Category as NCategory>::Identifier {
+        &self.category_id
+    }
+
+    fn category_id(&self) -> &<Self::Category as NCategory>::Identifier {
+        todo!()
+    }
+
+    fn base_cell_id(&self) -> &<<Self::BaseCell as NCell>::Category as NCategory>::Identifier {
+        todo!()
+    }
+
+    fn base_cell(&self) -> Self::BaseCell {
+        todo!()
+    }
+}
+
+impl <T: Eq + Clone + Hash + Debug + Identifier> From<T> for DiscreteCategory<T>
+{
+    fn from(object: T) -> Self {
         let mut category = DiscreteCategory::new();
         category.add_object(object).unwrap();
         category
     }
 }
 
-impl <T: Eq + Clone + Hash + Debug> From<Vec<T>> for DiscreteCategory<T>
+impl <T: Eq + Clone + Hash + Debug + Identifier> From<Vec<T>> for DiscreteCategory<T>
 {
     fn from(objects: Vec<T>) -> Self {
         let mut category = DiscreteCategory::new();
@@ -178,23 +207,15 @@ mod tests {
             &mut self.category
         }
 
-        fn generate_object_id(&self) -> <Self::Category as NCategory>::ObjectId {
-            random_string(5)
-        }
-
-        fn generate_cell_id(&self) -> <Self::Category as NCategory>::CellId {
-            random_string(5)
-        }
-
-        fn generate_cell(&mut self) -> <Self::Category as NCategory>::CellId {
+        fn generate_cell(&mut self) -> <Self::Category as NCategory>::Cell {
             todo!()
         }
 
-        fn generate_commuting_cell(&mut self) -> (Vec<<Self::Category as NCategory>::CellId>, Vec<<Self::Category as NCategory>::CellId>) {
+        fn generate_commuting_cell(&mut self) -> (Vec<<Self::Category as NCategory>::Cell>, Vec<<Self::Category as NCategory>::Cell>) {
             todo!()
         }
 
-        fn generate_non_commuting_cell(&mut self) -> (Vec<<Self::Category as NCategory>::CellId>, Vec<<Self::Category as NCategory>::CellId>) {
+        fn generate_non_commuting_cell(&mut self) -> (Vec<<Self::Category as NCategory>::Cell>, Vec<<Self::Category as NCategory>::Cell>) {
             todo!()
         }
 
@@ -203,8 +224,8 @@ mod tests {
             random_string(5)
         }
 
-        fn expected_category_level(&self) -> isize {
-            0
+        fn expected_nested_level(&self) -> isize {
+            1
         }
 
     }

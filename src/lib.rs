@@ -1,14 +1,14 @@
 
 mod core {
-    pub mod uuid_id;
-
     pub mod ncategory;
 
     pub mod generic_ncategory;
 
     pub mod discrete_category;
-
-    pub mod generic_id;
+    
+    pub mod ncell;
+    
+    pub mod identifier;
 
     #[cfg(test)]
     mod tests {

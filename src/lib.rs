@@ -7,6 +7,8 @@ mod core {
     pub mod discrete_category;
     
     pub mod ncell;
+
+    pub mod nfunctor;
     
     pub mod identifier;
 

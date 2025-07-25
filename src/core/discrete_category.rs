@@ -195,11 +195,11 @@ mod tests {
             todo!()
         }
 
-        fn generate_commuting_cell(&mut self) -> (Vec<<Self::Category as NCategory>::Cell>, Vec<<Self::Category as NCategory>::Cell>) {
+        fn generate_commuting_cell(&mut self) -> (Vec<<Self::Category as NCategory>::Identifier>, Vec<<Self::Category as NCategory>::Identifier>) {
             todo!()
         }
 
-        fn generate_non_commuting_cell(&mut self) -> (Vec<<Self::Category as NCategory>::Cell>, Vec<<Self::Category as NCategory>::Cell>) {
+        fn generate_non_commuting_cell(&mut self) -> (Vec<<Self::Category as NCategory>::Identifier>, Vec<<Self::Category as NCategory>::Identifier>) {
             todo!()
         }
 

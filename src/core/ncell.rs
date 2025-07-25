@@ -2,14 +2,6 @@ use std::collections::HashMap;
 use crate::core::identifier::Identifier;
 use crate::core::ncategory::{NCategory, UnitCategory};
 
-struct CellTree
-{
-    cell_id: String,
-    source_object_id: String,
-    target_object_id: String,
-    children: HashMap<String, CellTree>,
-}
-
 pub trait NCell
 where
     Self::Category: NCategory,
@@ -34,28 +26,6 @@ where
     fn base_cell_id(&self) -> &<<Self::BaseCell as NCell>::Category as NCategory>::Identifier;
 
     fn base_cell(&self) -> Self::BaseCell;
-
-    fn cell_tree(&self) -> CellTree {
-        /*
-            Cell tree is a recursive structure that represents the hierarchy of cells and mapping
-            of objects.
-
-            We first drill down all the way down the BaseCell until we reach the () cell then start
-            reconstructing the cell tree by mapping the BaseCell to the current cell.
-        */
-
-        // let mut cell_tree = CellTree {
-        //     cell_id: self.id().to_string(),
-        //     source_object_id: self.source_object_id().to_string(),
-        //     target_object_id: self.target_object_id().to_string(),
-        //     children: HashMap::new(),
-        // };
-        //
-        // // now we need to map cells for the base source object to the base target object
-        // let base_cell = self.base_cell();
-
-        todo!()
-    }
 }
 
 impl <T: Identifier> NCell for UnitCategory<T> {

@@ -3,25 +3,25 @@ use crate::core::ncategory::{NCategory};
 use crate::core::identifier::Identifier;
 use crate::core::ncell::NCell;
 
-pub trait NCategoryTestHelper {
-    type Category: NCategory;
+pub trait NCategoryTestHelper<'a> {
+    type Category: NCategory<'a>;
     fn get_category(&self) -> &Self::Category;
     fn get_mut_category(&mut self) -> &mut Self::Category;
-    fn generate_cell(&mut self) -> <Self::Category as NCategory>::Identifier;
+    fn generate_cell(&mut self) -> <Self::Category as NCategory<'a>>::Identifier;
 
-    fn generate_identifier(&self) -> <Self::Category as NCategory>::Identifier {
+    fn generate_identifier(&self) -> <Self::Category as NCategory<'a>>::Identifier {
         <Self::Category as NCategory>::Identifier::generate()
     }
 
     fn generate_commuting_cell(
         &mut self
-    ) -> (Vec<<Self::Category as NCategory>::Identifier>, Vec<<Self::Category as NCategory>::Identifier>);
+    ) -> (Vec<<Self::Category as NCategory<'a>>::Identifier>, Vec<<Self::Category as NCategory<'a>>::Identifier>);
 
     fn generate_non_commuting_cell(
         &mut self
-    ) -> (Vec<<Self::Category as NCategory>::Identifier>, Vec<<Self::Category as NCategory>::Identifier>);
+    ) -> (Vec<<Self::Category as NCategory<'a>>::Identifier>, Vec<<Self::Category as NCategory<'a>>::Identifier>);
 
-    fn generate_object(&mut self) -> <Self::Category as NCategory>::Object;
+    fn generate_object(&mut self) -> <Self::Category as NCategory<'a>>::Object;
 
     fn expected_nested_level(&self) -> isize;
 }
@@ -35,7 +35,7 @@ pub fn random_string(len: usize) -> String {
         .collect()
 }
 
-pub fn basic_object_cell_test<CategoryTestHelper: NCategoryTestHelper>(mut category_test_helper: CategoryTestHelper){
+pub fn basic_object_cell_test<'a, CategoryTestHelper: NCategoryTestHelper<'a>>(mut category_test_helper: CategoryTestHelper){
     // add object 1
     let object1_id = category_test_helper.generate_identifier();
     let object1 = category_test_helper.generate_object();
@@ -51,7 +51,7 @@ pub fn basic_object_cell_test<CategoryTestHelper: NCategoryTestHelper>(mut categ
         let cell_ids = cell_ids.unwrap();
         assert_eq!(cell_ids.len(), 1);
         let cell_id = cell_ids.first().unwrap();
-        assert_eq!(category.get_cell(cell_id).unwrap().source_object_id(), &object1_id);
+        assert_eq!(category.get_cell(cell_id).unwrap().source_object(), &object1_id);
         assert_eq!(category.get_cell(cell_id).unwrap().target_object_id(), &object1_id);
 
         // TODO: implement comparison of the object assert_eq!(category.get_object(&object1_id).unwrap(), &object);

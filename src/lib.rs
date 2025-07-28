@@ -8,6 +8,11 @@ mod core {
     
     pub mod ncell;
 
+    pub mod generic_ncell;
+
+    pub mod generic_nfunctor;
+
+
     pub mod nfunctor;
     
     pub mod identifier;

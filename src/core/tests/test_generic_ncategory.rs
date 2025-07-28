@@ -1,15 +1,16 @@
 use crate::core::tests::ncategory_test_helper::*;
 use crate::core::discrete_category::{DiscreteCategory};
 use crate::core::generic_ncategory::*;
+use crate::core::generic_ncell::GenericNCell;
 use crate::core::ncategory::NCategory;
 
 type DiscreteCategoryString = DiscreteCategory<String>;
 
-struct GenericCategory1TestHelper {
-    category: GenericNCategory<String, DiscreteCategoryString>,
+struct GenericCategory1TestHelper<'a> {
+    category: GenericNCategory<'a, String, DiscreteCategoryString>,
 }
 
-impl GenericCategory1TestHelper {
+impl GenericCategory1TestHelper<'_> {
     pub fn new() -> Self {
         GenericCategory1TestHelper {
             category: GenericNCategory::new(),
@@ -17,8 +18,8 @@ impl GenericCategory1TestHelper {
     }
 }
 
-impl NCategoryTestHelper for GenericCategory1TestHelper {
-    type Category = GenericNCategory<String, DiscreteCategoryString>;
+impl<'a> NCategoryTestHelper<'a> for GenericCategory1TestHelper<'a> {
+    type Category = GenericNCategory<'a, String, DiscreteCategoryString>;
 
     fn get_category(&self) -> &Self::Category {
         &self.category

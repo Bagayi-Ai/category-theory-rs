@@ -1,67 +1,43 @@
-use std::collections::HashMap;
 use crate::core::identifier::Identifier;
 use crate::core::ncategory::{NCategory, UnitCategory};
+use crate::core::nfunctor::{NFunctor, UnitFunctor};
 
-pub trait NCell
+pub trait NCell<'a> : 'a
 where
-    Self::Category: NCategory,
-    <Self::Category as NCategory>::BaseCategory: NCategory<Identifier = <Self::Category as NCategory>::Identifier>,
+    Self::Category: NCategory<'a>,
+    <Self::Category as NCategory<'a>>::BaseCategory: NCategory<'a, Identifier = <Self::Category as NCategory<'a>>::Identifier>,
 {
-    type Category: NCategory;
+    type Category: NCategory<'a>;
+    type Functor: NFunctor<'a, Category = <Self::Category as NCategory<'a>>::BaseCategory>;
 
-    type BaseCell: NCell<Category = <Self::Category as NCategory>::BaseCategory>;
+    fn id(&self) -> &<Self::Category as NCategory<'a>>::Identifier;
 
-    fn id(&self) -> &<Self::Category as NCategory>::Identifier;
+    fn source_object(&self) -> &<Self::Category as NCategory<'a>>::Object;
 
-    fn source_category_id(&self) -> &<Self::Category as NCategory>::Identifier;
+    fn target_object(&self) -> &<Self::Category as NCategory<'a>>::Object;
 
-    fn source_object_id(&self) -> &<Self::Category as NCategory>::Identifier;
+    // Each cell should have a functor that maps its source base category to its target base category.
+    fn functor(&self) -> &Self::Functor;
 
-    fn target_category_id(&self) -> &<Self::Category as NCategory>::Identifier;
-
-    fn target_object_id(&self) -> &<Self::Category as NCategory>::Identifier;
-
-    fn category_id(&self) -> &<Self::Category as NCategory>::Identifier;
-
-    fn base_cell_id(&self) -> &<<Self::BaseCell as NCell>::Category as NCategory>::Identifier;
-
-    fn base_cell(&self) -> Self::BaseCell;
 }
 
-impl <T: Identifier> NCell for UnitCategory<T> {
+impl <'a, T: Identifier + 'a> NCell<'a> for UnitCategory<T> {
     type Category = UnitCategory<T>;
+    type Functor = UnitFunctor<T>;
 
-    type BaseCell = UnitCategory<T>;
-
-    fn id(&self) -> &<Self::Category as NCategory>::Identifier {
+    fn id(&self) -> &<Self::Category as NCategory<'a>>::Identifier {
         todo!()
     }
 
-    fn source_category_id(&self) -> &<Self::Category as NCategory>::Identifier {
+    fn source_object(&self) -> &<Self::Category as NCategory>::Object {
         todo!()
     }
 
-    fn source_object_id(&self) -> &<Self::Category as NCategory>::Identifier {
+    fn target_object(&self) -> &<Self::Category as NCategory>::Object {
         todo!()
     }
 
-    fn target_category_id(&self) -> &<Self::Category as NCategory>::Identifier {
-        todo!()
-    }
-
-    fn target_object_id(&self) -> &<Self::Category as NCategory>::Identifier {
-        todo!()
-    }
-
-    fn category_id(&self) -> &<Self::Category as NCategory>::Identifier {
-        todo!()
-    }
-
-    fn base_cell_id(&self) -> &<<Self::BaseCell as NCell>::Category as NCategory>::Identifier {
-        todo!()
-    }
-
-    fn base_cell(&self) -> Self::BaseCell {
+    fn functor(&self) -> &Self::Functor {
         todo!()
     }
 }

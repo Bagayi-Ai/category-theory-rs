@@ -4,6 +4,7 @@ use std::hash::Hash;
 use crate::core::identifier::Identifier;
 use crate::core::ncategory::{NCategory, NCategoryError, UnitCategory};
 use crate::core::ncell::NCell;
+use crate::core::nfunctor::UnitFunctor;
 
 pub struct DiscreteCategory<T> {
     category_id: T,
@@ -29,7 +30,7 @@ impl<T: Eq + Clone + Debug + Hash + Identifier> DiscreteCategory<T> {
     }
 }
 
-impl<T: Eq + Clone + Hash + Debug + Identifier> NCategory for DiscreteCategory<T>
+impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a> NCategory<'a > for DiscreteCategory<T>
 {
     type Identifier = T;
     type Object = T;
@@ -40,23 +41,24 @@ impl<T: Eq + Clone + Hash + Debug + Identifier> NCategory for DiscreteCategory<T
         &self.category_id
     }
 
-    fn add_object(&mut self, object: Self::Object) -> Result<Self::Identifier, NCategoryError> {
+    fn add_object(&mut self, object: Self::Object) -> Result<&Self::Identifier, NCategoryError> {
         let cell = Self::new_with_id(object.clone());
         if let Some(cells) = &mut self.cells {
-            cells.insert(object.clone(), cell);
+            let a = cells.insert(object.clone(), cell);
         } else {
             self.cells = Some(HashMap::new());
             self.cells.as_mut().unwrap().insert(object.clone(), cell);
         }
-        Ok(object)
+
+        let cell = self.cells.as_ref().unwrap().get(&object).unwrap();
+        Ok(&NCell::id(cell))
     }
 
-    fn add_object_with_id(&mut self, object_id: Self::Identifier, _object: Self::Object) -> Result<(), NCategoryError> {
-        self.add_object(object_id)?;
-        Ok(())
+    fn add_object_with_id(&mut self, object_id: Self::Identifier, _object: Self::Object) -> Result<&Self::Identifier, NCategoryError> {
+        self.add_object(object_id)
     }
 
-    fn add_cell(&mut self, _cell: Self::Cell) -> Result<Self::Identifier, NCategoryError> {
+    fn add_cell(&mut self, _cell: Self::Cell) -> Result<&Self::Identifier, NCategoryError> {
         Err(NCategoryError::OnlyIdentityCellDiscreteCategory)
     }
 
@@ -105,39 +107,23 @@ impl<T: Eq + Clone + Hash + Debug + Identifier> NCategory for DiscreteCategory<T
     }
 }
 
-impl<T: Eq + Clone + Hash + Debug + Identifier> NCell for DiscreteCategory<T> {
+impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a> NCell<'a> for DiscreteCategory<T> {
     type Category = Self;
-    type BaseCell = UnitCategory<T>;
+    type Functor = UnitFunctor<T>;
 
     fn id(&self) -> &<Self::Category as NCategory>::Identifier {
         todo!()
     }
 
-    fn source_category_id(&self) -> &<Self::Category as NCategory>::Identifier {
+    fn source_object(&self) -> &<Self::Category as NCategory>::Object {
         todo!()
     }
 
-    fn source_object_id(&self) -> &<Self::Category as NCategory>::Identifier {
-        &self.category_id
-    }
-
-    fn target_category_id(&self) -> &<Self::Category as NCategory>::Identifier {
+    fn target_object(&self) -> &<Self::Category as NCategory>::Object {
         todo!()
     }
 
-    fn target_object_id(&self) -> &<Self::Category as NCategory>::Identifier {
-        &self.category_id
-    }
-
-    fn category_id(&self) -> &<Self::Category as NCategory>::Identifier {
-        todo!()
-    }
-
-    fn base_cell_id(&self) -> &<<Self::BaseCell as NCell>::Category as NCategory>::Identifier {
-        todo!()
-    }
-
-    fn base_cell(&self) -> Self::BaseCell {
+    fn functor(&self) -> &Self::Functor {
         todo!()
     }
 }
@@ -180,7 +166,7 @@ mod tests {
         }
     }
 
-    impl NCategoryTestHelper for GenericCategory0TestHelper {
+    impl NCategoryTestHelper<'_> for GenericCategory0TestHelper {
         type Category = DiscreteCategory<String>;
 
         fn get_category(&self) -> &Self::Category {

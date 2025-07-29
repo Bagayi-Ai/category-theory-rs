@@ -1,11 +1,11 @@
 use std::hash::Hash;
 use std::fmt::Debug;
 use std::collections::{HashMap, HashSet};
-
+use crate::core::generic_nfunctor::GenericNFunctor;
 use crate::core::ncategory::{NCategory, NCategoryError};
 use crate::core::identifier::Identifier;
 use crate::core::ncell::NCell;
-
+use crate::core::nfunctor::NFunctor;
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub struct GenericNCell<Id: Identifier, Category: NCategory<Identifier = Id>>
@@ -36,7 +36,7 @@ where
     Category: NCategory<Identifier = Id>,
 {
     type Category = Category;
-    type BaseCell = GenericNCell<Id, <Category as NCategory>::BaseCategory>;
+    type Functor = GenericNFunctor<<Category as NCategory>::BaseCategory>;
 
     fn id(&self) -> &<Self::Category as NCategory>::Identifier {
         todo!()
@@ -52,6 +52,10 @@ where
 
     fn target_object_id(&self) -> &<Self::Category as NCategory>::Identifier {
         &self.to
+    }
+
+    fn functor(&self) -> &<<Self::Functor as NFunctor>::Category as NCategory>::Identifier {
+        todo!()
     }
 }
 

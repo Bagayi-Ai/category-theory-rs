@@ -1,5 +1,6 @@
 use crate::core::identifier::Identifier;
 use crate::core::ncategory::{NCategory, UnitCategory};
+use crate::core::nfunctor::{NFunctor, UnitFunctor};
 
 pub trait NCell
 where
@@ -8,7 +9,7 @@ where
 {
     type Category: NCategory;
 
-    type BaseCell: NCell<Category = <Self::Category as NCategory>::BaseCategory>;
+    type Functor: NFunctor<Category = <Self::Category as NCategory>::BaseCategory>;
 
     fn id(&self) -> &<Self::Category as NCategory>::Identifier;
 
@@ -17,12 +18,14 @@ where
     fn source_object_id(&self) -> &<Self::Category as NCategory>::Identifier;
 
     fn target_object_id(&self) -> &<Self::Category as NCategory>::Identifier;
+
+    fn functor(&self) -> &<<Self::Functor as NFunctor>::Category as NCategory>::Identifier;
 }
 
 impl <T: Identifier> NCell for UnitCategory<T> {
     type Category = UnitCategory<T>;
 
-    type BaseCell = UnitCategory<T>;
+    type Functor = UnitFunctor<T>;
 
     fn id(&self) -> &<Self::Category as NCategory>::Identifier {
         todo!()
@@ -37,6 +40,10 @@ impl <T: Identifier> NCell for UnitCategory<T> {
     }
 
     fn category_id(&self) -> &<Self::Category as NCategory>::Identifier {
+        todo!()
+    }
+
+    fn functor(&self) -> &<<Self::Functor as NFunctor>::Category as NCategory>::Identifier {
         todo!()
     }
 }

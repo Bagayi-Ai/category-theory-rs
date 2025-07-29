@@ -7,7 +7,14 @@ mod core {
     pub mod discrete_category;
     
     pub mod ncell;
-    
+
+    pub mod generic_ncell;
+
+    pub mod generic_nfunctor;
+
+
+    pub mod nfunctor;
+
     pub mod identifier;
 
     #[cfg(test)]

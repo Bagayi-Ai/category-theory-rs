@@ -4,6 +4,7 @@ use std::hash::Hash;
 use crate::core::identifier::Identifier;
 use crate::core::ncategory::{NCategory, NCategoryError, UnitCategory};
 use crate::core::ncell::NCell;
+use crate::core::nfunctor::{NFunctor, UnitFunctor};
 
 pub struct DiscreteCategory<T> {
     category_id: T,
@@ -107,7 +108,8 @@ impl<T: Eq + Clone + Hash + Debug + Identifier> NCategory for DiscreteCategory<T
 
 impl<T: Eq + Clone + Hash + Debug + Identifier> NCell for DiscreteCategory<T> {
     type Category = Self;
-    type BaseCell = UnitCategory<T>;
+
+    type Functor = UnitFunctor<T>;
 
     fn id(&self) -> &<Self::Category as NCategory>::Identifier {
         todo!()
@@ -122,6 +124,10 @@ impl<T: Eq + Clone + Hash + Debug + Identifier> NCell for DiscreteCategory<T> {
     }
 
     fn category_id(&self) -> &<Self::Category as NCategory>::Identifier {
+        todo!()
+    }
+
+    fn functor(&self) -> &<<Self::Functor as NFunctor>::Category as NCategory>::Identifier {
         todo!()
     }
 }
@@ -179,7 +185,7 @@ mod tests {
             todo!()
         }
 
-        fn generate_commuting_cell(&mut self) -> (Vec<<Self::Category as NCategory>::Cell>, Vec<<Self::Category as NCategory>::Cell>) {
+        fn generate_commuting_cell(&mut self) -> (Vec<<Self::Category as NCategory>::Identifier>, Vec<<Self::Category as NCategory>::Identifier>) {
             todo!()
         }
 

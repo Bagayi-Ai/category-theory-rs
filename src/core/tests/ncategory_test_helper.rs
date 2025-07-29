@@ -15,7 +15,7 @@ pub trait NCategoryTestHelper {
 
     fn generate_commuting_cell(
         &mut self
-    ) -> (Vec<<Self::Category as NCategory>::Cell>, Vec<<Self::Category as NCategory>::Cell>);
+    ) -> (Vec<<Self::Category as NCategory>::Identifier>, Vec<<Self::Category as NCategory>::Identifier>);
 
     fn generate_non_commuting_cell(
         &mut self
@@ -119,18 +119,18 @@ pub fn basic_object_cell_test<CategoryTestHelper: NCategoryTestHelper>(mut categ
         assert!(category.get_object(source_id).is_ok());
         assert!(category.get_object(target_id).is_ok());
     }
-    //
-    // {
-    //     // now we test for the commuting cells
-    //     let (commuting_cell1, commuting_cell2) = category_test_helper.generate_commuting_cell();
-    //     let commute_result = category_test_helper.get_category().commute(
-    //         commuting_cell1.iter().collect(),
-    //         commuting_cell2.iter().collect()
-    //     );
-    //     assert!(commute_result.is_ok());
-    //     let commute_result = commute_result.unwrap();
-    //     assert!(commute_result);
-    // }
+
+    {
+        // now we test for the commuting cells
+        let (commuting_cell1, commuting_cell2) = category_test_helper.generate_commuting_cell();
+        let commute_result = category_test_helper.get_category().cells_commute(
+            commuting_cell1.iter().collect(),
+            commuting_cell2.iter().collect()
+        );
+        assert!(commute_result.is_ok());
+        let commute_result = commute_result.unwrap();
+        assert!(commute_result);
+    }
     //
     // {
     //     // now we test for the non-commuting cells

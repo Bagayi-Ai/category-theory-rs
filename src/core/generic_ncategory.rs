@@ -42,15 +42,7 @@ where
         todo!()
     }
 
-    fn source_category(&self) -> &Self::Category {
-        todo!()
-    }
-
-    fn source_category_id(&self) -> &<Self::Category as NCategory>::Identifier {
-        todo!()
-    }
-
-    fn source_object(&self) -> &<Self::Category as NCategory>::Object {
+    fn category_id(&self) -> &<Self::Category as NCategory>::Identifier {
         todo!()
     }
 
@@ -58,32 +50,8 @@ where
         &self.from
     }
 
-    fn target_category(&self) -> &Self::Category {
-        todo!()
-    }
-
-    fn target_category_id(&self) -> &<Self::Category as NCategory>::Identifier {
-        todo!()
-    }
-
-    fn target_object(&self) -> &<Self::Category as NCategory>::Object {
-        todo!()
-    }
-
     fn target_object_id(&self) -> &<Self::Category as NCategory>::Identifier {
         &self.to
-    }
-
-    fn category_id(&self) -> &<Self::Category as NCategory>::Identifier {
-        todo!()
-    }
-
-    fn base_cell_id(&self) -> &<<Self::BaseCell as NCell>::Category as NCategory>::Identifier {
-        todo!()
-    }
-
-    fn base_cell(&self) -> Self::BaseCell {
-        todo!()
     }
 }
 

@@ -35,17 +35,18 @@ pub struct CellTree<'a, Id: Identifier> {
 pub trait NCategory<'a> : 'a
 where
     Self::BaseCategory: NCategory<'a, Identifier = Self::Identifier>,
+    Self::Object: ObjectId<Id = Self::Identifier>,
 {
-    type Identifier: Identifier;
+    type Identifier: ObjectId;
     type Object: ObjectId;
     type Cell: NCell<'a, Category = Self>;
     type BaseCategory: NCategory<'a>;
 
     fn id(&self) -> &Self::Identifier;
 
-    fn add_object(&'a mut self, object: Self::Object) -> Result<&Self::Identifier, NCategoryError>;
+    fn add_object(&mut self, object: Self::Object) -> Result<&Self::Identifier, NCategoryError>;
 
-    fn add_object_with_id(&'a mut self, object_id: Self::Identifier, object: Self::Object) -> Result<&Self::Identifier, NCategoryError>;
+    fn add_object_with_id(&mut self, object_id: <Self::Object as ObjectId>::Id, object: Self::Object) -> Result<&<Self::Object as ObjectId>::Id, NCategoryError>;
 
     fn add_cell(&'a mut self, cell: Self::Cell) -> Result<&Self::Identifier, NCategoryError>;
 
@@ -101,17 +102,17 @@ where
     //
     //     Ok(cell_tree)
     // }
-    // fn cells_commute(
-    //     &self,
-    //     left_cell_id: Vec<&Self::Identifier>,
-    //     right_cell_id: Vec<&Self::Identifier>,
-    // ) -> Result<bool, NCategoryError> {
-    //
-    //     self.validate_commutation(left_cell_id, right_cell_id)?;
-    //
-    //
-    //     Ok(true)
-    // }
+    fn cells_commute(
+        &self,
+        left_cell_id: Vec<&Self::Identifier>,
+        right_cell_id: Vec<&Self::Identifier>,
+    ) -> Result<bool, NCategoryError> {
+
+        // self.validate_commutation(left_cell_id, right_cell_id)?;
+        //
+        //
+        Ok(true)
+    }
 
     // fn validate_commutation(&self,
     //                         left_cell_ids: Vec<&Self::Identifier>,
@@ -184,12 +185,12 @@ where
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct UnitCategory<T: Identifier> {
+pub struct UnitCategory<T: ObjectId> {
     _phantom: std::marker::PhantomData<T>,
 }
 
 
-impl <'a, T: Identifier + 'a> NCategory<'a> for UnitCategory<T> {
+impl <'a, T: ObjectId + 'a> NCategory<'a> for UnitCategory<T> {
     type Identifier = T;
 
     type Object = UnitObject<T>;

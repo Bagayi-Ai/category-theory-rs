@@ -1,5 +1,5 @@
 use crate::core::ncategory::{NCategory, UnitCategory};
-use crate::core::identifier::Identifier;
+use crate::core::identifier::{Identifier, ObjectId};
 
 pub trait NFunctor<'a>
 where
@@ -17,10 +17,10 @@ where
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct UnitFunctor<T: Identifier> {
+pub struct UnitFunctor<T: ObjectId> {
     _phantom: std::marker::PhantomData<T>,
 }
-impl <'a, T: Identifier + 'a> NFunctor<'a> for UnitFunctor<T> {
+impl <'a, T: ObjectId + 'a> NFunctor<'a> for UnitFunctor<T> {
     type Category = UnitCategory<T>;
 
     fn id(&self) -> &<Self::Category as NCategory>::Identifier {

@@ -1,10 +1,10 @@
-use crate::core::identifier::Identifier;
+use crate::core::identifier::{Identifier, ObjectId};
 use crate::core::ncategory::NCategory;
 use crate::core::ncell::NCell;
 use crate::core::generic_nfunctor::GenericNFunctor;
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
-pub struct GenericNCell<'a, Id: Identifier, Category: NCategory<'a, Identifier= Id>>
+pub struct GenericNCell<'a, Id: ObjectId, Category: NCategory<'a, Identifier= Id>>
 {
     id: &'a Id,
     source: &'a Category::Object,
@@ -12,7 +12,7 @@ pub struct GenericNCell<'a, Id: Identifier, Category: NCategory<'a, Identifier= 
     name: String,
 }
 
-impl <'a, Id: Identifier, Category: NCategory<'a, Identifier= Id>> GenericNCell<'a, Id, Category>
+impl <'a, Id: ObjectId, Category: NCategory<'a, Identifier= Id>> GenericNCell<'a, Id, Category>
 {
     pub fn new(id: &'a Id, source: &'a Category::Object, target: &'a Category::Object, name: String) -> Self {
         GenericNCell {
@@ -43,7 +43,7 @@ impl <'a, Id: Identifier, Category: NCategory<'a, Identifier= Id>> GenericNCell<
 
 impl <'a, Id, Category: NCategory<'a>> NCell<'a> for GenericNCell<'a, Id, Category>
 where
-    Id: Identifier,
+    Id: ObjectId,
     Category: NCategory<'a, Identifier = Id>,
 {
     type Category = Category;
@@ -54,7 +54,7 @@ where
     }
 
     fn source_object(&self) -> &<Self::Category as NCategory<'a>>::Object {
-        todo!()
+        self.source
     }
 
     fn target_object(&self) -> &<Self::Category as NCategory<'a>>::Object {

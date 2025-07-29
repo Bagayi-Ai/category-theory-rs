@@ -1,4 +1,4 @@
-use crate::core::identifier::Identifier;
+use crate::core::identifier::{Identifier, ObjectId};
 use crate::core::ncategory::{NCategory, UnitCategory};
 use crate::core::nfunctor::{NFunctor, UnitFunctor};
 
@@ -14,6 +14,11 @@ where
 
     fn source_object(&self) -> &<Self::Category as NCategory<'a>>::Object;
 
+    fn source_object_id(&'a self) -> &<<Self::Category as NCategory<'a>>::Object as ObjectId>::Id {
+        let source_object = self.source_object();
+        source_object.object_id()
+    }
+
     fn target_object(&self) -> &<Self::Category as NCategory<'a>>::Object;
 
     // Each cell should have a functor that maps its source base category to its target base category.
@@ -21,7 +26,7 @@ where
 
 }
 
-impl <'a, T: Identifier + 'a> NCell<'a> for UnitCategory<T> {
+impl <'a, T: ObjectId + 'a> NCell<'a> for UnitCategory<T> {
     type Category = UnitCategory<T>;
     type Functor = UnitFunctor<T>;
 

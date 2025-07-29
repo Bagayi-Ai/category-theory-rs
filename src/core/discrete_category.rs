@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::hash::Hash;
-use crate::core::identifier::Identifier;
+use crate::core::identifier::{Identifier, ObjectId};
 use crate::core::ncategory::{NCategory, NCategoryError, UnitCategory};
 use crate::core::ncell::NCell;
 use crate::core::nfunctor::UnitFunctor;
@@ -14,7 +14,7 @@ pub struct DiscreteCategory<T> {
 
 }
 
-impl<T: Eq + Clone + Debug + Hash + Identifier> DiscreteCategory<T> {
+impl<T: Eq + Clone + Debug + Hash + ObjectId> DiscreteCategory<T> {
     pub fn new() -> Self {
         DiscreteCategory {
             category_id: T::generate(),
@@ -30,7 +30,7 @@ impl<T: Eq + Clone + Debug + Hash + Identifier> DiscreteCategory<T> {
     }
 }
 
-impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a> NCategory<'a > for DiscreteCategory<T>
+impl<'a, T: Eq + Clone + Hash + Debug + ObjectId<Id = T> + 'a> NCategory<'a > for DiscreteCategory<T>
 {
     type Identifier = T;
     type Object = T;
@@ -107,7 +107,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a> NCategory<'a > for Disc
     }
 }
 
-impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a> NCell<'a> for DiscreteCategory<T> {
+impl<'a, T: Eq + Clone + Hash + Debug + ObjectId<Id = T> + 'a> NCell<'a> for DiscreteCategory<T> {
     type Category = Self;
     type Functor = UnitFunctor<T>;
 
@@ -128,7 +128,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a> NCell<'a> for DiscreteC
     }
 }
 
-impl <T: Eq + Clone + Hash + Debug + Identifier> From<T> for DiscreteCategory<T>
+impl <T: Eq + Clone + Hash + Debug + ObjectId<Id = T>> From<T> for DiscreteCategory<T>
 {
     fn from(object: T) -> Self {
         let mut category = DiscreteCategory::new();
@@ -137,7 +137,7 @@ impl <T: Eq + Clone + Hash + Debug + Identifier> From<T> for DiscreteCategory<T>
     }
 }
 
-impl <T: Eq + Clone + Hash + Debug + Identifier> From<Vec<T>> for DiscreteCategory<T>
+impl <T: Eq + Clone + Hash + Debug + ObjectId<Id = T>> From<Vec<T>> for DiscreteCategory<T>
 {
     fn from(objects: Vec<T>) -> Self {
         let mut category = DiscreteCategory::new();

@@ -3,12 +3,12 @@ use std::fmt::Debug;
 use std::collections::{HashMap, HashSet};
 
 use crate::core::ncategory::{NCategory, NCategoryError};
-use crate::core::identifier::Identifier;
+use crate::core::identifier::{Identifier, ObjectId};
 use crate::core::generic_ncell::GenericNCell;
 use crate::core::ncell::NCell;
 
 #[derive(Debug, Clone)]
-pub struct GenericNCategory<'a, Id: Identifier, BaseCategory: NCategory<'a, Identifier = Id>>
+pub struct GenericNCategory<'a, Id: ObjectId, BaseCategory: NCategory<'a, Identifier = Id> + ObjectId<Id = Id>>
 {
     objects: HashMap<Id, BaseCategory>,
     object_mapping: HashMap<&'a Id, HashMap<&'a Id, HashSet<&'a Id>>>,
@@ -16,7 +16,7 @@ pub struct GenericNCategory<'a, Id: Identifier, BaseCategory: NCategory<'a, Iden
 }
 
 
-impl <'a, Id: Identifier, Category: NCategory<'a, Identifier = Id>> GenericNCategory<'a, Id, Category>
+impl <'a, Id: ObjectId, Category: NCategory<'a, Identifier = Id> + ObjectId<Id = Id>> GenericNCategory<'a, Id, Category>
 {
     pub fn new() -> Self {
         GenericNCategory {
@@ -28,7 +28,7 @@ impl <'a, Id: Identifier, Category: NCategory<'a, Identifier = Id>> GenericNCate
 }
 
 
-impl <'a, Id: Identifier, BaseCategory: NCategory<'a, Identifier = Id>> NCategory<'a> for GenericNCategory<'a, Id, BaseCategory>{
+impl <'a, Id: ObjectId, BaseCategory: NCategory<'a, Identifier = Id> + ObjectId<Id = Id>> NCategory<'a> for GenericNCategory<'a, Id, BaseCategory>{
     type Identifier = Id;
     type Object = BaseCategory;
     type Cell = GenericNCell<'a, Id, Self>;
@@ -39,16 +39,16 @@ impl <'a, Id: Identifier, BaseCategory: NCategory<'a, Identifier = Id>> NCategor
     }
 
     fn add_object(&'a mut self, object: Self::Object) -> Result<&Self::Identifier, NCategoryError> {
-        let object_id: Self::Identifier = Identifier::generate();
+        let object_id: Self::Identifier = Self::Identifier::generate();
         self.add_object_with_id(object_id.clone(), object)
     }
 
-    fn add_object_with_id(&'a mut self, object_id: Self::Identifier, object: Self::Object) -> Result<&Self::Identifier, NCategoryError> {
+    fn add_object_with_id(&mut self, object_id: Self::Identifier, object: Self::Object) -> Result<&Self::Identifier, NCategoryError> {
         self.objects.insert(object_id.clone(), object);
         // Retrieve the object reference and extract necessary data
         let (id_ref, obj_ref): (_, &Self::Object) = {
             let object_ref = self.objects.get(&object_id).ok_or(NCategoryError::ObjectNotFound)?;
-            (object_ref.id(), object_ref)
+            (object_ref.object_id(), object_ref)
         };
         let identity_cell: GenericNCell<'a, Self::Identifier, Self> = GenericNCell::new(
             id_ref,

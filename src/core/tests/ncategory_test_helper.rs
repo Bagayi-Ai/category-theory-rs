@@ -19,7 +19,7 @@ pub trait NCategoryTestHelper {
 
     fn generate_non_commuting_cell(
         &mut self
-    ) -> (Vec<<Self::Category as NCategory>::Cell>, Vec<<Self::Category as NCategory>::Cell>);
+    ) -> (Vec<<Self::Category as NCategory>::Identifier>, Vec<<Self::Category as NCategory>::Identifier>);
 
     fn generate_object(&mut self) -> <Self::Category as NCategory>::Object;
 
@@ -46,13 +46,13 @@ pub fn basic_object_cell_test<CategoryTestHelper: NCategoryTestHelper>(mut categ
         assert!(category.get_object(&object1_id).is_ok());
 
         // check identity morphism
-        let cell_ids = category.get_object_cells(&object1_id);
-        assert!(cell_ids.is_ok());
-        let cell_ids = cell_ids.unwrap();
-        assert_eq!(cell_ids.len(), 1);
-        let cell_id = cell_ids.first().unwrap();
-        assert_eq!(category.get_cell(cell_id).unwrap().source_object_id(), &object1_id);
-        assert_eq!(category.get_cell(cell_id).unwrap().target_object_id(), &object1_id);
+        let cell = category.get_object_cells(&object1_id);
+        assert!(cell.is_ok());
+        let cell = cell.unwrap();
+        assert_eq!(cell.len(), 1);
+        let cell = cell.first().unwrap();
+        assert_eq!(cell.source_object_id(), &object1_id);
+        assert_eq!(cell.target_object_id(), &object1_id);
 
         // TODO: implement comparison of the object assert_eq!(category.get_object(&object1_id).unwrap(), &object);
 
@@ -68,13 +68,13 @@ pub fn basic_object_cell_test<CategoryTestHelper: NCategoryTestHelper>(mut categ
         assert!(category.get_object(&object2_id).is_ok());
 
         // check identity morphism
-        let cell_ids = category.get_object_cells(&object2_id);
-        assert!(cell_ids.is_ok());
-        let cell_ids = cell_ids.unwrap();
-        assert_eq!(cell_ids.len(), 1);
-        let cell_id = cell_ids.first().unwrap();
-        assert_eq!(category.get_cell(cell_id).unwrap().source_object_id(), &object2_id);
-        assert_eq!(category.get_cell(cell_id).unwrap().target_object_id(), &object2_id);
+        let cells = category.get_object_cells(&object2_id);
+        assert!(cells.is_ok());
+        let cells = cells.unwrap();
+        assert_eq!(cells.len(), 1);
+        let cell = cells.first().unwrap();
+        assert_eq!(cell.source_object_id(), &object2_id);
+        assert_eq!(cell.target_object_id(), &object2_id);
     }
 
     // add object 3 without id
@@ -92,11 +92,11 @@ pub fn basic_object_cell_test<CategoryTestHelper: NCategoryTestHelper>(mut categ
         assert!(category.get_object(&object3_id).is_ok());
 
         // check identity morphism
-        let cell_ids = category.get_object_cells(&object3_id);
-        assert!(cell_ids.is_ok());
-        let cell_ids = cell_ids.unwrap();
-        assert_eq!(cell_ids.len(), 1);
-        let cell = category.get_cell(cell_ids.first().unwrap()).unwrap();
+        let cells = category.get_object_cells(&object3_id);
+        assert!(cells.is_ok());
+        let cells = cells.unwrap();
+        assert_eq!(cells.len(), 1);
+        let cell = cells.first().unwrap();
         assert_eq!(cell.source_object_id(), &object3_id);
         assert_eq!(cell.target_object_id(), &object3_id);
     }
@@ -131,11 +131,11 @@ pub fn basic_object_cell_test<CategoryTestHelper: NCategoryTestHelper>(mut categ
         let commute_result = commute_result.unwrap();
         assert!(commute_result);
     }
-    //
+
     // {
     //     // now we test for the non-commuting cells
     //     let (commuting_cell1, commuting_cell2) = category_test_helper.generate_non_commuting_cell();
-    //     let commute_result = category_test_helper.get_category().commute(
+    //     let commute_result = category_test_helper.get_category().cells_commute(
     //         commuting_cell1.iter().collect(),
     //         commuting_cell2.iter().collect()
     //     );

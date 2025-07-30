@@ -1,23 +1,24 @@
+use crate::core::identifier::Identifier;
 use crate::core::ncategory::NCategory;
 use crate::core::nfunctor::NFunctor;
 
-pub struct GenericNFunctor<Category: NCategory> {
-    value: Category::Identifier,
+pub struct GenericNFunctor<Id: Identifier> {
+    value: Id
 }
 
 
-impl <Category: NCategory> NFunctor for GenericNFunctor<Category> {
-    type Category = Category;
+impl <Id: Identifier> NFunctor for GenericNFunctor<Id> {
+    type Identifier = Id;
 
-    fn id(&self) -> &<Self::Category as NCategory>::Identifier {
+    fn id(&self) -> &Self::Identifier {
         todo!()
     }
 
-    fn source_category_id(&self) -> &<Self::Category as NCategory>::Identifier {
+    fn source_category_id(&self) -> &Self::Identifier {
         todo!()
     }
 
-    fn target_category_id(&self) -> &<Self::Category as NCategory>::Identifier {
+    fn target_category_id(&self) -> &Self::Identifier {
         todo!()
     }
 }

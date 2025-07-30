@@ -15,6 +15,8 @@ mod core {
 
     pub mod nfunctor;
 
+    pub mod cell_tree;
+
     pub mod identifier;
 
     #[cfg(test)]

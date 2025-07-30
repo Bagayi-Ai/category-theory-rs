@@ -2,17 +2,14 @@ use crate::core::ncategory::{NCategory, UnitCategory};
 use crate::core::identifier::{Identifier};
 
 pub trait NFunctor
-where
-    Self::Category: NCategory,
-    // <Self::Category as NCategory>::BaseCategory: NCategory<Identifier = <Self::Category as NCategory>::Identifier>,
 {
-    type Category: NCategory;
+    type Identifier: Identifier;
 
-    fn id(&self) -> &<Self::Category as NCategory>::Identifier;
+    fn id(&self) -> &Self::Identifier;
 
-    fn source_category_id(&self) -> &<Self::Category as NCategory>::Identifier;
+    fn source_category_id(&self) -> &Self::Identifier;
 
-    fn target_category_id(&self) -> &<Self::Category as NCategory>::Identifier;
+    fn target_category_id(&self) -> &Self::Identifier;
 
 }
 
@@ -21,17 +18,18 @@ pub struct UnitFunctor<T: Identifier> {
     _phantom: std::marker::PhantomData<T>,
 }
 impl <T: Identifier> NFunctor for UnitFunctor<T> {
-    type Category = UnitCategory<T>;
 
-    fn id(&self) -> &<Self::Category as NCategory>::Identifier {
+    type Identifier = T;
+
+    fn id(&self) -> &Self::Identifier {
         todo!()
     }
 
-    fn source_category_id(&self) -> &<Self::Category as NCategory>::Identifier {
+    fn source_category_id(&self) -> &Self::Identifier {
         todo!()
     }
 
-    fn target_category_id(&self) -> &<Self::Category as NCategory>::Identifier {
+    fn target_category_id(&self) -> &Self::Identifier {
         todo!()
     }
 }

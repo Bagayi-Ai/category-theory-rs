@@ -1,17 +1,30 @@
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
-use std::hash::Hash;
+use std::hash::{Hash, Hasher};
 use crate::core::identifier::Identifier;
 use crate::core::ncategory::{NCategory, NCategoryError, UnitCategory};
 use crate::core::ncell::NCell;
 use crate::core::nfunctor::{NFunctor, UnitFunctor};
 
-pub struct DiscreteCategory<T> {
+
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub struct DiscreteCategory<T: Hash + Eq + Clone> {
     category_id: T,
     // TODO: Find a way of avoiding storing identity cells
     // as we could derive them from the objects.
     cells: Option<HashMap<T ,Self>>
 
+}
+
+impl<T: Hash + Eq + Clone> Hash for DiscreteCategory<T> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.category_id.hash(state);
+        if let Some(cells) = &self.cells {
+            for key in cells.keys() {
+                key.hash(state);
+            }
+        }
+    }
 }
 
 impl<T: Eq + Clone + Debug + Hash + Identifier> DiscreteCategory<T> {
@@ -70,8 +83,8 @@ impl<T: Eq + Clone + Hash + Debug + Identifier> NCategory for DiscreteCategory<T
         Err(NCategoryError::ObjectNotFound)
     }
 
-    fn get_identity_cell(&self, object_id: &Self::Identifier) -> Result<&Self::Identifier, NCategoryError> {
-        self.get_object(object_id)
+    fn get_identity_cell(&self, object_id: &Self::Identifier) -> Result<&Self::Cell, NCategoryError> {
+        self.get_cell(object_id)
     }
 
     fn get_all_objects(&self) -> Result<HashSet<&Self::Identifier>, NCategoryError> {
@@ -82,12 +95,12 @@ impl<T: Eq + Clone + Hash + Debug + Identifier> NCategory for DiscreteCategory<T
         }
     }
 
-    fn get_all_cells(&self) -> Result<HashSet<&Self::Identifier>, NCategoryError> {
-        // In discrete the cells are only identity cells
-        Ok(self.get_all_objects()?)
+    fn get_all_cells(&self) -> Result<HashSet<&Self::Cell>, NCategoryError> {
+        self.get_all_objects()?.into_iter().map(
+            |object_id| self.get_identity_cell(object_id)).collect()
     }
 
-    fn get_object_cells(&self, object_id: &Self::Identifier) -> Result<Vec<&Self::Identifier>, NCategoryError> {
+    fn get_object_cells(&self, object_id: &Self::Identifier) -> Result<Vec<&Self::Cell>, NCategoryError> {
         // only cell in discrete category is the identity cell.
         Ok(vec![self.get_identity_cell(object_id)?])
     }
@@ -107,27 +120,27 @@ impl<T: Eq + Clone + Hash + Debug + Identifier> NCategory for DiscreteCategory<T
 }
 
 impl<T: Eq + Clone + Hash + Debug + Identifier> NCell for DiscreteCategory<T> {
-    type Category = Self;
 
+    type Identifier = T;
     type Functor = UnitFunctor<T>;
 
-    fn id(&self) -> &<Self::Category as NCategory>::Identifier {
+    fn id(&self) -> &Self::Identifier {
         todo!()
     }
 
-    fn source_object_id(&self) -> &<Self::Category as NCategory>::Identifier {
+    fn source_object_id(&self) -> &Self::Identifier {
         &self.category_id
     }
 
-    fn target_object_id(&self) -> &<Self::Category as NCategory>::Identifier {
+    fn target_object_id(&self) -> &Self::Identifier {
         &self.category_id
     }
 
-    fn category_id(&self) -> &<Self::Category as NCategory>::Identifier {
+    fn category_id(&self) -> &Self::Identifier {
         todo!()
     }
 
-    fn functor(&self) -> &<<Self::Functor as NFunctor>::Category as NCategory>::Identifier {
+    fn functor(&self) -> &<Self::Functor as NFunctor>::Identifier {
         todo!()
     }
 }
@@ -189,7 +202,7 @@ mod tests {
             todo!()
         }
 
-        fn generate_non_commuting_cell(&mut self) -> (Vec<<Self::Category as NCategory>::Cell>, Vec<<Self::Category as NCategory>::Cell>) {
+        fn generate_non_commuting_cell(&mut self) -> (Vec<<Self::Category as NCategory>::Identifier>, Vec<<Self::Category as NCategory>::Identifier>) {
             todo!()
         }
 

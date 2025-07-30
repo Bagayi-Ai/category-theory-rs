@@ -6,65 +6,15 @@ use crate::core::ncategory::{NCategory, NCategoryError};
 use crate::core::identifier::Identifier;
 use crate::core::ncell::NCell;
 use crate::core::nfunctor::NFunctor;
-
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
-pub struct GenericNCell<Id: Identifier, Category: NCategory<Identifier = Id>>
-{
-    id: Id,
-    from: Id,
-    to: Id,
-    name: String,
-    _phantom: std::marker::PhantomData<Category>,
-}
-
-impl <Id: Identifier, Category: NCategory<Identifier = Id>> GenericNCell<Id, Category>
-{
-    pub fn new(id: Id, from: Id, to: Id, name: String) -> Self {
-        GenericNCell {
-            id,
-            from,
-            to,
-            name,
-            _phantom: std::marker::PhantomData,
-        }
-    }
-}
-
-impl <Id, Category: NCategory> NCell for GenericNCell<Id, Category>
-where
-    Id: Identifier,
-    Category: NCategory<Identifier = Id>,
-{
-    type Category = Category;
-    type Functor = GenericNFunctor<<Category as NCategory>::BaseCategory>;
-
-    fn id(&self) -> &<Self::Category as NCategory>::Identifier {
-        todo!()
-    }
-
-    fn category_id(&self) -> &<Self::Category as NCategory>::Identifier {
-        todo!()
-    }
-
-    fn source_object_id(&self) -> &<Self::Category as NCategory>::Identifier {
-        &self.from
-    }
-
-    fn target_object_id(&self) -> &<Self::Category as NCategory>::Identifier {
-        &self.to
-    }
-
-    fn functor(&self) -> &<<Self::Functor as NFunctor>::Category as NCategory>::Identifier {
-        todo!()
-    }
-}
+use crate::core::generic_ncell::GenericNCell;
 
 
 pub struct GenericNCategory<Id: Identifier, BaseCategory: NCategory<Identifier = Id>>
 {
+    id: Id,
     objects: HashMap<Id, BaseCategory>,
     object_mapping: HashMap<Id, HashMap<Id, HashSet<Id>>>,
-    cells: HashMap<Id, GenericNCell<Id, Self>>,
+    cells: HashMap<Id, GenericNCell<Id>>,
 }
 
 
@@ -72,6 +22,7 @@ impl <Id: Identifier, Category: NCategory<Identifier = Id>> GenericNCategory<Id,
 {
     pub fn new() -> Self {
         GenericNCategory {
+            id: Id::generate(),
             objects: HashMap::new(),
             object_mapping: HashMap::new(),
             cells: HashMap::new(),
@@ -83,7 +34,7 @@ impl <Id: Identifier, Category: NCategory<Identifier = Id>> GenericNCategory<Id,
 impl <Id: Identifier, BaseCategory: NCategory<Identifier = Id>> NCategory for GenericNCategory<Id, BaseCategory>{
     type Identifier = Id;
     type Object = BaseCategory;
-    type Cell = GenericNCell<Id, Self>;
+    type Cell = GenericNCell<Id>;
     type BaseCategory = BaseCategory;
 
     fn id(&self) -> &Self::Identifier {
@@ -105,7 +56,7 @@ impl <Id: Identifier, BaseCategory: NCategory<Identifier = Id>> NCategory for Ge
         //     name: "identity".to_string(),
         //     _phantom: std::marker::PhantomData,
         // };
-        let identity_cell: GenericNCell<Self::Identifier, Self> = GenericNCell::new(
+        let identity_cell: GenericNCell<Self::Identifier> = GenericNCell::new(
             object_id.clone(),
             object_id.clone(),
             object_id.clone(),
@@ -116,17 +67,17 @@ impl <Id: Identifier, BaseCategory: NCategory<Identifier = Id>> NCategory for Ge
     }
 
     fn add_cell(&mut self, cell: Self::Cell) -> Result<Self::Identifier, NCategoryError> {
-        if self.cells.contains_key(&cell.id) {
+        if self.cells.contains_key(&cell.id()) {
             return Err(NCategoryError::CellAlreadyExists);
         }
         self.object_mapping
-            .entry(cell.from.clone())
+            .entry(cell.source_object_id().clone())
             .or_default()
-            .entry(cell.to.clone())
+            .entry(cell.target_object_id().clone())
             .or_default()
-            .insert(cell.id.clone());
-        let cell_id = cell.id.clone();
-        self.cells.insert(cell.id.clone(), cell);
+            .insert(cell.id().clone());
+        let cell_id = cell.id().clone();
+        self.cells.insert(cell.id().clone(), cell);
         Ok(cell_id)
     }
 
@@ -138,31 +89,39 @@ impl <Id: Identifier, BaseCategory: NCategory<Identifier = Id>> NCategory for Ge
         }
     }
 
-    fn get_identity_cell(&self, object_id: &Self::Identifier) -> Result<&Self::Identifier, NCategoryError> {
+    fn get_identity_cell(&self, object_id: &Self::Identifier) -> Result<&Self::Cell, NCategoryError> {
+        // it's basically the cell with the same id as the object
+        self.get_cell(object_id)
+    }
+
+    fn get_all_objects(&self) -> Result<HashSet<&Self::Object>, NCategoryError> {
         todo!()
     }
 
-    fn get_all_objects(&self) -> Result<HashSet<&Self::Identifier>, NCategoryError> {
-        todo!()
+    fn get_all_cells(&self) -> Result<HashSet<&Self::Cell>, NCategoryError> {
+        // Todo needs optimization
+        // Ok(self.cells.values().collect())
+
+        let mut result: HashSet<&Self::Cell> = HashSet::new();
+        for (_id, cell) in &self.cells {
+            result.insert(cell);
+        }
+        Ok(result)
     }
 
-    fn get_all_cells(&self) -> Result<HashSet<&Self::Identifier>, NCategoryError> {
-        Ok(self.cells.keys().collect())
-    }
-
-    fn get_object_cells(&self, object_id: &Self::Identifier) -> Result<Vec<&Self::Identifier>, NCategoryError> {
+    fn get_object_cells(&self, object_id: &Self::Identifier) -> Result<Vec<&Self::Cell>, NCategoryError> {
         if let Some(cells) = self.object_mapping.get(object_id) {
-            let mut cell_ids: Vec<&Self::Identifier> = Vec::new();
+            let mut result: Vec<&Self::Cell> = Vec::new();
             for (_to, cell_set) in cells {
                 for cell_id in cell_set {
                     if let Some(cell) = self.cells.get(cell_id) {
-                        if &cell.from == object_id {
-                            cell_ids.push(&cell.id);
+                        if cell.source_object_id() == object_id {
+                            result.push(&cell);
                         }
                     }
                 }
             }
-            Ok(cell_ids)
+            Ok(result)
         } else {
             Err(NCategoryError::ObjectNotFound)
         }

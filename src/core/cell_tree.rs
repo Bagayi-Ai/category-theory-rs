@@ -17,6 +17,20 @@ impl <'a, Id: Identifier> CellTree<'a, Id> {
             children: Vec::new(),
         }
     }
+    
+    pub fn new_with_children(
+        cell_id: &'a Id,
+        source_cell_id: &'a Id,
+        target_cell_id: &'a Id,
+        children: Vec<CellTree<'a, Id>>,
+    ) -> Self {
+        CellTree {
+            cell_id,
+            source_cell_id,
+            target_cell_id,
+            children,
+        }
+    }
 
     pub fn add_child(&mut self, child: CellTree<'_, Id>) {
         todo!()

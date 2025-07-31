@@ -50,7 +50,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier<Id = T> + 'a> NCategory<'a> f
     type Cell = Self;
     type BaseCategory = UnitCategory<T>;
 
-    fn id(&self) -> &Self::Identifier {
+    fn category_id(&self) -> &Self::Identifier {
         &self.category_id
     }
 
@@ -119,7 +119,7 @@ impl<T: Eq + Clone + Hash + Debug + Identifier> NCell for DiscreteCategory<T> {
     type Identifier = T;
     type Functor = UnitFunctor<T>;
 
-    fn id(&self) -> &Self::Identifier {
+    fn cell_id(&self) -> &Self::Identifier {
         todo!()
     }
 

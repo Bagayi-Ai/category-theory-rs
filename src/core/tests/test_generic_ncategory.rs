@@ -201,7 +201,7 @@ pub fn test_base_scenarios() {
     let mut category = GenericNCategory::new();
     // add object 1
     let object1 = generate_object();
-    let object1_id = NCategory::id(&object1).clone();
+    let object1_id = NCategory::category_id(&object1).clone();
     let object2_id = generate_identifier();
 
     category.add_object(&object1).unwrap();
@@ -237,7 +237,7 @@ pub fn test_base_scenarios() {
     // add object 2
     let object2 = generate_object();
     category.add_object(&object2).unwrap();
-    let object2_id = NCategory::id(&object2).clone();
+    let object2_id = NCategory::category_id(&object2).clone();
     assert!(category.get_object(&object2_id).is_ok());
 
     // check identity morphism
@@ -251,7 +251,7 @@ pub fn test_base_scenarios() {
 
     // add object 3
     let object3 = generate_object();
-    let object3_id = NCategory::id(&object3);
+    let object3_id = NCategory::category_id(&object3);
     category.add_object(&object3);
 
     // check object 3 exists
@@ -326,8 +326,8 @@ pub fn test_identity_cell_tree() {
         &discreteCategoryALower).unwrap();
 
     let identity_cell = setCategoryAlphabetLower.get_identity_cell(&discreteCategoryALower).unwrap();
-    assert_eq!(identity_cell.source_object_id(), NCategory::id(&discreteCategoryALower));
-    assert_eq!(identity_cell.target_object_id(), NCategory::id(&discreteCategoryALower));
+    assert_eq!(identity_cell.source_object_id(), NCategory::category_id(&discreteCategoryALower));
+    assert_eq!(identity_cell.target_object_id(), NCategory::category_id(&discreteCategoryALower));
 
     // let acutal_cell_tree = category.get_cell_tree(identity_cell).unwrap();
     //

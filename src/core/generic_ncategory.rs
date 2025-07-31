@@ -37,16 +37,16 @@ impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> 
     type Cell = GenericNCell<Id>;
     type BaseCategory = BaseCategory;
 
-    fn id(&self) -> &Self::Identifier {
+    fn category_id(&self) -> &Self::Identifier {
         todo!()
     }
 
     fn add_object(&mut self, object: Self::Object) -> Result<(), NCategoryError> {
-        self.objects.insert(object.id().clone(), object);
+        self.objects.insert(object.category_id().clone(), object);
         let identity_cell: GenericNCell<Self::Identifier> = GenericNCell::new(
-            object.id().clone(),
-            object.id().clone(),
-            object.id().clone(),
+            object.category_id().clone(),
+            object.category_id().clone(),
+            object.category_id().clone(),
             "identity".to_string(),
         );
         self.add_cell(identity_cell)?;
@@ -78,7 +78,7 @@ impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> 
 
     fn get_identity_cell(&self, object_id: Self::Object) -> Result<&Self::Cell, NCategoryError> {
         // it's basically the cell with the same id as the object
-        self.get_cell(object_id.id())
+        self.get_cell(object_id.category_id())
     }
 
     fn get_all_objects(&self) -> Result<HashSet<Self::Object>, NCategoryError> {
@@ -97,12 +97,12 @@ impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> 
     }
 
     fn get_object_cells(&self, object: Self::Object) -> Result<Vec<&Self::Cell>, NCategoryError> {
-        if let Some(cells) = self.object_mapping.get(object.id()) {
+        if let Some(cells) = self.object_mapping.get(object.category_id()) {
             let mut result: Vec<&Self::Cell> = Vec::new();
             for (_to, cell_set) in cells {
                 for cell_id in cell_set {
                     if let Some(cell) = self.cells.get(cell_id) {
-                        if cell.source_object_id() == object.id() {
+                        if cell.source_object_id() == object.category_id() {
                             result.push(&cell);
                         }
                     }

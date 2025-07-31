@@ -8,7 +8,7 @@ pub trait NCell
 
     type Functor: NFunctor<Identifier = Self::Identifier>;
 
-    fn id(&self) -> &Self::Identifier;
+    fn cell_id(&self) -> &Self::Identifier;
 
     fn category_id(&self) -> &Self::Identifier;
 
@@ -25,7 +25,7 @@ impl <T: Identifier> NCell for UnitCategory<T> {
 
     type Functor = UnitFunctor<T>;
 
-    fn id(&self) -> &Self::Identifier {
+    fn cell_id(&self) -> &Self::Identifier {
         todo!()
     }
 

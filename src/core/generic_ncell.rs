@@ -42,7 +42,7 @@ impl <Id: Identifier> NCell for GenericNCell<Id>
     type Identifier = Id;
     type Functor = GenericNFunctor<Self::Identifier>;
 
-    fn id(&self) -> &Self::Identifier {
+    fn cell_id(&self) -> &Self::Identifier {
         &self.id
     }
 

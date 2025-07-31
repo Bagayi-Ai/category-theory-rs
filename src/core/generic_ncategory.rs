@@ -41,7 +41,7 @@ impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> 
         todo!()
     }
 
-    fn add_object(&mut self, object: Self::Object) -> Result<Self::Identifier, NCategoryError> {
+    fn add_object(&mut self, object: Self::Object) -> Result<(), NCategoryError> {
         self.objects.insert(object.id().clone(), object);
         let identity_cell: GenericNCell<Self::Identifier> = GenericNCell::new(
             object.id().clone(),
@@ -50,7 +50,7 @@ impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> 
             "identity".to_string(),
         );
         self.add_cell(identity_cell)?;
-        Ok(object.id().clone())
+        Ok(())
     }
 
     fn add_cell(&mut self, cell: Self::Cell) -> Result<Self::Identifier, NCategoryError> {

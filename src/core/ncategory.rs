@@ -34,7 +34,7 @@ where
 
     fn id(&self) -> &Self::Identifier;
 
-    fn add_object(&mut self, object: Self::Object) -> Result<Self::Identifier, NCategoryError>;
+    fn add_object(&mut self, object: Self::Object) -> Result<(), NCategoryError>;
 
     fn add_cell(&mut self, cell: Self::Cell) -> Result<Self::Identifier, NCategoryError>;
 
@@ -42,7 +42,7 @@ where
 
     fn get_identity_cell(
         &self,
-        object_id: Self::Object,
+        object: Self::Object,
     ) -> Result<&Self::Cell, NCategoryError>;
 
     fn get_all_objects(&self) -> Result<HashSet<Self::Object>, NCategoryError>;
@@ -202,7 +202,7 @@ impl <'a, T: Identifier> NCategory<'a> for UnitCategory<T> {
         todo!()
     }
 
-    fn add_object(&mut self, object: Self::Object) -> Result<Self::Identifier, NCategoryError> {
+    fn add_object(&mut self, object: Self::Object) -> Result<(), NCategoryError> {
         todo!()
     }
 

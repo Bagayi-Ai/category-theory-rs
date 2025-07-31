@@ -54,7 +54,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier<Id = T> + 'a> NCategory<'a> f
         &self.category_id
     }
 
-    fn add_object(&mut self, object: Self::Object) -> Result<Self::Identifier, NCategoryError> {
+    fn add_object(&mut self, object: Self::Object) -> Result<(), NCategoryError> {
         let cell = Self::new_with_id(object.clone());
         if let Some(cells) = &mut self.cells {
             cells.insert(object.clone(), cell);
@@ -62,7 +62,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier<Id = T> + 'a> NCategory<'a> f
             self.cells = Some(HashMap::new());
             self.cells.as_mut().unwrap().insert(object.clone(), cell);
         }
-        Ok(object.clone())
+        Ok(())
     }
 
     fn add_cell(&mut self, _cell: Self::Cell) -> Result<Self::Identifier, NCategoryError> {
@@ -179,7 +179,6 @@ mod tests {
         let mut category = DiscreteCategory::new();
         // add object 1
         let object1 = generate_object();
-        let object2_id = generate_identifier();
 
         category.add_object(object1.clone()).unwrap();
         assert!(category.get_object(&object1).is_ok());
@@ -192,11 +191,6 @@ mod tests {
         assert_eq!(cell.source_object_id(), &object1);
         assert_eq!(cell.target_object_id(), &object1);
 
-        // TODO: implement comparison of the object assert_eq!(category.get_object(&object1_id).unwrap(), &object);
-
-        // check object 2 does not exist yet
-        assert!(!category.get_object(&object2_id).is_ok());
-
         // check identity morphism
         let cell = category.get_object_cells(object1.clone());
         assert!(cell.is_ok());
@@ -208,39 +202,34 @@ mod tests {
 
         // TODO: implement comparison of the object assert_eq!(category.get_object(&object1_id).unwrap(), &object);
 
-        // check object 2 does not exist yet
-        assert!(!category.get_object(&object2_id).is_ok());
-
         // add object 2
         let object2 = generate_object();
-        let object2_id = category.add_object(object2).unwrap();
-        assert!(category.get_object(&object2_id).is_ok());
+        assert!(category.add_object(object2.clone()).is_ok());
+        assert!(category.get_object(&object2).is_ok());
 
         // check identity morphism
-        let cells = category.get_object_cells(object2_id.clone());
+        let cells = category.get_object_cells(object2.clone());
         assert!(cells.is_ok());
         let cells = cells.unwrap();
         assert_eq!(cells.len(), 1);
         let cell = cells.first().unwrap();
-        assert_eq!(cell.source_object_id(), &object2_id);
-        assert_eq!(cell.target_object_id(), &object2_id);
+        assert_eq!(cell.source_object_id(), &object2);
+        assert_eq!(cell.target_object_id(), &object2);
 
         // add object 3 without id
         let object3 = generate_object();
-        let object3_id = category.add_object(object3);
-        assert!(object3_id.is_ok());
-        let object3_id = object3_id.unwrap();
+        assert!(category.add_object(object3.clone()).is_ok());
 
         // check object 3 exists
-        assert!(category.get_object(&object3_id).is_ok());
+        assert!(category.get_object(&object3).is_ok());
 
         // check identity morphism
-        let cells = category.get_object_cells(object3_id.clone());
+        let cells = category.get_object_cells(object3.clone());
         assert!(cells.is_ok());
         let cells = cells.unwrap();
         assert_eq!(cells.len(), 1);
         let cell = cells.first().unwrap();
-        assert_eq!(cell.source_object_id(), &object3_id);
-        assert_eq!(cell.target_object_id(), &object3_id);
+        assert_eq!(cell.source_object_id(), &object3);
+        assert_eq!(cell.target_object_id(), &object3);
     }
 }

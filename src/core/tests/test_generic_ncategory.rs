@@ -249,11 +249,10 @@ pub fn test_base_scenarios() {
     assert_eq!(cell.source_object_id(), &object2_id);
     assert_eq!(cell.target_object_id(), &object2_id);
 
-    // add object 3 without id
+    // add object 3
     let object3 = generate_object();
-    let object3_id = category.add_object(&object3);
-    assert!(object3_id.is_ok());
-    let object3_id = object3_id.unwrap();
+    let object3_id = NCategory::id(&object3);
+    category.add_object(&object3);
 
     // check object 3 exists
     assert!(category.get_object(&object3_id).is_ok());
@@ -264,8 +263,8 @@ pub fn test_base_scenarios() {
     let cells = cells.unwrap();
     assert_eq!(cells.len(), 1);
     let cell = cells.first().unwrap();
-    assert_eq!(cell.source_object_id(), &object3_id);
-    assert_eq!(cell.target_object_id(), &object3_id);
+    assert_eq!(cell.source_object_id(), object3_id);
+    assert_eq!(cell.target_object_id(), object3_id);
 
     // now add a cell between object1 and object2
     let cell_id = generate_identifier();

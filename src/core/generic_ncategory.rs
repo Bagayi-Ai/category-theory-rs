@@ -9,16 +9,16 @@ use crate::core::nfunctor::NFunctor;
 use crate::core::generic_ncell::GenericNCell;
 
 
-pub struct GenericNCategory<Id: Identifier, BaseCategory: NCategory<Identifier = Id>>
+pub struct GenericNCategory<'a, Id: Identifier, BaseCategory: NCategory<'a, Identifier = Id>>
 {
     id: Id,
-    objects: HashMap<Id, BaseCategory>,
+    objects: HashMap<Id, &'a BaseCategory>,
     object_mapping: HashMap<Id, HashMap<Id, HashSet<Id>>>,
     cells: HashMap<Id, GenericNCell<Id>>,
 }
 
 
-impl <Id: Identifier, Category: NCategory<Identifier = Id>> GenericNCategory<Id, Category>
+impl <'a, Id: Identifier, Category: NCategory<'a, Identifier = Id>> GenericNCategory<'a, Id, Category>
 {
     pub fn new() -> Self {
         GenericNCategory {
@@ -31,9 +31,9 @@ impl <Id: Identifier, Category: NCategory<Identifier = Id>> GenericNCategory<Id,
 }
 
 
-impl <Id: Identifier, BaseCategory: NCategory<Identifier = Id>> NCategory for GenericNCategory<Id, BaseCategory>{
+impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> + 'a> NCategory<'a> for GenericNCategory<'a, Id, BaseCategory>{
     type Identifier = Id;
-    type Object = BaseCategory;
+    type Object = &'a BaseCategory;
     type Cell = GenericNCell<Id>;
     type BaseCategory = BaseCategory;
 
@@ -81,7 +81,7 @@ impl <Id: Identifier, BaseCategory: NCategory<Identifier = Id>> NCategory for Ge
         Ok(cell_id)
     }
 
-    fn get_object(&self, object_id: &Self::Identifier) -> Result<&Self::Object, NCategoryError> {
+    fn get_object(&self, object_id: &Self::Identifier) -> Result<Self::Object, NCategoryError> {
         if let Some(object) = self.objects.get(object_id) {
             Ok(object)
         } else {
@@ -94,7 +94,7 @@ impl <Id: Identifier, BaseCategory: NCategory<Identifier = Id>> NCategory for Ge
         self.get_cell(object_id)
     }
 
-    fn get_all_objects(&self) -> Result<HashSet<&Self::Object>, NCategoryError> {
+    fn get_all_objects(&self) -> Result<HashSet<Self::Object>, NCategoryError> {
         todo!()
     }
 

@@ -22,14 +22,14 @@ pub enum NCategoryError {
 }
 
 
-pub trait NCategory
+pub trait NCategory<'a>
 where
-    Self::BaseCategory: NCategory<Identifier = Self::Identifier>,
+    Self::BaseCategory: NCategory<'a, Identifier = Self::Identifier>,
 {
     type Identifier: Identifier;
-    type Object;
+    type Object: 'a;
     type Cell: NCell<Identifier = Self::Identifier>;
-    type BaseCategory: NCategory;
+    type BaseCategory: NCategory<'a>;
 
     fn id(&self) -> &Self::Identifier;
 
@@ -39,14 +39,14 @@ where
 
     fn add_cell(&mut self, cell: Self::Cell) -> Result<Self::Identifier, NCategoryError>;
 
-    fn get_object(&self, object_id: &Self::Identifier) -> Result<&Self::Object, NCategoryError>;
+    fn get_object(&self, object_id: &Self::Identifier) -> Result<Self::Object, NCategoryError>;
 
     fn get_identity_cell(
         &self,
         object_id: &Self::Identifier,
     ) -> Result<&Self::Cell, NCategoryError>;
 
-    fn get_all_objects(&self) -> Result<HashSet<&Self::Object>, NCategoryError>;
+    fn get_all_objects(&self) -> Result<HashSet<Self::Object>, NCategoryError>;
 
     fn get_all_cells(&self) -> Result<HashSet<&Self::Cell>, NCategoryError>;
 
@@ -69,12 +69,12 @@ where
 
     fn get_cell(&self, cell_id: &Self::Identifier) -> Result<&Self::Cell, NCategoryError>;
 
-    fn get_cell_source_object(&self, cell: &Self::Cell) -> Result<&Self::Object, NCategoryError> {
+    fn get_cell_source_object(&self, cell: &Self::Cell) -> Result<Self::Object, NCategoryError> {
         self.get_object(cell.source_object_id())
             .map_err(|_| NCategoryError::ObjectNotFound)
     }
 
-    fn get_cell_target_object(&self, cell: &Self::Cell) -> Result<&Self::Object, NCategoryError> {
+    fn get_cell_target_object(&self, cell: &Self::Cell) -> Result<Self::Object, NCategoryError> {
         self.get_object(cell.target_object_id())
             .map_err(|_| NCategoryError::ObjectNotFound)
     }
@@ -86,20 +86,21 @@ where
         of objects.
         */
 
-        let cell = self.get_cell(cell_id)?;
-
-        let cell_tree = CellTree::new(
-            cell.id(),
-            cell.source_object_id(),
-            cell.target_object_id()
-        );
-
-        // Now take map all the cells in the base of source object
-        let source_base_objects = self.base_object(cell.source_object_id())?;
-        let all_source_base_cells = source_base_objects.get_all_cells()?;
-
-
-        Ok(cell_tree)
+        // let cell = self.get_cell(cell_id)?;
+        //
+        // let cell_tree = CellTree::new(
+        //     cell.id(),
+        //     cell.source_object_id(),
+        //     cell.target_object_id()
+        // );
+        //
+        // // Now take map all the cells in the base of source object
+        // let source_base_objects = self.base_object(cell.source_object_id())?;
+        // let all_source_base_cells = source_base_objects.get_all_cells()?;
+        //
+        //
+        // Ok(cell_tree)
+        todo!()
     }
     fn cells_commute(
         &self,
@@ -189,7 +190,7 @@ pub struct UnitCategory<T: Identifier> {
     _phantom: std::marker::PhantomData<T>,
 }
 
-impl <T: Identifier> NCategory for UnitCategory<T> {
+impl <'a, T: Identifier> NCategory<'a> for UnitCategory<T> {
     type Identifier = T;
 
     type Object = ();
@@ -214,7 +215,7 @@ impl <T: Identifier> NCategory for UnitCategory<T> {
         todo!()
     }
 
-    fn get_object(&self, object_id: &Self::Identifier) -> Result<&Self::Object, NCategoryError> {
+    fn get_object(&self, object_id: &Self::Identifier) -> Result<Self::Object, NCategoryError> {
         todo!()
     }
 
@@ -225,7 +226,7 @@ impl <T: Identifier> NCategory for UnitCategory<T> {
         todo!()
     }
 
-    fn get_all_objects(&self) -> Result<HashSet<&Self::Object>, NCategoryError> {
+    fn get_all_objects(&self) -> Result<HashSet<Self::Object>, NCategoryError> {
         todo!()
     }
 

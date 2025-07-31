@@ -1,5 +1,6 @@
 use crate::core::identifier::Identifier;
 
+#[derive(PartialEq, Debug, Clone, Hash)]
 pub struct CellTree<'a, Id: Identifier> {
     cell_id: &'a Id,
     source_cell_id: &'a Id,

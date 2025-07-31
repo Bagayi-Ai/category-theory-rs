@@ -200,14 +200,14 @@ fn generate_object() -> DiscreteCategoryString {
 pub fn test_base_scenarios() {
     let mut category = GenericNCategory::new();
     // add object 1
-    let object1_id = generate_identifier();
     let object1 = generate_object();
+    let object1_id = NCategory::id(&object1).clone();
     let object2_id = generate_identifier();
 
-    category.add_object_with_id(object1_id.clone(), &object1).unwrap();
+    category.add_object(&object1).unwrap();
     assert!(category.get_object(&object1_id).is_ok());
     // check identity morphism
-    let cell = category.get_object_cells(&object1_id);
+    let cell = category.get_object_cells(&object1);
     assert!(cell.is_ok());
     let cell = cell.unwrap();
     assert_eq!(cell.len(), 1);
@@ -221,7 +221,7 @@ pub fn test_base_scenarios() {
     assert!(!category.get_object(&object2_id).is_ok());
 
     // check identity morphism
-    let cell = category.get_object_cells(&object1_id);
+    let cell = category.get_object_cells(&object1);
     assert!(cell.is_ok());
     let cell = cell.unwrap();
     assert_eq!(cell.len(), 1);
@@ -236,11 +236,12 @@ pub fn test_base_scenarios() {
 
     // add object 2
     let object2 = generate_object();
-    category.add_object_with_id(object2_id.clone(), &object2).unwrap();
+    category.add_object(&object2).unwrap();
+    let object2_id = NCategory::id(&object2).clone();
     assert!(category.get_object(&object2_id).is_ok());
 
     // check identity morphism
-    let cells = category.get_object_cells(&object2_id);
+    let cells = category.get_object_cells(&object2);
     assert!(cells.is_ok());
     let cells = cells.unwrap();
     assert_eq!(cells.len(), 1);
@@ -258,7 +259,7 @@ pub fn test_base_scenarios() {
     assert!(category.get_object(&object3_id).is_ok());
 
     // check identity morphism
-    let cells = category.get_object_cells(&object3_id);
+    let cells = category.get_object_cells(&object3);
     assert!(cells.is_ok());
     let cells = cells.unwrap();
     assert_eq!(cells.len(), 1);
@@ -272,7 +273,7 @@ pub fn test_base_scenarios() {
         cell_id.clone(),
         object1_id.clone(),
         object2_id.clone(),
-        "A to B".to_string());
+        "obj1 to obj2".to_string());
     category.add_cell(cell).unwrap();
 
 
@@ -310,43 +311,45 @@ pub fn test_base_scenarios() {
 
 #[test]
 pub fn test_identity_cell_tree() {
-    // starting with identity cell
-    let mut category_test_helper = GenericCategory1TestHelper::new();
-    let object1_id = category_test_helper.generate_identifier();
-    let mut object1 = DiscreteCategory::new();
-    let object_a = "a".to_string();
-    let object_b = "b".to_string();
-    let object_c = "c".to_string();
-    object1.add_object(object_a).unwrap();
-    object1.add_object(object_b).unwrap();
-    object1.add_object(object_c).unwrap();
-    {
-        let category = category_test_helper.get_mut_category();
-        category.add_object_with_id(object1_id.clone(), &object1).unwrap();
-    }
-    let category = category_test_helper.get_category();
-    let identity_cell = category.get_identity_cell(&object1_id).unwrap();
-    assert_eq!(identity_cell.source_object_id(), &object1_id);
-    assert_eq!(identity_cell.target_object_id(), &object1_id);
+    let mut setCategoryAlphabetLower = GenericNCategory::new();
 
-    // let cell_tree = category.get_cell_tree(&object1_id).unwrap();
+    // Discrete category A with a, b, c as objects
+    let mut discreteCategoryALower = DiscreteCategory::new_with_id("alphabet_lower".to_string());
+    let object1_a = "a".to_string();
+    let object1_b = "b".to_string();
+    let object1_c = "c".to_string();
+    discreteCategoryALower.add_object(object1_a).unwrap();
+    discreteCategoryALower.add_object(object1_b).unwrap();
+    discreteCategoryALower.add_object(object1_c).unwrap();
+
+    // Add the discrete category A as an object in Set category alphabet
+    let setCategoryAlphabetLowerId = setCategoryAlphabetLower.add_object(
+        &discreteCategoryALower).unwrap();
+
+    let identity_cell = setCategoryAlphabetLower.get_identity_cell(&discreteCategoryALower).unwrap();
+    assert_eq!(identity_cell.source_object_id(), NCategory::id(&discreteCategoryALower));
+    assert_eq!(identity_cell.target_object_id(), NCategory::id(&discreteCategoryALower));
+
+    // let acutal_cell_tree = category.get_cell_tree(identity_cell).unwrap();
     //
     // // expected cell tree
-    // let expected_cell_tree = CellTree::new(
+    // let mut  expected_cell_tree = CellTree::new(
     //     identity_cell.id(),
     //     identity_cell.source_object_id(),
     //     identity_cell.target_object_id(),
     // );
-    // now add children cell tree for the identity cell.
-    // for our case we know its identity cell of the base category.
-    // for cells in object1.get_all_cells() {
-    //     let cell = category.get_cell(cells).unwrap();
+    // // now add children cell tree for the identity cell.
+    // // for our case we know its identity cell of the base category.
+    // for cell in object1.get_all_cells().unwrap() {
+    //     let childern_cell = cell.get_all_cells().unwrap();
     //     expected_cell_tree.add_child(
     //         CellTree::new(
-    //             cell.id(),
+    //             NCategory::id(cell),
     //             cell.source_object_id(),
     //             cell.target_object_id(),
     //         )
     //     );
     // }
+    //
+    // assert_eq!(acutal_cell_tree, expected_cell_tree);
 }

@@ -15,6 +15,7 @@ pub enum NCategoryError {
     InvalidCellComposition,
     InvalidCellCommutation,
     ObjectNotFound,
+    InvalidObjectId,
     InvalidObjectMapping,
     InvalidCellMapping,
     NoObjectsInCategory,
@@ -35,15 +36,13 @@ where
 
     fn add_object(&mut self, object: Self::Object) -> Result<Self::Identifier, NCategoryError>;
 
-    fn add_object_with_id(&mut self, object_id: Self::Identifier, object: Self::Object) -> Result<(), NCategoryError>;
-
     fn add_cell(&mut self, cell: Self::Cell) -> Result<Self::Identifier, NCategoryError>;
 
     fn get_object(&self, object_id: &Self::Identifier) -> Result<Self::Object, NCategoryError>;
 
     fn get_identity_cell(
         &self,
-        object_id: &Self::Identifier,
+        object_id: Self::Object,
     ) -> Result<&Self::Cell, NCategoryError>;
 
     fn get_all_objects(&self) -> Result<HashSet<Self::Object>, NCategoryError>;
@@ -52,7 +51,7 @@ where
 
     fn get_object_cells(
         &self,
-        object_id: &Self::Identifier,
+        object_id: Self::Object,
     ) -> Result<Vec<&Self::Cell>, NCategoryError>;
 
     fn get_object_targets(
@@ -79,7 +78,7 @@ where
             .map_err(|_| NCategoryError::ObjectNotFound)
     }
 
-    fn get_cell_tree(&self, cell_id: &Self::Identifier) -> Result<CellTree<Self::Identifier>, NCategoryError>
+    fn get_cell_tree(&self, cell_id: &Self::Cell) -> Result<CellTree<Self::Identifier>, NCategoryError>
     {
         /*
         Cell tree is a recursive structure that represents the hierarchy of cells and mapping
@@ -207,10 +206,6 @@ impl <'a, T: Identifier> NCategory<'a> for UnitCategory<T> {
         todo!()
     }
 
-    fn add_object_with_id(&mut self, object_id: Self::Identifier, object: Self::Object) -> Result<(), NCategoryError> {
-        todo!()
-    }
-
     fn add_cell(&mut self, cell: Self::Cell) -> Result<Self::Identifier, NCategoryError> {
         todo!()
     }
@@ -221,7 +216,7 @@ impl <'a, T: Identifier> NCategory<'a> for UnitCategory<T> {
 
     fn get_identity_cell(
         &self,
-        object_id: &Self::Identifier,
+        object_id: Self::Object,
     ) -> Result<&Self::Cell, NCategoryError> {
         todo!()
     }
@@ -236,7 +231,7 @@ impl <'a, T: Identifier> NCategory<'a> for UnitCategory<T> {
 
     fn get_object_cells(
         &self,
-        object_id: &Self::Identifier,
+        object_id: Self::Object,
     ) -> Result<Vec<&Self::Cell>, NCategoryError> {
         todo!()
     }

@@ -42,28 +42,15 @@ impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> 
     }
 
     fn add_object(&mut self, object: Self::Object) -> Result<Self::Identifier, NCategoryError> {
-        let object_id: Self::Identifier = Identifier::generate();
-        self.add_object_with_id(object_id.clone(), object).unwrap();
-        Ok(object_id)
-    }
-
-    fn add_object_with_id(&mut self, object_id: Self::Identifier, object: Self::Object) -> Result<(), NCategoryError> {
-        self.objects.insert(object_id.clone(), object);
-        // let identity_cell = GenericNCell {
-        //     id: object_id.clone(),
-        //     from: object_id.clone(),
-        //     to: object_id.clone(),
-        //     name: "identity".to_string(),
-        //     _phantom: std::marker::PhantomData,
-        // };
+        self.objects.insert(object.id().clone(), object);
         let identity_cell: GenericNCell<Self::Identifier> = GenericNCell::new(
-            object_id.clone(),
-            object_id.clone(),
-            object_id.clone(),
+            object.id().clone(),
+            object.id().clone(),
+            object.id().clone(),
             "identity".to_string(),
         );
         self.add_cell(identity_cell)?;
-        Ok(())
+        Ok(object.id().clone())
     }
 
     fn add_cell(&mut self, cell: Self::Cell) -> Result<Self::Identifier, NCategoryError> {
@@ -89,9 +76,9 @@ impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> 
         }
     }
 
-    fn get_identity_cell(&self, object_id: &Self::Identifier) -> Result<&Self::Cell, NCategoryError> {
+    fn get_identity_cell(&self, object_id: Self::Object) -> Result<&Self::Cell, NCategoryError> {
         // it's basically the cell with the same id as the object
-        self.get_cell(object_id)
+        self.get_cell(object_id.id())
     }
 
     fn get_all_objects(&self) -> Result<HashSet<Self::Object>, NCategoryError> {
@@ -109,13 +96,13 @@ impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> 
         Ok(result)
     }
 
-    fn get_object_cells(&self, object_id: &Self::Identifier) -> Result<Vec<&Self::Cell>, NCategoryError> {
-        if let Some(cells) = self.object_mapping.get(object_id) {
+    fn get_object_cells(&self, object: Self::Object) -> Result<Vec<&Self::Cell>, NCategoryError> {
+        if let Some(cells) = self.object_mapping.get(object.id()) {
             let mut result: Vec<&Self::Cell> = Vec::new();
             for (_to, cell_set) in cells {
                 for cell_id in cell_set {
                     if let Some(cell) = self.cells.get(cell_id) {
-                        if cell.source_object_id() == object_id {
+                        if cell.source_object_id() == object.id() {
                             result.push(&cell);
                         }
                     }

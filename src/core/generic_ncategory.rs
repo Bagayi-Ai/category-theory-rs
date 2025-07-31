@@ -9,16 +9,16 @@ use crate::core::nfunctor::NFunctor;
 use crate::core::generic_ncell::GenericNCell;
 
 
-pub struct GenericNCategory<'a, Id: Identifier, BaseCategory: NCategory<'a, Identifier = Id>>
+pub struct GenericNCategory<'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> + Debug + Eq>
 {
     id: Id,
     objects: HashMap<Id, &'a BaseCategory>,
     object_mapping: HashMap<Id, HashMap<Id, HashSet<Id>>>,
-    cells: HashMap<Id, GenericNCell<Id>>,
+    cells: HashMap<Id, GenericNCell<'a, Self>>,
 }
 
 
-impl <'a, Id: Identifier, Category: NCategory<'a, Identifier = Id>> GenericNCategory<'a, Id, Category>
+impl <'a, Id: Identifier<Id = Id>, Category: NCategory<'a, Identifier = Id> + Debug + Eq> GenericNCategory<'a, Id, Category>
 {
     pub fn new() -> Self {
         GenericNCategory {
@@ -31,10 +31,10 @@ impl <'a, Id: Identifier, Category: NCategory<'a, Identifier = Id>> GenericNCate
 }
 
 
-impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> + 'a> NCategory<'a> for GenericNCategory<'a, Id, BaseCategory>{
+impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> + 'a + Debug + Eq> NCategory<'a> for GenericNCategory<'a, Id, BaseCategory>{
     type Identifier = Id;
     type Object = &'a BaseCategory;
-    type Cell = GenericNCell<Id>;
+    type Cell = GenericNCell<'a, Self>;
     type BaseCategory = BaseCategory;
 
     fn category_id(&self) -> &Self::Identifier {
@@ -43,10 +43,10 @@ impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> 
 
     fn add_object(&mut self, object: Self::Object) -> Result<(), NCategoryError> {
         self.objects.insert(object.category_id().clone(), object);
-        let identity_cell: GenericNCell<Self::Identifier> = GenericNCell::new(
+        let identity_cell = GenericNCell::new(
             object.category_id().clone(),
-            object.category_id().clone(),
-            object.category_id().clone(),
+            object,
+            object,
             "identity".to_string(),
         );
         self.add_cell(identity_cell)?;
@@ -57,14 +57,14 @@ impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> 
         if self.cells.contains_key(&cell.id()) {
             return Err(NCategoryError::CellAlreadyExists);
         }
+        let cell = self.cells.entry(cell.id().clone()).or_insert(cell);
         self.object_mapping
-            .entry(cell.source_object_id().clone())
+            .entry(cell.source_object().category_id().clone())
             .or_default()
-            .entry(cell.target_object_id().clone())
+            .entry(cell.target_object().category_id().clone())
             .or_default()
-            .insert(cell.id().clone());
+            .insert(cell.cell_id().clone());
         let cell_id = cell.id().clone();
-        self.cells.insert(cell.id().clone(), cell);
         Ok(cell_id)
     }
 
@@ -90,9 +90,9 @@ impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> 
         // Ok(self.cells.values().collect())
 
         let mut result: HashSet<&Self::Cell> = HashSet::new();
-        for (_id, cell) in &self.cells {
-            result.insert(cell);
-        }
+        // for (_id, cell) in &self.cells {
+        //     result.insert(cell);
+        // }
         Ok(result)
     }
 
@@ -102,7 +102,7 @@ impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> 
             for (_to, cell_set) in cells {
                 for cell_id in cell_set {
                     if let Some(cell) = self.cells.get(cell_id) {
-                        if cell.source_object_id() == object.category_id() {
+                        if cell.source_object() == object {
                             result.push(&cell);
                         }
                     }

@@ -114,30 +114,27 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier<Id = T> + 'a> NCategory<'a> f
     }
 }
 
-impl<T: Eq + Clone + Hash + Debug + Identifier> NCell for DiscreteCategory<T> {
+impl<'a, T: Eq + Clone + Hash + Debug + Identifier<Id = T> + 'a> NCell<'a> for DiscreteCategory<T> {
 
-    type Identifier = T;
-    type Functor = UnitFunctor<T>;
+    type Category = Self;
+    // type Functor = UnitFunctor<T>;
 
-    fn cell_id(&self) -> &Self::Identifier {
+    fn cell_id(&self) -> &<Self::Category as NCategory<'a>>::Identifier {
         todo!()
     }
 
-    fn source_object_id(&self) -> &Self::Identifier {
-        &self.category_id
+    fn source_object(&self) -> <Self::Category as NCategory<'a>>::Object {
+        self.category_id.clone()
     }
 
-    fn target_object_id(&self) -> &Self::Identifier {
-        &self.category_id
+    fn target_object(&self) -> <Self::Category as NCategory<'a>>::Object {
+        self.category_id.clone()
     }
 
-    fn category_id(&self) -> &Self::Identifier {
-        todo!()
-    }
 
-    fn functor(&self) -> &<Self::Functor as NFunctor>::Identifier {
-        todo!()
-    }
+    // fn functor(&self) -> &<Self::Functor as NFunctor>::Identifier {
+    //     todo!()
+    // }
 }
 
 impl <T: Eq + Clone + Hash + Debug + Identifier<Id = T>> From<T> for DiscreteCategory<T>
@@ -188,8 +185,8 @@ mod tests {
         let cell = cell.unwrap();
         assert_eq!(cell.len(), 1);
         let cell = cell.first().unwrap();
-        assert_eq!(cell.source_object_id(), &object1);
-        assert_eq!(cell.target_object_id(), &object1);
+        assert_eq!(cell.source_object(), object1);
+        assert_eq!(cell.target_object(), object1);
 
         // check identity morphism
         let cell = category.get_object_cells(object1.clone());
@@ -197,8 +194,8 @@ mod tests {
         let cell = cell.unwrap();
         assert_eq!(cell.len(), 1);
         let cell = cell.first().unwrap();
-        assert_eq!(cell.source_object_id(), &object1);
-        assert_eq!(cell.target_object_id(), &object1);
+        assert_eq!(cell.source_object(), object1);
+        assert_eq!(cell.target_object(), object1);
 
         // TODO: implement comparison of the object assert_eq!(category.get_object(&object1_id).unwrap(), &object);
 
@@ -213,8 +210,8 @@ mod tests {
         let cells = cells.unwrap();
         assert_eq!(cells.len(), 1);
         let cell = cells.first().unwrap();
-        assert_eq!(cell.source_object_id(), &object2);
-        assert_eq!(cell.target_object_id(), &object2);
+        assert_eq!(cell.source_object(), object2);
+        assert_eq!(cell.target_object(), object2);
 
         // add object 3 without id
         let object3 = generate_object();
@@ -229,7 +226,7 @@ mod tests {
         let cells = cells.unwrap();
         assert_eq!(cells.len(), 1);
         let cell = cells.first().unwrap();
-        assert_eq!(cell.source_object_id(), &object3);
-        assert_eq!(cell.target_object_id(), &object3);
+        assert_eq!(cell.source_object(), object3);
+        assert_eq!(cell.target_object(), object3);
     }
 }

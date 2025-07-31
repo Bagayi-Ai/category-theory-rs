@@ -7,27 +7,36 @@ use crate::core::ncell::NCell;
 use crate::core::generic_nfunctor::GenericNFunctor;
 use crate::core::nfunctor::NFunctor;
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
-pub struct GenericNCell<Id: Identifier>
+#[derive(Debug, PartialEq, Eq)]
+pub struct GenericNCell<'a, Category>
+where
+    Category: NCategory<'a>,
+    <Category as NCategory<'a>>::Object: Clone
 {
-    id: Id,
-    source_id: Id,
-    target_id: Id,
+    id: <Category as NCategory<'a>>::Identifier,
+    source: <Category as NCategory<'a>>::Object,
+    target: <Category as NCategory<'a>>::Object,
     name: String,
 }
 
-impl <Id: Identifier> GenericNCell<Id>
+impl <'a, Category: NCategory<'a>> GenericNCell<'a, Category>
+where <Category as NCategory<'a>>::Object: Clone
 {
-    pub fn new(id: Id, source_id: Id, target_id: Id, name: String) -> Self {
+    pub fn new(
+        id: <Category as NCategory<'a>>::Identifier,
+        source: <Category as NCategory<'a>>::Object,
+        target: <Category as NCategory<'a>>::Object,
+        name: String
+    ) -> Self {
         GenericNCell {
             id,
-            source_id,
-            target_id,
+            source,
+            target,
             name,
         }
     }
 
-    pub fn id(&self) -> &Id {
+    pub fn id(&self) -> &<Category as NCategory<'a>>::Identifier {
         &self.id
     }
 
@@ -37,28 +46,25 @@ impl <Id: Identifier> GenericNCell<Id>
 }
 
 
-impl <Id: Identifier> NCell for GenericNCell<Id>
+impl <'a, Category: NCategory<'a>> NCell<'a> for GenericNCell<'a, Category>
+where <Category as NCategory<'a>>::Object: Clone
 {
-    type Identifier = Id;
-    type Functor = GenericNFunctor<Self::Identifier>;
+    type Category = Category;
+    // type Functor = GenericNFunctor<Self::Identifier>;
 
-    fn cell_id(&self) -> &Self::Identifier {
+    fn cell_id(&self) -> &<Category as NCategory<'a>>::Identifier {
         &self.id
     }
 
-    fn category_id(&self) -> &Self::Identifier {
-        todo!()
+    fn source_object(&self) -> <Category as NCategory<'a>>::Object {
+        self.source.clone()
     }
 
-    fn source_object_id(&self) -> &Self::Identifier {
-        &self.source_id
+    fn target_object(&self) -> <Category as NCategory<'a>>::Object {
+        self.target.clone()
     }
 
-    fn target_object_id(&self) -> &Self::Identifier {
-        &self.target_id
-    }
-
-    fn functor(&self) -> &<Self::Functor as NFunctor>::Identifier {
-        todo!()
-    }
+    // fn functor(&self) -> &<Self::Functor as NFunctor>::Identifier {
+    //     todo!()
+    // }
 }

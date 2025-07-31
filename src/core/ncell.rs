@@ -2,46 +2,40 @@ use crate::core::identifier::Identifier;
 use crate::core::ncategory::{NCategory, UnitCategory};
 use crate::core::nfunctor::{NFunctor, UnitFunctor};
 
-pub trait NCell
+pub trait NCell<'a>
 {
-    type Identifier: Identifier;
+    type Category: NCategory<'a>;
 
-    type Functor: NFunctor<Identifier = Self::Identifier>;
+    // type Functor: NFunctor<Identifier = Self::Identifier>;
 
-    fn cell_id(&self) -> &Self::Identifier;
+    fn cell_id(&self) -> &<Self::Category as NCategory<'a>>::Identifier;
 
-    fn category_id(&self) -> &Self::Identifier;
+    fn source_object(&self) -> <Self::Category as NCategory<'a>>::Object;
 
-    fn source_object_id(&self) -> &Self::Identifier;
+    fn target_object(&self) -> <Self::Category as NCategory<'a>>::Object;
 
-    fn target_object_id(&self) -> &Self::Identifier;
-
-    fn functor(&self) -> &<Self::Functor as NFunctor>::Identifier;
+    // fn functor(&self) -> &<Self::Functor as NFunctor>::Identifier;
 }
 
-impl <T: Identifier> NCell for UnitCategory<T> {
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct UnitCell<T: Identifier> {
+    _phantom: std::marker::PhantomData<T>,
+}
 
-    type Identifier = T;
 
-    type Functor = UnitFunctor<T>;
 
-    fn cell_id(&self) -> &Self::Identifier {
+impl <'a, T: Identifier> NCell<'a> for UnitCell<T> {
+    type Category = UnitCategory<T>;
+
+    fn cell_id(&self) -> &<Self::Category as NCategory<'a>>::Identifier {
         todo!()
     }
 
-    fn category_id(&self) -> &Self::Identifier {
+    fn source_object(&self) -> <Self::Category as NCategory<'a>>::Object {
         todo!()
     }
 
-    fn source_object_id(&self) -> &Self::Identifier {
-        todo!()
-    }
-
-    fn target_object_id(&self) -> &Self::Identifier {
-        todo!()
-    }
-
-    fn functor(&self) -> &<Self::Functor as NFunctor>::Identifier {
+    fn target_object(&self) -> <Self::Category as NCategory<'a>>::Object {
         todo!()
     }
 }

@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 use std::hash::Hash;
 use std::fmt::Debug;
 
-use crate::core::ncell::{NCell};
+use crate::core::ncell::{NCell, UnitCell};
 use crate::core::identifier::Identifier;
 use crate::core::cell_tree::CellTree;
 
@@ -28,8 +28,8 @@ where
     Self::BaseCategory: NCategory<'a, Identifier = Self::Identifier>,
 {
     type Identifier: Identifier;
-    type Object: 'a;
-    type Cell: NCell<Identifier = Self::Identifier>;
+    type Object: 'a + Eq + Debug;
+    type Cell: NCell<'a, Category = Self>;
     type BaseCategory: NCategory<'a>;
 
     fn category_id(&self) -> &Self::Identifier;
@@ -68,16 +68,6 @@ where
 
     fn get_cell(&self, cell_id: &Self::Identifier) -> Result<&Self::Cell, NCategoryError>;
 
-    fn get_cell_source_object(&self, cell: &Self::Cell) -> Result<Self::Object, NCategoryError> {
-        self.get_object(cell.source_object_id())
-            .map_err(|_| NCategoryError::ObjectNotFound)
-    }
-
-    fn get_cell_target_object(&self, cell: &Self::Cell) -> Result<Self::Object, NCategoryError> {
-        self.get_object(cell.target_object_id())
-            .map_err(|_| NCategoryError::ObjectNotFound)
-    }
-
     fn get_cell_tree(&self, cell_id: &Self::Cell) -> Result<CellTree<Self::Identifier>, NCategoryError>
     {
         /*
@@ -103,66 +93,62 @@ where
     }
     fn cells_commute(
         &self,
-        left_cell_id: Vec<&Self::Identifier>,
-        right_cell_id: Vec<&Self::Identifier>,
+        left_cells: Vec<&Self::Cell>,
+        right_cells: Vec<&Self::Cell>,
     ) -> Result<bool, NCategoryError> {
 
-        self.validate_commutation(left_cell_id, right_cell_id)?;
+        self.validate_commutation(left_cells, right_cells)?;
 
 
         Ok(true)
     }
 
     fn validate_commutation(&self,
-                            left_cell_ids: Vec<&Self::Identifier>,
-                            right_cell_ids: Vec<&Self::Identifier>) -> Result<(), NCategoryError>
+                            left_cells: Vec<&Self::Cell>,
+                            right_cells: Vec<&Self::Cell>) -> Result<(), NCategoryError>
     {
         // source and target of left cells id should be same with right cells
-        let left_source_object_id = self.get_cell(&left_cell_ids[0])?.source_object_id();
-        let right_source_object_id = self.get_cell(&right_cell_ids[0])?.source_object_id();
+        let left_source_object = left_cells.first().ok_or_else(|| NCategoryError::InvalidCellCommutation)?.source_object();
+        let right_source_object = right_cells.first().ok_or_else(|| NCategoryError::InvalidCellCommutation)?.source_object();
 
-        if left_source_object_id != right_source_object_id {
+        if left_source_object != right_source_object {
             return Err(NCategoryError::InvalidCellComposition);
         }
 
-        let left_target_object_id = self.get_cell(&left_cell_ids[left_cell_ids.len() - 1])?.target_object_id();
-        let right_target_object_id = self.get_cell(&right_cell_ids[right_cell_ids.len() - 1])?.target_object_id();
+        let left_target_object = left_cells.first().ok_or_else(|| NCategoryError::InvalidCellCommutation)?.target_object();
+        let right_target_object = right_cells.first().ok_or_else(|| NCategoryError::InvalidCellCommutation)?.target_object();
 
-        if left_target_object_id != right_target_object_id {
+        if left_target_object != right_target_object {
             return Err(NCategoryError::InvalidCellComposition);
         }
 
         // confirm composition is correct
-        self.validate_composition(left_cell_ids)?;
-        self.validate_composition(right_cell_ids)?;
+        self.validate_composition(left_cells)?;
+        self.validate_composition(right_cells)?;
 
         Ok(())
     }
 
-    fn validate_composition(&self, cell_ids: Vec<&Self::Identifier>) -> Result<(), NCategoryError>
+    fn validate_composition(&self, cells: Vec<&Self::Cell>) -> Result<(), NCategoryError>
     {
-        if cell_ids.is_empty() {
+        if cells.is_empty() {
             return Err(NCategoryError::InvalidCellComposition)
         }
 
         // composition of only once cell is always valid
-        if cell_ids.len() <= 1 {
+        if cells.len() <= 1 {
             return Ok(());
         }
         // target of first cell needs to be the source of subsequent cell
-        let mut target_object_id = self.get_cell(&cell_ids[0])?.target_object_id();
+        let mut target_object = cells.first()
+            .ok_or_else(|| NCategoryError::InvalidCellComposition)?.target_object();
 
-        for cell_id in &cell_ids[1..] {
-            let cell = self.get_cell(cell_id)?;
-
-            if cell.source_object_id() != target_object_id {
+        for cell in &cells[1..] {
+            if cell.source_object() != target_object {
                 return Err(NCategoryError::InvalidCellComposition);
             }
-
-            target_object_id = cell.target_object_id();
+            target_object = cell.target_object();
         }
-
-
         Ok(())
     }
 
@@ -194,7 +180,7 @@ impl <'a, T: Identifier> NCategory<'a> for UnitCategory<T> {
 
     type Object = ();
 
-    type Cell = Self;
+    type Cell = UnitCell<T>;
 
     type BaseCategory = UnitCategory<T>;
 

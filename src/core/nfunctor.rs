@@ -1,4 +1,4 @@
-use crate::core::ncategory::{NCategory, UnitCategory};
+use crate::core::ncategory::{NCategory, NCategoryError, UnitCategory};
 use crate::core::identifier::{Identifier};
 
 pub trait NFunctor<'a>
@@ -13,6 +13,13 @@ pub trait NFunctor<'a>
     fn source_category(&self) -> &Self::SourceCategory;
 
     fn target_category(&self) -> &Self::TargetCategory;
+
+    fn validate_level(&self) -> Result<(), NCategoryError> {
+        if self.source_category().level() != self.target_category().level() {
+            return Err(NCategoryError::InvalidFunctorLevelMissmatch);
+        }
+        Ok(())
+    }
 
 }
 

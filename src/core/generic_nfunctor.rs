@@ -1,5 +1,5 @@
 use crate::core::identifier::Identifier;
-use crate::core::ncategory::NCategory;
+use crate::core::ncategory::{NCategory, NCategoryError};
 use crate::core::nfunctor::NFunctor;
 
 pub struct GenericNFunctor<'a, Id: Identifier, SourceCategory: NCategory<'a>,  TargetCategory: NCategory<'a>>{

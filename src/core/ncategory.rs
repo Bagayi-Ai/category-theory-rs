@@ -20,6 +20,8 @@ pub enum NCategoryError {
     InvalidCellMapping,
     NoObjectsInCategory,
     InvalidCategory,
+    InvalidFunctorLevelMissmatch,
+    InvalidFunctor,
 }
 
 
@@ -31,6 +33,11 @@ where
     type Object: 'a + Eq + Debug;
     type Cell: NCell<'a, Category = Self>;
     type BaseCategory: NCategory<'a>;
+
+
+    fn level(&self) -> usize where Self: Sized {
+        Self::nested_level()
+    }
 
     fn category_id(&self) -> &Self::Identifier;
 
@@ -160,7 +167,7 @@ where
 
     fn base_object(&self, object_id: &Self::Identifier) -> Result<&Self::BaseCategory, NCategoryError>;
 
-    fn nested_level() -> isize
+    fn nested_level() -> usize
     where
         Self: Sized,
     {
@@ -230,5 +237,5 @@ impl <'a, T: Identifier> NCategory<'a> for UnitCategory<T> {
         todo!()
     }
 
-    fn nested_level() -> isize { 0 }
+    fn nested_level() -> usize { 0 }
 }

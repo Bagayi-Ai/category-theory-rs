@@ -2,7 +2,7 @@ use rand::{distributions::Alphanumeric, Rng};
 use crate::core::discrete_category::DiscreteCategory;
 use crate::core::ncategory::{NCategory};
 use crate::core::identifier::Identifier;
-use crate::core::ncell::NCell;
+use crate::core::morphism::Morphism;
 use crate::core::tests::test_generic_ncategory::GenericCategory1TestHelper;
 
 pub trait NCategoryTestHelper<'a> {

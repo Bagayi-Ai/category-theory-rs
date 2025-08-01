@@ -6,16 +6,16 @@ mod core {
 
     pub mod discrete_category;
     
-    pub mod ncell;
+    pub mod morphism;
 
-    pub mod generic_ncell;
+    pub mod generic_morphism;
 
     pub mod generic_nfunctor;
 
 
     pub mod nfunctor;
 
-    pub mod cell_tree;
+    pub mod morphism_tree;
 
     pub mod identifier;
 

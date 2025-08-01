@@ -9,8 +9,8 @@ pub struct GenericNFunctor<'a, Id: Identifier, SourceCategory: NCategory<'a>,  T
     source_category: &'a SourceCategory,
     target_category: &'a TargetCategory,
     mappings: HashMap<
-        &'a <SourceCategory as NCategory<'a>>::Cell,
-        &'a <TargetCategory as NCategory<'a>>::Cell>,
+        &'a <SourceCategory as NCategory<'a>>::Morphism,
+        &'a <TargetCategory as NCategory<'a>>::Morphism>,
 }
 
 impl<'a, Id, SourceCategory, TargetCategory> GenericNFunctor<'a, Id, SourceCategory, TargetCategory>
@@ -24,8 +24,8 @@ where
         source_category: &'a SourceCategory,
         target_category: &'a TargetCategory,
         mappings: HashMap<
-            &'a <SourceCategory as NCategory<'a>>::Cell,
-            &'a <TargetCategory as NCategory<'a>>::Cell>,
+            &'a <SourceCategory as NCategory<'a>>::Morphism,
+            &'a <TargetCategory as NCategory<'a>>::Morphism>,
     ) -> Self {
         let functor = GenericNFunctor {
             id,

@@ -2,9 +2,9 @@ use std::collections::{HashMap, HashSet};
 use std::hash::Hash;
 use std::fmt::Debug;
 
-use crate::core::ncell::{NCell, UnitCell};
+use crate::core::morphism::{Morphism, UnitMorphism};
 use crate::core::identifier::Identifier;
-use crate::core::cell_tree::CellTree;
+use crate::core::morphism_tree::MorphismMappingTree;
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -25,13 +25,13 @@ pub enum NCategoryError {
 }
 
 
-pub trait NCategory<'a>
+pub trait NCategory<'a> : Debug
 where
     Self::BaseCategory: NCategory<'a, Identifier = Self::Identifier>,
 {
     type Identifier: Identifier;
     type Object: 'a + Eq + Debug;
-    type Cell: NCell<'a, Category = Self>;
+    type Morphism: Morphism<'a, Category = Self>;
     type BaseCategory: NCategory<'a>;
 
 
@@ -43,23 +43,23 @@ where
 
     fn add_object(&mut self, object: Self::Object) -> Result<(), NCategoryError>;
 
-    fn add_cell(&mut self, cell: Self::Cell) -> Result<Self::Identifier, NCategoryError>;
+    fn add_moprhism(&mut self, cell: Self::Morphism) -> Result<Self::Identifier, NCategoryError>;
 
     fn get_object(&self, object_id: &Self::Identifier) -> Result<Self::Object, NCategoryError>;
 
-    fn get_identity_cell(
+    fn get_identity_morphism(
         &self,
         object: Self::Object,
-    ) -> Result<&Self::Cell, NCategoryError>;
+    ) -> Result<&Self::Morphism, NCategoryError>;
 
     fn get_all_objects(&self) -> Result<HashSet<Self::Object>, NCategoryError>;
 
-    fn get_all_cells(&self) -> Result<HashSet<&Self::Cell>, NCategoryError>;
+    fn get_all_morphisms(&self) -> Result<HashSet<&Self::Morphism>, NCategoryError>;
 
-    fn get_object_cells(
+    fn get_object_morphisms(
         &self,
         object_id: Self::Object,
-    ) -> Result<Vec<&Self::Cell>, NCategoryError>;
+    ) -> Result<Vec<&Self::Morphism>, NCategoryError>;
 
     fn get_object_targets(
         &self,
@@ -73,9 +73,9 @@ where
         todo!()
     }
 
-    fn get_cell(&self, cell_id: &Self::Identifier) -> Result<&Self::Cell, NCategoryError>;
+    fn get_cell(&self, cell_id: &Self::Identifier) -> Result<&Self::Morphism, NCategoryError>;
 
-    fn get_cell_tree(&self, cell_id: &Self::Cell) -> Result<CellTree<Self::Identifier>, NCategoryError>
+    fn get_morphism_tree(&self, cell_id: &Self::Morphism) -> Result<MorphismMappingTree<'a, Self::Identifier, Self, Self>, NCategoryError> where Self: Sized
     {
         /*
         Cell tree is a recursive structure that represents the hierarchy of cells and mapping
@@ -100,8 +100,8 @@ where
     }
     fn cells_commute(
         &self,
-        left_cells: Vec<&Self::Cell>,
-        right_cells: Vec<&Self::Cell>,
+        left_cells: Vec<&Self::Morphism>,
+        right_cells: Vec<&Self::Morphism>,
     ) -> Result<bool, NCategoryError> {
 
         self.validate_commutation(left_cells, right_cells)?;
@@ -111,8 +111,8 @@ where
     }
 
     fn validate_commutation(&self,
-                            left_cells: Vec<&Self::Cell>,
-                            right_cells: Vec<&Self::Cell>) -> Result<(), NCategoryError>
+                            left_cells: Vec<&Self::Morphism>,
+                            right_cells: Vec<&Self::Morphism>) -> Result<(), NCategoryError>
     {
         // source and target of left cells id should be same with right cells
         let left_source_object = left_cells.first().ok_or_else(|| NCategoryError::InvalidCellCommutation)?.source_object();
@@ -136,7 +136,7 @@ where
         Ok(())
     }
 
-    fn validate_composition(&self, cells: Vec<&Self::Cell>) -> Result<(), NCategoryError>
+    fn validate_composition(&self, cells: Vec<&Self::Morphism>) -> Result<(), NCategoryError>
     {
         if cells.is_empty() {
             return Err(NCategoryError::InvalidCellComposition)
@@ -187,7 +187,7 @@ impl <'a, T: Identifier> NCategory<'a> for UnitCategory<T> {
 
     type Object = ();
 
-    type Cell = UnitCell<T>;
+    type Morphism = UnitMorphism<T>;
 
     type BaseCategory = UnitCategory<T>;
 
@@ -199,7 +199,7 @@ impl <'a, T: Identifier> NCategory<'a> for UnitCategory<T> {
         todo!()
     }
 
-    fn add_cell(&mut self, cell: Self::Cell) -> Result<Self::Identifier, NCategoryError> {
+    fn add_moprhism(&mut self, cell: Self::Morphism) -> Result<Self::Identifier, NCategoryError> {
         todo!()
     }
 
@@ -207,10 +207,10 @@ impl <'a, T: Identifier> NCategory<'a> for UnitCategory<T> {
         todo!()
     }
 
-    fn get_identity_cell(
+    fn get_identity_morphism(
         &self,
         object_id: Self::Object,
-    ) -> Result<&Self::Cell, NCategoryError> {
+    ) -> Result<&Self::Morphism, NCategoryError> {
         todo!()
     }
 
@@ -218,18 +218,18 @@ impl <'a, T: Identifier> NCategory<'a> for UnitCategory<T> {
         todo!()
     }
 
-    fn get_all_cells(&self) -> Result<HashSet<&Self::Cell>, NCategoryError> {
+    fn get_all_morphisms(&self) -> Result<HashSet<&Self::Morphism>, NCategoryError> {
         todo!()
     }
 
-    fn get_object_cells(
+    fn get_object_morphisms(
         &self,
         object_id: Self::Object,
-    ) -> Result<Vec<&Self::Cell>, NCategoryError> {
+    ) -> Result<Vec<&Self::Morphism>, NCategoryError> {
         todo!()
     }
 
-    fn get_cell(&self, cell_id: &Self::Identifier) -> Result<&Self::Cell, NCategoryError> {
+    fn get_cell(&self, cell_id: &Self::Identifier) -> Result<&Self::Morphism, NCategoryError> {
         todo!()
     }
 

@@ -4,9 +4,9 @@ use crate::core::tests::ncategory_test_helper::*;
 use crate::core::discrete_category::{DiscreteCategory};
 use crate::core::generic_ncategory::*;
 use crate::core::ncategory::{NCategory, NCategoryError};
-use crate::core::cell_tree::CellTree;
-use crate::core::ncell::NCell;
-use crate::core::generic_ncell::GenericNCell;
+use crate::core::morphism_tree::MorphismMappingTree;
+use crate::core::morphism::Morphism;
+use crate::core::generic_morphism::GenericMorphism;
 use crate::core::generic_nfunctor::GenericNFunctor;
 use crate::core::identifier::Identifier;
 
@@ -209,7 +209,7 @@ pub fn test_base_scenarios() {
     category.add_object(&object1).unwrap();
     assert!(category.get_object(&object1_id).is_ok());
     // check identity morphism
-    let cell = category.get_object_cells(&object1);
+    let cell = category.get_object_morphisms(&object1);
     assert!(cell.is_ok());
     let cell = cell.unwrap();
     assert_eq!(cell.len(), 1);
@@ -223,7 +223,7 @@ pub fn test_base_scenarios() {
     assert!(!category.get_object(&object2_id).is_ok());
 
     // check identity morphism
-    let cell = category.get_object_cells(&object1);
+    let cell = category.get_object_morphisms(&object1);
     assert!(cell.is_ok());
     let cell = cell.unwrap();
     assert_eq!(cell.len(), 1);
@@ -243,7 +243,7 @@ pub fn test_base_scenarios() {
     assert!(category.get_object(&object2_id).is_ok());
 
     // check identity morphism
-    let cells = category.get_object_cells(&object2);
+    let cells = category.get_object_morphisms(&object2);
     assert!(cells.is_ok());
     let cells = cells.unwrap();
     assert_eq!(cells.len(), 1);
@@ -260,7 +260,7 @@ pub fn test_base_scenarios() {
     assert!(category.get_object(&object3_id).is_ok());
 
     // check identity morphism
-    let cells = category.get_object_cells(&object3);
+    let cells = category.get_object_morphisms(&object3);
     assert!(cells.is_ok());
     let cells = cells.unwrap();
     assert_eq!(cells.len(), 1);
@@ -270,12 +270,12 @@ pub fn test_base_scenarios() {
 
     // now add a cell between object1 and object2
     let cell_id = generate_identifier();
-    let cell = GenericNCell::new(
+    let cell = GenericMorphism::new(
         cell_id.clone(),
         &object1,
         &object2,
         "obj1 to obj2".to_string());
-    category.add_cell(cell).unwrap();
+    category.add_moprhism(cell).unwrap();
 
 
     let cell = category.get_cell(&cell_id).unwrap();
@@ -325,7 +325,7 @@ pub fn test_identity_cell_tree() {
     setCategoryAlphabet.add_object(
         &discreteCategoryALower).unwrap();
 
-    let identity_cell = setCategoryAlphabet.get_identity_cell(&discreteCategoryALower).unwrap();
+    let identity_cell = setCategoryAlphabet.get_identity_morphism(&discreteCategoryALower).unwrap();
     assert_eq!(identity_cell.source_object(), &discreteCategoryALower);
     assert_eq!(identity_cell.target_object(), &discreteCategoryALower);
 
@@ -375,16 +375,16 @@ pub fn test_identity_cell_tree() {
         &discreteCategoryAUpper,
         HashMap::from([
             // a to A
-            (discreteCategoryALower.get_identity_cell(object_a.clone()).unwrap(),
-             discreteCategoryAUpper.get_identity_cell(object_A.clone()).unwrap()),
+            (discreteCategoryALower.get_identity_morphism(object_a.clone()).unwrap(),
+             discreteCategoryAUpper.get_identity_morphism(object_A.clone()).unwrap()),
 
             // b to B
-            (discreteCategoryALower.get_identity_cell(object_b.clone()).unwrap(),
-             discreteCategoryAUpper.get_identity_cell(object_B.clone()).unwrap()),
+            (discreteCategoryALower.get_identity_morphism(object_b.clone()).unwrap(),
+             discreteCategoryAUpper.get_identity_morphism(object_B.clone()).unwrap()),
 
             // c to C
-            (discreteCategoryALower.get_identity_cell(object_c.clone()).unwrap(),
-             discreteCategoryAUpper.get_identity_cell(object_C.clone()).unwrap()),
+            (discreteCategoryALower.get_identity_morphism(object_c.clone()).unwrap(),
+             discreteCategoryAUpper.get_identity_morphism(object_C.clone()).unwrap()),
         ])
     );
 

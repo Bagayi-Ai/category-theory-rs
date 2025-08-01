@@ -3,12 +3,12 @@ use std::hash::Hash;
 use crate::core::discrete_category::DiscreteCategory;
 use crate::core::identifier::{Identifier};
 use crate::core::ncategory::NCategory;
-use crate::core::ncell::NCell;
+use crate::core::morphism::Morphism;
 use crate::core::generic_nfunctor::GenericNFunctor;
 use crate::core::nfunctor::NFunctor;
 
 #[derive(Debug, PartialEq, Eq)]
-pub struct GenericNCell<'a, Category>
+pub struct GenericMorphism<'a, Category>
 where
     Category: NCategory<'a>,
     <Category as NCategory<'a>>::Object: Clone
@@ -19,7 +19,7 @@ where
     name: String,
 }
 
-impl <'a, Category: NCategory<'a>> GenericNCell<'a, Category>
+impl <'a, Category: NCategory<'a>> GenericMorphism<'a, Category>
 where <Category as NCategory<'a>>::Object: Clone
 {
     pub fn new(
@@ -28,7 +28,7 @@ where <Category as NCategory<'a>>::Object: Clone
         target: <Category as NCategory<'a>>::Object,
         name: String
     ) -> Self {
-        GenericNCell {
+        GenericMorphism {
             id,
             source,
             target,
@@ -46,7 +46,7 @@ where <Category as NCategory<'a>>::Object: Clone
 }
 
 
-impl <'a, Category: NCategory<'a>> NCell<'a> for GenericNCell<'a, Category>
+impl <'a, Category: NCategory<'a>> Morphism<'a> for GenericMorphism<'a, Category>
 where <Category as NCategory<'a>>::Object: Clone
 {
     type Category = Category;

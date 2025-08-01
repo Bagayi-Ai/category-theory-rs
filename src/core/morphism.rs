@@ -1,8 +1,9 @@
+use std::fmt::Debug;
 use crate::core::identifier::Identifier;
 use crate::core::ncategory::{NCategory, UnitCategory};
 use crate::core::nfunctor::{NFunctor, UnitFunctor};
 
-pub trait NCell<'a>
+pub trait Morphism<'a> : Debug
 {
     type Category: NCategory<'a>;
 
@@ -18,13 +19,13 @@ pub trait NCell<'a>
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct UnitCell<T: Identifier> {
+pub struct UnitMorphism<T: Identifier> {
     _phantom: std::marker::PhantomData<T>,
 }
 
 
 
-impl <'a, T: Identifier> NCell<'a> for UnitCell<T> {
+impl <'a, T: Identifier> Morphism<'a> for UnitMorphism<T> {
     type Category = UnitCategory<T>;
 
     fn cell_id(&self) -> &<Self::Category as NCategory<'a>>::Identifier {

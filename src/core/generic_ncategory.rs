@@ -4,17 +4,18 @@ use std::collections::{HashMap, HashSet};
 use crate::core::generic_nfunctor::GenericNFunctor;
 use crate::core::ncategory::{NCategory, NCategoryError};
 use crate::core::identifier::Identifier;
-use crate::core::ncell::NCell;
+use crate::core::morphism::Morphism;
 use crate::core::nfunctor::NFunctor;
-use crate::core::generic_ncell::GenericNCell;
+use crate::core::generic_morphism::GenericMorphism;
 
 
+#[derive(Debug)]
 pub struct GenericNCategory<'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> + Debug + Eq>
 {
     id: Id,
     objects: HashMap<Id, &'a BaseCategory>,
     object_mapping: HashMap<Id, HashMap<Id, HashSet<Id>>>,
-    cells: HashMap<Id, GenericNCell<'a, Self>>,
+    cells: HashMap<Id, GenericMorphism<'a, Self>>,
 }
 
 
@@ -34,7 +35,7 @@ impl <'a, Id: Identifier<Id = Id>, Category: NCategory<'a, Identifier = Id> + De
 impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> + 'a + Debug + Eq> NCategory<'a> for GenericNCategory<'a, Id, BaseCategory>{
     type Identifier = Id;
     type Object = &'a BaseCategory;
-    type Cell = GenericNCell<'a, Self>;
+    type Morphism = GenericMorphism<'a, Self>;
     type BaseCategory = BaseCategory;
 
     fn category_id(&self) -> &Self::Identifier {
@@ -43,17 +44,17 @@ impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> 
 
     fn add_object(&mut self, object: Self::Object) -> Result<(), NCategoryError> {
         self.objects.insert(object.category_id().clone(), object);
-        let identity_cell = GenericNCell::new(
+        let identity_cell = GenericMorphism::new(
             object.category_id().clone(),
             object,
             object,
             "identity".to_string(),
         );
-        self.add_cell(identity_cell)?;
+        self.add_moprhism(identity_cell)?;
         Ok(())
     }
 
-    fn add_cell(&mut self, cell: Self::Cell) -> Result<Self::Identifier, NCategoryError> {
+    fn add_moprhism(&mut self, cell: Self::Morphism) -> Result<Self::Identifier, NCategoryError> {
         if self.cells.contains_key(&cell.id()) {
             return Err(NCategoryError::CellAlreadyExists);
         }
@@ -76,7 +77,7 @@ impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> 
         }
     }
 
-    fn get_identity_cell(&self, object_id: Self::Object) -> Result<&Self::Cell, NCategoryError> {
+    fn get_identity_morphism(&self, object_id: Self::Object) -> Result<&Self::Morphism, NCategoryError> {
         // it's basically the cell with the same id as the object
         self.get_cell(object_id.category_id())
     }
@@ -85,20 +86,20 @@ impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> 
         todo!()
     }
 
-    fn get_all_cells(&self) -> Result<HashSet<&Self::Cell>, NCategoryError> {
+    fn get_all_morphisms(&self) -> Result<HashSet<&Self::Morphism>, NCategoryError> {
         // Todo needs optimization
         // Ok(self.cells.values().collect())
 
-        let mut result: HashSet<&Self::Cell> = HashSet::new();
+        let mut result: HashSet<&Self::Morphism> = HashSet::new();
         // for (_id, cell) in &self.cells {
         //     result.insert(cell);
         // }
         Ok(result)
     }
 
-    fn get_object_cells(&self, object: Self::Object) -> Result<Vec<&Self::Cell>, NCategoryError> {
+    fn get_object_morphisms(&self, object: Self::Object) -> Result<Vec<&Self::Morphism>, NCategoryError> {
         if let Some(cells) = self.object_mapping.get(object.category_id()) {
-            let mut result: Vec<&Self::Cell> = Vec::new();
+            let mut result: Vec<&Self::Morphism> = Vec::new();
             for (_to, cell_set) in cells {
                 for cell_id in cell_set {
                     if let Some(cell) = self.cells.get(cell_id) {
@@ -114,7 +115,7 @@ impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> 
         }
     }
 
-    fn get_cell(&self, cell_id: &Self::Identifier) -> Result<&Self::Cell, NCategoryError> {
+    fn get_cell(&self, cell_id: &Self::Identifier) -> Result<&Self::Morphism, NCategoryError> {
         if let Some(cell) = self.cells.get(cell_id) {
             Ok(cell)
         } else {

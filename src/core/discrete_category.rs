@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 use crate::core::identifier::Identifier;
 use crate::core::ncategory::{NCategory, NCategoryError, UnitCategory};
-use crate::core::ncell::NCell;
+use crate::core::morphism::Morphism;
 use crate::core::nfunctor::{NFunctor, UnitFunctor};
 
 
@@ -47,7 +47,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier<Id = T> + 'a> NCategory<'a> f
 {
     type Identifier = T;
     type Object = T;
-    type Cell = Self;
+    type Morphism = Self;
     type BaseCategory = UnitCategory<T>;
 
     fn category_id(&self) -> &Self::Identifier {
@@ -65,7 +65,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier<Id = T> + 'a> NCategory<'a> f
         Ok(())
     }
 
-    fn add_cell(&mut self, _cell: Self::Cell) -> Result<Self::Identifier, NCategoryError> {
+    fn add_moprhism(&mut self, _cell: Self::Morphism) -> Result<Self::Identifier, NCategoryError> {
         Err(NCategoryError::OnlyIdentityCellDiscreteCategory)
     }
 
@@ -78,7 +78,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier<Id = T> + 'a> NCategory<'a> f
         Err(NCategoryError::ObjectNotFound)
     }
 
-    fn get_identity_cell(&self, object_id: Self::Object) -> Result<&Self::Cell, NCategoryError> {
+    fn get_identity_morphism(&self, object_id: Self::Object) -> Result<&Self::Morphism, NCategoryError> {
         self.get_cell(&object_id)
     }
 
@@ -90,17 +90,17 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier<Id = T> + 'a> NCategory<'a> f
         }
     }
 
-    fn get_all_cells(&self) -> Result<HashSet<&Self::Cell>, NCategoryError> {
+    fn get_all_morphisms(&self) -> Result<HashSet<&Self::Morphism>, NCategoryError> {
         self.get_all_objects()?.into_iter().map(
-            |object_id| self.get_identity_cell(object_id)).collect()
+            |object_id| self.get_identity_morphism(object_id)).collect()
     }
 
-    fn get_object_cells(&self, object_id: Self::Object) -> Result<Vec<&Self::Cell>, NCategoryError> {
+    fn get_object_morphisms(&self, object_id: Self::Object) -> Result<Vec<&Self::Morphism>, NCategoryError> {
         // only cell in discrete category is the identity cell.
-        Ok(vec![self.get_identity_cell(object_id)?])
+        Ok(vec![self.get_identity_morphism(object_id)?])
     }
 
-    fn get_cell(&self, cell_id: &Self::Identifier) -> Result<&Self::Cell, NCategoryError> {
+    fn get_cell(&self, cell_id: &Self::Identifier) -> Result<&Self::Morphism, NCategoryError> {
         if let Some(cells) = &self.cells {
             if let Some(cell) = cells.get(cell_id) {
                 return Ok(cell);
@@ -114,7 +114,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier<Id = T> + 'a> NCategory<'a> f
     }
 }
 
-impl<'a, T: Eq + Clone + Hash + Debug + Identifier<Id = T> + 'a> NCell<'a> for DiscreteCategory<T> {
+impl<'a, T: Eq + Clone + Hash + Debug + Identifier<Id = T> + 'a> Morphism<'a> for DiscreteCategory<T> {
 
     type Category = Self;
     // type Functor = UnitFunctor<T>;
@@ -180,7 +180,7 @@ mod tests {
         category.add_object(object1.clone()).unwrap();
         assert!(category.get_object(&object1).is_ok());
         // check identity morphism
-        let cell = category.get_object_cells(object1.clone());
+        let cell = category.get_object_morphisms(object1.clone());
         assert!(cell.is_ok());
         let cell = cell.unwrap();
         assert_eq!(cell.len(), 1);
@@ -189,7 +189,7 @@ mod tests {
         assert_eq!(cell.target_object(), object1);
 
         // check identity morphism
-        let cell = category.get_object_cells(object1.clone());
+        let cell = category.get_object_morphisms(object1.clone());
         assert!(cell.is_ok());
         let cell = cell.unwrap();
         assert_eq!(cell.len(), 1);
@@ -205,7 +205,7 @@ mod tests {
         assert!(category.get_object(&object2).is_ok());
 
         // check identity morphism
-        let cells = category.get_object_cells(object2.clone());
+        let cells = category.get_object_morphisms(object2.clone());
         assert!(cells.is_ok());
         let cells = cells.unwrap();
         assert_eq!(cells.len(), 1);
@@ -221,7 +221,7 @@ mod tests {
         assert!(category.get_object(&object3).is_ok());
 
         // check identity morphism
-        let cells = category.get_object_cells(object3.clone());
+        let cells = category.get_object_morphisms(object3.clone());
         assert!(cells.is_ok());
         let cells = cells.unwrap();
         assert_eq!(cells.len(), 1);

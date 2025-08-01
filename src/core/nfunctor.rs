@@ -31,7 +31,7 @@ where
     TargetCategory: NCategory<'a>,
     Id: Identifier,
 {
-    pub target_cell: &'a <TargetCategory as NCategory<'a>>::Cell,
+    pub target_cell: &'a <TargetCategory as NCategory<'a>>::Morphism,
     pub base_functor: &'a dyn NFunctor<'a,
         Identifier = Id,
         SourceCategory = <SourceCategory as NCategory<'a>>::BaseCategory,
@@ -45,7 +45,7 @@ where
     Id: Identifier,
 {
     pub mappings: HashMap<
-        &'a <SourceCategory as NCategory<'a>>::Cell,
+        &'a <SourceCategory as NCategory<'a>>::Morphism,
         Mapping<'a, SourceCategory, TargetCategory, Id>>,
 }
 

@@ -1,5 +1,66 @@
+use std::collections::HashMap;
 use crate::core::ncategory::{NCategory, NCategoryError, UnitCategory};
 use crate::core::identifier::{Identifier};
+
+// pub struct FunctorMapping<'a, SourceCategory: NCategory<'a>, TargetCategory: NCategory<'a>> {
+//     source_cell: &'a <SourceCategory as NCategory<'a>>::Cell,
+//     target_cell: &'a <TargetCategory as NCategory<'a>>::Cell,
+//     children: Vec<
+//         Box<
+//             dyn FunctorMappingTrait<
+//                 'a,
+//                 SourceCategory = <SourceCategory as NCategory<'a>>::BaseCategory,
+//                 TargetCategory = <TargetCategory as NCategory<'a>>::BaseCategory
+//             >
+//         >
+//     >
+// }
+//
+// pub trait FunctorMappingTrait<'a> {
+//     type SourceCategory: NCategory<'a>;
+//     type TargetCategory: NCategory<'a>;
+//
+//     fn source_cell(&self) -> &'a <Self::SourceCategory as NCategory<'a>>::Cell;
+//     fn target_cell(&self) -> &'a <Self::TargetCategory as NCategory<'a>>::Cell;
+// }
+
+
+pub struct Mapping<'a, SourceCategory, TargetCategory, Id>
+where
+    SourceCategory: NCategory<'a>,
+    TargetCategory: NCategory<'a>,
+    Id: Identifier,
+{
+    pub target_cell: &'a <TargetCategory as NCategory<'a>>::Cell,
+    pub base_functor: &'a dyn NFunctor<'a,
+        Identifier = Id,
+        SourceCategory = <SourceCategory as NCategory<'a>>::BaseCategory,
+        TargetCategory = <TargetCategory as NCategory<'a>>::BaseCategory>,
+}
+
+pub struct FunctorMappings<'a, SourceCategory, TargetCategory, Id>
+where
+    SourceCategory: NCategory<'a>,
+    TargetCategory: NCategory<'a>,
+    Id: Identifier,
+{
+    pub mappings: HashMap<
+        &'a <SourceCategory as NCategory<'a>>::Cell,
+        Mapping<'a, SourceCategory, TargetCategory, Id>>,
+}
+
+impl<'a, SourceCategory, TargetCategory, Id> FunctorMappings<'a, SourceCategory, TargetCategory, Id>
+where
+    SourceCategory: NCategory<'a>,
+    TargetCategory: NCategory<'a>,
+    Id: Identifier,
+{
+    pub fn new() -> Self {
+        Self {
+            mappings: HashMap::new(),
+        }
+    }
+}
 
 pub trait NFunctor<'a>
 {
@@ -13,6 +74,13 @@ pub trait NFunctor<'a>
     fn source_category(&self) -> &Self::SourceCategory;
 
     fn target_category(&self) -> &Self::TargetCategory;
+
+    fn mappings(&self) -> Result<
+        FunctorMappings<'a, Self::SourceCategory, Self::TargetCategory, Self::Identifier>,
+        NCategoryError>;
+
+    // for each mapping of a cell,
+    // there is a corresponding functor mapping of its base category
 
     fn validate_level(&self) -> Result<(), NCategoryError> {
         if self.source_category().level() != self.target_category().level() {
@@ -49,6 +117,10 @@ where
     }
 
     fn target_category(&self) -> &Self::TargetCategory {
+        todo!()
+    }
+
+    fn mappings(&self) -> Result<FunctorMappings<'a, Self::SourceCategory, Self::TargetCategory, Self::Identifier>, NCategoryError> {
         todo!()
     }
 }

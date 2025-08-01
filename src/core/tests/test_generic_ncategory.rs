@@ -1,4 +1,5 @@
 use std::cell::Cell;
+use std::collections::HashMap;
 use crate::core::tests::ncategory_test_helper::*;
 use crate::core::discrete_category::{DiscreteCategory};
 use crate::core::generic_ncategory::*;
@@ -328,7 +329,7 @@ pub fn test_identity_cell_tree() {
     assert_eq!(identity_cell.source_object(), &discreteCategoryALower);
     assert_eq!(identity_cell.target_object(), &discreteCategoryALower);
 
-    let actual_cell_tree = setCategoryAlphabet.get_cell_tree(identity_cell).unwrap();
+    // let actual_cell_tree = setCategoryAlphabet.get_cell_tree(identity_cell).unwrap();
 
     // expected cell tree
     // all the cells of the discrete category A remain as children of the identity cell
@@ -371,8 +372,22 @@ pub fn test_identity_cell_tree() {
     let functor = GenericNFunctor::new(
         "functor_1".to_string(),
         &discreteCategoryALower,
-        &setCategoryAlphabet
+        &discreteCategoryAUpper,
+        HashMap::from([
+            // a to A
+            (discreteCategoryALower.get_identity_cell(object_a.clone()).unwrap(),
+             discreteCategoryAUpper.get_identity_cell(object_A.clone()).unwrap()),
+
+            // b to B
+            (discreteCategoryALower.get_identity_cell(object_b.clone()).unwrap(),
+             discreteCategoryAUpper.get_identity_cell(object_B.clone()).unwrap()),
+
+            // c to C
+            (discreteCategoryALower.get_identity_cell(object_c.clone()).unwrap(),
+             discreteCategoryAUpper.get_identity_cell(object_C.clone()).unwrap()),
+        ])
     );
+
 
     // // Add the discrete category A as an object in Set category alphabet
     // setCategoryAlphabet.add_object(

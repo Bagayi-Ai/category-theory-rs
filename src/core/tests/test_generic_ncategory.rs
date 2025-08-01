@@ -6,6 +6,7 @@ use crate::core::ncategory::{NCategory, NCategoryError};
 use crate::core::cell_tree::CellTree;
 use crate::core::ncell::NCell;
 use crate::core::generic_ncell::GenericNCell;
+use crate::core::generic_nfunctor::GenericNFunctor;
 use crate::core::identifier::Identifier;
 
 type DiscreteCategoryString = DiscreteCategory<String>;
@@ -356,16 +357,23 @@ pub fn test_identity_cell_tree() {
     //
     // assert_eq!(actual_cell_tree, expected_cell_tree);
     //
-    // // Discrete category A with a, b, c as objects
-    // let mut discreteCategoryAUpper = DiscreteCategory::new_with_id("alphabet_upper".to_string());
-    // let object_A = "A".to_string();
-    // let object_B = "B".to_string();
-    // let object_C = "C".to_string();
-    // discreteCategoryAUpper.add_object(object_A.clone()).unwrap();
-    // discreteCategoryAUpper.add_object(object_B.clone()).unwrap();
-    // discreteCategoryAUpper.add_object(object_C.clone()).unwrap();
-    //
-    //
+    // Discrete category A with a, b, c as objects
+    let mut discreteCategoryAUpper = DiscreteCategory::new_with_id("alphabet_upper".to_string());
+    let object_A = "A".to_string();
+    let object_B = "B".to_string();
+    let object_C = "C".to_string();
+    discreteCategoryAUpper.add_object(object_A.clone()).unwrap();
+    discreteCategoryAUpper.add_object(object_B.clone()).unwrap();
+    discreteCategoryAUpper.add_object(object_C.clone()).unwrap();
+
+
+    // create a functor1 from lower to upper
+    let functor = GenericNFunctor::new(
+        "functor_1".to_string(),
+        &discreteCategoryALower,
+        &setCategoryAlphabet
+    );
+
     // // Add the discrete category A as an object in Set category alphabet
     // setCategoryAlphabet.add_object(
     //     &discreteCategoryAUpper).unwrap();

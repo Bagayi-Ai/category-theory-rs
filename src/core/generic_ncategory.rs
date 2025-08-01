@@ -56,7 +56,7 @@ impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> 
 
     fn add_moprhism(&mut self, cell: Self::Morphism) -> Result<Self::Identifier, NCategoryError> {
         if self.cells.contains_key(&cell.id()) {
-            return Err(NCategoryError::CellAlreadyExists);
+            return Err(NCategoryError::MorphismAlreadyExists);
         }
         let cell = self.cells.entry(cell.id().clone()).or_insert(cell);
         self.object_mapping
@@ -79,7 +79,7 @@ impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> 
 
     fn get_identity_morphism(&self, object_id: Self::Object) -> Result<&Self::Morphism, NCategoryError> {
         // it's basically the cell with the same id as the object
-        self.get_cell(object_id.category_id())
+        self.get_moprhism(object_id.category_id())
     }
 
     fn get_all_objects(&self) -> Result<HashSet<Self::Object>, NCategoryError> {
@@ -115,11 +115,11 @@ impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> 
         }
     }
 
-    fn get_cell(&self, cell_id: &Self::Identifier) -> Result<&Self::Morphism, NCategoryError> {
+    fn get_moprhism(&self, cell_id: &Self::Identifier) -> Result<&Self::Morphism, NCategoryError> {
         if let Some(cell) = self.cells.get(cell_id) {
             Ok(cell)
         } else {
-            Err(NCategoryError::CellNotFound)
+            Err(NCategoryError::MorphismNotFound)
         }
     }
 

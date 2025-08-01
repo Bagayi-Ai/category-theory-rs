@@ -66,7 +66,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier<Id = T> + 'a> NCategory<'a> f
     }
 
     fn add_moprhism(&mut self, _cell: Self::Morphism) -> Result<Self::Identifier, NCategoryError> {
-        Err(NCategoryError::OnlyIdentityCellDiscreteCategory)
+        Err(NCategoryError::OnlyIdentityMorphismDiscreteCategory)
     }
 
     fn get_object(&self, object_id: &Self::Identifier) -> Result<Self::Object, NCategoryError> {
@@ -79,7 +79,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier<Id = T> + 'a> NCategory<'a> f
     }
 
     fn get_identity_morphism(&self, object_id: Self::Object) -> Result<&Self::Morphism, NCategoryError> {
-        self.get_cell(&object_id)
+        self.get_moprhism(&object_id)
     }
 
     fn get_all_objects(&self) -> Result<HashSet<Self::Identifier>, NCategoryError> {
@@ -100,13 +100,13 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier<Id = T> + 'a> NCategory<'a> f
         Ok(vec![self.get_identity_morphism(object_id)?])
     }
 
-    fn get_cell(&self, cell_id: &Self::Identifier) -> Result<&Self::Morphism, NCategoryError> {
+    fn get_moprhism(&self, cell_id: &Self::Identifier) -> Result<&Self::Morphism, NCategoryError> {
         if let Some(cells) = &self.cells {
             if let Some(cell) = cells.get(cell_id) {
                 return Ok(cell);
             }
         }
-        Err(NCategoryError::CellNotFound)
+        Err(NCategoryError::MorphismNotFound)
     }
 
     fn base_object(&self, _object_id: &Self::Identifier) -> Result<&Self::BaseCategory, NCategoryError> {

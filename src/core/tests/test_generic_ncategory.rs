@@ -1,4 +1,3 @@
-use std::cell::Cell;
 use std::collections::HashMap;
 use crate::core::tests::ncategory_test_helper::*;
 use crate::core::discrete_category::{DiscreteCategory};
@@ -278,7 +277,7 @@ pub fn test_base_scenarios() {
     category.add_moprhism(cell).unwrap();
 
 
-    let cell = category.get_cell(&cell_id).unwrap();
+    let cell = category.get_moprhism(&cell_id).unwrap();
     assert_eq!(cell.source_object(), &object1);
     assert_eq!(cell.target_object(), &object2);
 

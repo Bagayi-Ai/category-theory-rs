@@ -9,11 +9,11 @@ use crate::core::morphism_tree::MorphismMappingTree;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum NCategoryError {
-    CellAlreadyExists,
-    CellNotFound,
-    OnlyIdentityCellDiscreteCategory,
-    InvalidCellComposition,
-    InvalidCellCommutation,
+    MorphismAlreadyExists,
+    MorphismNotFound,
+    OnlyIdentityMorphismDiscreteCategory,
+    InvalidMorphismComposition,
+    InvalidMorphismCommutation,
     ObjectNotFound,
     InvalidObjectId,
     InvalidObjectMapping,
@@ -73,7 +73,7 @@ where
         todo!()
     }
 
-    fn get_cell(&self, cell_id: &Self::Identifier) -> Result<&Self::Morphism, NCategoryError>;
+    fn get_moprhism(&self, morphism_id: &Self::Identifier) -> Result<&Self::Morphism, NCategoryError>;
 
     fn get_morphism_tree(&self, cell_id: &Self::Morphism) -> Result<MorphismMappingTree<'a, Self::Identifier, Self, Self>, NCategoryError> where Self: Sized
     {
@@ -98,63 +98,63 @@ where
         // Ok(cell_tree)
         todo!()
     }
-    fn cells_commute(
+    fn morphism_commute(
         &self,
-        left_cells: Vec<&Self::Morphism>,
-        right_cells: Vec<&Self::Morphism>,
+        left_morphisms: Vec<&Self::Morphism>,
+        right_morphisms: Vec<&Self::Morphism>,
     ) -> Result<bool, NCategoryError> {
 
-        self.validate_commutation(left_cells, right_cells)?;
+        self.validate_morphisms_commutation(left_morphisms, right_morphisms)?;
 
 
         Ok(true)
     }
 
-    fn validate_commutation(&self,
-                            left_cells: Vec<&Self::Morphism>,
-                            right_cells: Vec<&Self::Morphism>) -> Result<(), NCategoryError>
+    fn validate_morphisms_commutation(&self,
+                            left_morphisms: Vec<&Self::Morphism>,
+                            right_morphisms: Vec<&Self::Morphism>) -> Result<(), NCategoryError>
     {
         // source and target of left cells id should be same with right cells
-        let left_source_object = left_cells.first().ok_or_else(|| NCategoryError::InvalidCellCommutation)?.source_object();
-        let right_source_object = right_cells.first().ok_or_else(|| NCategoryError::InvalidCellCommutation)?.source_object();
+        let left_source_object = left_morphisms.first().ok_or_else(|| NCategoryError::InvalidMorphismCommutation)?.source_object();
+        let right_source_object = right_morphisms.first().ok_or_else(|| NCategoryError::InvalidMorphismCommutation)?.source_object();
 
         if left_source_object != right_source_object {
-            return Err(NCategoryError::InvalidCellComposition);
+            return Err(NCategoryError::InvalidMorphismComposition);
         }
 
-        let left_target_object = left_cells.first().ok_or_else(|| NCategoryError::InvalidCellCommutation)?.target_object();
-        let right_target_object = right_cells.first().ok_or_else(|| NCategoryError::InvalidCellCommutation)?.target_object();
+        let left_target_object = left_morphisms.first().ok_or_else(|| NCategoryError::InvalidMorphismCommutation)?.target_object();
+        let right_target_object = right_morphisms.first().ok_or_else(|| NCategoryError::InvalidMorphismCommutation)?.target_object();
 
         if left_target_object != right_target_object {
-            return Err(NCategoryError::InvalidCellComposition);
+            return Err(NCategoryError::InvalidMorphismComposition);
         }
 
         // confirm composition is correct
-        self.validate_composition(left_cells)?;
-        self.validate_composition(right_cells)?;
+        self.validate_morphisms_composition(left_morphisms)?;
+        self.validate_morphisms_composition(right_morphisms)?;
 
         Ok(())
     }
 
-    fn validate_composition(&self, cells: Vec<&Self::Morphism>) -> Result<(), NCategoryError>
+    fn validate_morphisms_composition(&self, morphims: Vec<&Self::Morphism>) -> Result<(), NCategoryError>
     {
-        if cells.is_empty() {
-            return Err(NCategoryError::InvalidCellComposition)
+        if morphims.is_empty() {
+            return Err(NCategoryError::InvalidMorphismComposition)
         }
 
         // composition of only once cell is always valid
-        if cells.len() <= 1 {
+        if morphims.len() <= 1 {
             return Ok(());
         }
         // target of first cell needs to be the source of subsequent cell
-        let mut target_object = cells.first()
-            .ok_or_else(|| NCategoryError::InvalidCellComposition)?.target_object();
+        let mut target_object = morphims.first()
+            .ok_or_else(|| NCategoryError::InvalidMorphismComposition)?.target_object();
 
-        for cell in &cells[1..] {
-            if cell.source_object() != target_object {
-                return Err(NCategoryError::InvalidCellComposition);
+        for morphism in &morphims[1..] {
+            if morphism.source_object() != target_object {
+                return Err(NCategoryError::InvalidMorphismComposition);
             }
-            target_object = cell.target_object();
+            target_object = morphism.target_object();
         }
         Ok(())
     }
@@ -229,7 +229,7 @@ impl <'a, T: Identifier> NCategory<'a> for UnitCategory<T> {
         todo!()
     }
 
-    fn get_cell(&self, cell_id: &Self::Identifier) -> Result<&Self::Morphism, NCategoryError> {
+    fn get_moprhism(&self, cell_id: &Self::Identifier) -> Result<&Self::Morphism, NCategoryError> {
         todo!()
     }
 

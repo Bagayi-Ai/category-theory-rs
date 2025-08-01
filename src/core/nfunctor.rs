@@ -75,12 +75,12 @@ pub trait NFunctor<'a>
 
     fn target_category(&self) -> &Self::TargetCategory;
 
+    // for each mapping of a cell,
+    // there is a corresponding functor mapping of its base category
+    // to base category of the target category
     fn mappings(&self) -> Result<
         FunctorMappings<'a, Self::SourceCategory, Self::TargetCategory, Self::Identifier>,
         NCategoryError>;
-
-    // for each mapping of a cell,
-    // there is a corresponding functor mapping of its base category
 
     fn validate_level(&self) -> Result<(), NCategoryError> {
         if self.source_category().level() != self.target_category().level() {

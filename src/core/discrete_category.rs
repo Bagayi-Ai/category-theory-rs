@@ -117,7 +117,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier<Id = T> + 'a> NCategory<'a> f
 impl<'a, T: Eq + Clone + Hash + Debug + Identifier<Id = T> + 'a> Morphism<'a> for DiscreteCategory<T> {
 
     type Category = Self;
-    // type Functor = UnitFunctor<T>;
+    type Functor = UnitFunctor<'a, T, UnitCategory<T>, UnitCategory<T>>;
 
     fn cell_id(&self) -> &<Self::Category as NCategory<'a>>::Identifier {
         todo!()
@@ -130,11 +130,11 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier<Id = T> + 'a> Morphism<'a> fo
     fn target_object(&self) -> <Self::Category as NCategory<'a>>::Object {
         self.category_id.clone()
     }
+    
+    fn functor(&self) -> &Self::Functor {
+        todo!()
+    }
 
-
-    // fn functor(&self) -> &<Self::Functor as NFunctor>::Identifier {
-    //     todo!()
-    // }
 }
 
 impl <T: Eq + Clone + Hash + Debug + Identifier<Id = T>> From<T> for DiscreteCategory<T>

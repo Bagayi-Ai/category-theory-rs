@@ -182,7 +182,7 @@ pub struct UnitCategory<T: Identifier> {
     _phantom: std::marker::PhantomData<T>,
 }
 
-impl <'a, T: Identifier> NCategory<'a> for UnitCategory<T> {
+impl <'a, T: Identifier + 'a> NCategory<'a> for UnitCategory<T> {
     type Identifier = T;
 
     type Object = ();

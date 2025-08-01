@@ -46,11 +46,18 @@ where <Category as NCategory<'a>>::Object: Clone
 }
 
 
-impl <'a, Category: NCategory<'a>> Morphism<'a> for GenericMorphism<'a, Category>
-where <Category as NCategory<'a>>::Object: Clone
+impl <'a, Category: NCategory<'a>> Morphism<'a>
+for GenericMorphism<'a, Category>
+where
+    <Category as NCategory<'a>>::Object: Clone,
+    <Category as NCategory<'a>>::BaseCategory: 'a
 {
     type Category = Category;
-    // type Functor = GenericNFunctor<Self::Identifier>;
+    type Functor = GenericNFunctor<
+        'a,
+        <Category as NCategory<'a>>::Identifier,
+        <Category as NCategory<'a>>::BaseCategory,
+        <Category as NCategory<'a>>::BaseCategory>;
 
     fn cell_id(&self) -> &<Category as NCategory<'a>>::Identifier {
         &self.id
@@ -63,7 +70,11 @@ where <Category as NCategory<'a>>::Object: Clone
     fn target_object(&self) -> <Category as NCategory<'a>>::Object {
         self.target.clone()
     }
-
+    
+    fn functor(&self) -> &Self::Functor {
+        todo!()
+    }
+    
     // fn functor(&self) -> &<Self::Functor as NFunctor>::Identifier {
     //     todo!()
     // }

@@ -21,6 +21,8 @@ pub enum NCategoryError {
     InvalidCategory,
     InvalidFunctorLevelMissmatch,
     InvalidFunctor,
+    InvalidFunctorMappings,
+    InvalidBaseFunctor,
 }
 
 pub trait NCategory<'a>: Debug
@@ -28,7 +30,7 @@ where
     Self::BaseCategory: NCategory<'a, Identifier = Self::Identifier>,
 {
     type Identifier: Identifier;
-    type Object: 'a + Eq + Debug;
+    type Object: 'a + Eq + Debug + Hash;
     type Morphism: Morphism<'a, Category = Self>;
     type BaseCategory: NCategory<'a>;
 

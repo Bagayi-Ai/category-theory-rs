@@ -8,11 +8,11 @@ use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::hash::Hash;
 
-#[derive(Debug, PartialEq,Eq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct GenericNCategory<
     'a,
-    Id: Identifier<Id = Id>,
-    BaseCategory: NCategory<'a, Identifier = Id> + Debug + Eq,
+    Id: Identifier<Id = Id> + 'a,
+    BaseCategory: NCategory<'a, Identifier = Id> + Debug + Eq + Hash,
 > {
     id: Id,
     objects: HashMap<Id, &'a BaseCategory>,
@@ -20,7 +20,7 @@ pub struct GenericNCategory<
     cells: HashMap<Id, GenericMorphism<'a, Self>>,
 }
 
-impl<'a, Id: Identifier<Id = Id>, Category: NCategory<'a, Identifier = Id> + Debug + Eq>
+impl<'a, Id: Identifier<Id = Id>, Category: NCategory<'a, Identifier = Id> + Debug + Eq + Hash>
     GenericNCategory<'a, Id, Category>
 {
     pub fn new() -> Self {
@@ -33,8 +33,11 @@ impl<'a, Id: Identifier<Id = Id>, Category: NCategory<'a, Identifier = Id> + Deb
     }
 }
 
-impl<'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> + 'a + Debug + Eq>
-    NCategory<'a> for GenericNCategory<'a, Id, BaseCategory>
+impl<
+    'a,
+    Id: Identifier<Id = Id> + 'a,
+    BaseCategory: NCategory<'a, Identifier = Id> + 'a + Debug + Eq + Hash,
+> NCategory<'a> for GenericNCategory<'a, Id, BaseCategory>
 {
     type Identifier = Id;
     type Object = &'a BaseCategory;

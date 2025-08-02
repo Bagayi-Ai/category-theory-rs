@@ -11,6 +11,8 @@ mod core {
 
     pub mod generic_nfunctor;
 
+    pub mod functor_mapping;
+
     pub mod nfunctor;
 
     pub mod morphism_tree;

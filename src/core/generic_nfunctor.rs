@@ -1,8 +1,12 @@
-use std::collections::HashMap;
-
+use crate::core::discrete_category::DiscreteCategory;
+use crate::core::functor_mapping::FunctorMappings;
 use crate::core::identifier::Identifier;
-use crate::core::ncategory::{NCategory, NCategoryError};
-use crate::core::nfunctor::NFunctor;
+use crate::core::ncategory::{NCategory, NCategoryError, UnitCategory};
+use crate::core::nfunctor::{NFunctor, UnitFunctor};
+use std::collections::HashMap;
+use std::fmt::Display;
+use std::hash::Hash;
+use uuid::Uuid;
 
 pub struct GenericNFunctor<
     'a,
@@ -13,26 +17,20 @@ pub struct GenericNFunctor<
     id: Id,
     source_category: &'a SourceCategory,
     target_category: &'a TargetCategory,
-    mappings: HashMap<
-        &'a <SourceCategory as NCategory<'a>>::Morphism,
-        &'a <TargetCategory as NCategory<'a>>::Morphism,
-    >,
+    mappings: FunctorMappings<'a, Id, SourceCategory, TargetCategory>,
 }
 
 impl<'a, Id, SourceCategory, TargetCategory> GenericNFunctor<'a, Id, SourceCategory, TargetCategory>
 where
-    SourceCategory: NCategory<'a, Identifier = Id>,
-    TargetCategory: NCategory<'a, Identifier = Id>,
+    SourceCategory: NCategory<'a>,
+    TargetCategory: NCategory<'a>,
     Id: Identifier,
 {
     pub fn new(
         id: Id,
         source_category: &'a SourceCategory,
         target_category: &'a TargetCategory,
-        mappings: HashMap<
-            &'a <SourceCategory as NCategory<'a>>::Morphism,
-            &'a <TargetCategory as NCategory<'a>>::Morphism,
-        >,
+        mappings: FunctorMappings<'a, Id, SourceCategory, TargetCategory>,
     ) -> Self {
         let functor = GenericNFunctor {
             id,
@@ -50,8 +48,8 @@ where
 impl<'a, Id, SourceCategory, TargetCategory> NFunctor<'a>
     for GenericNFunctor<'a, Id, SourceCategory, TargetCategory>
 where
-    SourceCategory: NCategory<'a, Identifier = Id>,
-    TargetCategory: NCategory<'a, Identifier = Id>,
+    SourceCategory: NCategory<'a>,
+    TargetCategory: NCategory<'a>,
     Id: Identifier,
 {
     type SourceCategory = SourceCategory;
@@ -73,14 +71,9 @@ where
     fn mappings(
         &self,
     ) -> Result<
-        super::nfunctor::FunctorMappings<
-            'a,
-            Self::Identifier,
-            Self::SourceCategory,
-            Self::TargetCategory,
-        >,
+        &FunctorMappings<'a, Self::Identifier, Self::SourceCategory, Self::TargetCategory>,
         NCategoryError,
     > {
-        todo!()
+        Ok(&self.mappings)
     }
 }

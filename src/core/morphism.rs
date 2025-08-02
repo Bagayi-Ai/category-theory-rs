@@ -1,8 +1,8 @@
-use std::hash::Hash;
 use crate::core::identifier::Identifier;
 use crate::core::ncategory::{NCategory, UnitCategory};
 use crate::core::nfunctor::{NFunctor, UnitFunctor};
 use std::fmt::Debug;
+use std::hash::Hash;
 
 pub trait Morphism<'a>: Debug + Eq + Hash {
     type Category: NCategory<'a>;
@@ -19,6 +19,8 @@ pub trait Morphism<'a>: Debug + Eq + Hash {
     fn source_object(&self) -> <Self::Category as NCategory<'a>>::Object;
 
     fn target_object(&self) -> <Self::Category as NCategory<'a>>::Object;
+
+    fn is_identity(&self) -> bool;
 
     fn functor(&self) -> &Self::Functor;
 }
@@ -42,6 +44,10 @@ impl<'a, T: Identifier + 'a> Morphism<'a> for UnitMorphism<T> {
     }
 
     fn target_object(&self) -> <Self::Category as NCategory<'a>>::Object {
+        todo!()
+    }
+
+    fn is_identity(&self) -> bool {
         todo!()
     }
 

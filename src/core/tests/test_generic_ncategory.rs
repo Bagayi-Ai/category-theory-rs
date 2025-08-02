@@ -1,4 +1,5 @@
 use crate::core::discrete_category::DiscreteCategory;
+use crate::core::functor_mapping::FunctorMappings;
 use crate::core::generic_morphism::GenericMorphism;
 use crate::core::generic_ncategory::*;
 use crate::core::generic_nfunctor::GenericNFunctor;
@@ -6,7 +7,7 @@ use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
 use crate::core::morphism_tree::MorphismMappingTree;
 use crate::core::ncategory::{NCategory, NCategoryError, UnitCategory};
-use crate::core::nfunctor::{FunctorMappings, Mapping, NFunctor, UnitFunctor};
+use crate::core::nfunctor::{NFunctor, UnitFunctor};
 use crate::core::tests::ncategory_test_helper::*;
 use std::collections::HashMap;
 
@@ -40,8 +41,8 @@ impl<'a> NCategoryTestHelper<'a> for GenericCategory1TestHelper<'a> {
     fn generate_cell(&mut self) -> <Self::Category as NCategory<'a>>::Identifier {
         // let object1 = self.generate_object();
         // let object2 = self.generate_object()#[derive(PartialEq)]
-// #[derive(PartialEq)]
-// ;
+        // #[derive(PartialEq)]
+        // ;
         // let object1_id = self.get_mut_category().add_object(&object1).unwrap();
         // let object2_id = self.get_mut_category().add_object(&object2).unwrap();
         // let cell_id = self.generate_identifier();
@@ -347,122 +348,122 @@ pub fn test_identity_cell_tree() {
     discreteCategoryANumber.add_object(object_2).unwrap();
     discreteCategoryANumber.add_object(object_3).unwrap();
 
-    let unit_functor = UnitFunctor::new();
-
-    // create a functor from lower to number
-    let functor_lower_to_number = GenericNFunctor::new(
-        "functor_lower_to_number".to_string(),
-        &discreteCategoryALower,
-        &discreteCategoryANumber,
-        HashMap::from([
-            // a to 1
-            (
-                discreteCategoryALower
-                    .get_identity_morphism(object_a.clone())
-                    .unwrap(),
-                discreteCategoryANumber
-                    .get_identity_morphism(object_1)
-                    .unwrap(),
-            ),
-            // b to 2
-            (
-                discreteCategoryALower
-                    .get_identity_morphism(object_b.clone())
-                    .unwrap(),
-                discreteCategoryANumber
-                    .get_identity_morphism(object_2)
-                    .unwrap(),
-            ),
-            // c to 3
-            (
-                discreteCategoryALower
-                    .get_identity_morphism(object_c.clone())
-                    .unwrap(),
-                discreteCategoryANumber
-                    .get_identity_morphism(object_3)
-                    .unwrap(),
-            ),
-        ]),
-    );
-
+    // let unit_functor = UnitFunctor::new();
+    //
+    // // create a functor from lower to number
+    // let functor_lower_to_number = GenericNFunctor::new(
+    //     "functor_lower_to_number".to_string(),
+    //     &discreteCategoryALower,
+    //     &discreteCategoryANumber,
+    //     HashMap::from([
+    //         // a to 1
+    //         (
+    //             discreteCategoryALower
+    //                 .get_identity_morphism(object_a.clone())
+    //                 .unwrap(),
+    //             discreteCategoryANumber
+    //                 .get_identity_morphism(object_1)
+    //                 .unwrap(),
+    //         ),
+    //         // b to 2
+    //         (
+    //             discreteCategoryALower
+    //                 .get_identity_morphism(object_b.clone())
+    //                 .unwrap(),
+    //             discreteCategoryANumber
+    //                 .get_identity_morphism(object_2)
+    //                 .unwrap(),
+    //         ),
+    //         // c to 3
+    //         (
+    //             discreteCategoryALower
+    //                 .get_identity_morphism(object_c.clone())
+    //                 .unwrap(),
+    //             discreteCategoryANumber
+    //                 .get_identity_morphism(object_3)
+    //                 .unwrap(),
+    //         ),
+    //     ]),
+    // );
+    //
     // let actual_mapping = functor_lower_to_number.mappings().unwrap();
-
-    let expected_mapping: FunctorMappings<String, DiscreteCategoryString, DiscreteCategory<usize>> =
-        FunctorMappings {
-            mappings: HashMap::from([
-                (
-                    discreteCategoryALower
-                        .get_identity_morphism(object_a.clone())
-                        .unwrap(),
-                    Mapping {
-                        target_cell: discreteCategoryANumber
-                            .get_identity_morphism(object_1)
-                            .unwrap(),
-                        base_functor: &unit_functor,
-                    },
-                ),
-                (
-                    discreteCategoryALower
-                        .get_identity_morphism(object_b.clone())
-                        .unwrap(),
-                    Mapping {
-                        target_cell: discreteCategoryANumber
-                            .get_identity_morphism(object_2)
-                            .unwrap(),
-                        base_functor: &unit_functor,
-                    },
-                ),
-                (
-                    discreteCategoryALower
-                        .get_identity_morphism(object_c.clone())
-                        .unwrap(),
-                    Mapping {
-                        target_cell: discreteCategoryANumber
-                            .get_identity_morphism(object_3)
-                            .unwrap(),
-                        base_functor: &unit_functor,
-                    },
-                ),
-            ]),
-        };
-
+    //
+    // let expected_mapping: FunctorMappings<String, DiscreteCategoryString, DiscreteCategory<usize>> =
+    //     FunctorMappings {
+    //         mappings: HashMap::from([
+    //             (
+    //                 discreteCategoryALower
+    //                     .get_identity_morphism(object_a.clone())
+    //                     .unwrap(),
+    //                 Mapping {
+    //                     target_cell: discreteCategoryANumber
+    //                         .get_identity_morphism(object_1)
+    //                         .unwrap(),
+    //                     base_functor: &unit_functor,
+    //                 },
+    //             ),
+    //             (
+    //                 discreteCategoryALower
+    //                     .get_identity_morphism(object_b.clone())
+    //                     .unwrap(),
+    //                 Mapping {
+    //                     target_cell: discreteCategoryANumber
+    //                         .get_identity_morphism(object_2)
+    //                         .unwrap(),
+    //                     base_functor: &unit_functor,
+    //                 },
+    //             ),
+    //             (
+    //                 discreteCategoryALower
+    //                     .get_identity_morphism(object_c.clone())
+    //                     .unwrap(),
+    //                 Mapping {
+    //                     target_cell: discreteCategoryANumber
+    //                         .get_identity_morphism(object_3)
+    //                         .unwrap(),
+    //                     base_functor: &unit_functor,
+    //                 },
+    //             ),
+    //         ]),
+    //     };
+    //
     // assert_eq!(actual_mapping, expected_mapping);
-
-    // create a functor1 from lower to upper
-    let functor_lower_to_upper = GenericNFunctor::new(
-        "functor_1".to_string(),
-        &discreteCategoryALower,
-        &discreteCategoryAUpper,
-        HashMap::from([
-            // a to A
-            (
-                discreteCategoryALower
-                    .get_identity_morphism(object_a.clone())
-                    .unwrap(),
-                discreteCategoryAUpper
-                    .get_identity_morphism(object_A.clone())
-                    .unwrap(),
-            ),
-            // b to B
-            (
-                discreteCategoryALower
-                    .get_identity_morphism(object_b.clone())
-                    .unwrap(),
-                discreteCategoryAUpper
-                    .get_identity_morphism(object_B.clone())
-                    .unwrap(),
-            ),
-            // c to C
-            (
-                discreteCategoryALower
-                    .get_identity_morphism(object_c.clone())
-                    .unwrap(),
-                discreteCategoryAUpper
-                    .get_identity_morphism(object_C.clone())
-                    .unwrap(),
-            ),
-        ]),
-    );
+    //
+    // // create a functor1 from lower to upper
+    // let functor_lower_to_upper = GenericNFunctor::new(
+    //     "functor_1".to_string(),
+    //     &discreteCategoryALower,
+    //     &discreteCategoryAUpper,
+    //     HashMap::from([
+    //         // a to A
+    //         (
+    //             discreteCategoryALower
+    //                 .get_identity_morphism(object_a.clone())
+    //                 .unwrap(),
+    //             discreteCategoryAUpper
+    //                 .get_identity_morphism(object_A.clone())
+    //                 .unwrap(),
+    //         ),
+    //         // b to B
+    //         (
+    //             discreteCategoryALower
+    //                 .get_identity_morphism(object_b.clone())
+    //                 .unwrap(),
+    //             discreteCategoryAUpper
+    //                 .get_identity_morphism(object_B.clone())
+    //                 .unwrap(),
+    //         ),
+    //         // c to C
+    //         (
+    //             discreteCategoryALower
+    //                 .get_identity_morphism(object_c.clone())
+    //                 .unwrap(),
+    //             discreteCategoryAUpper
+    //                 .get_identity_morphism(object_C.clone())
+    //                 .unwrap(),
+    //         ),
+    //     ]),
+    // );
 
     // // expected functor mapping
     // let actual_mapping =

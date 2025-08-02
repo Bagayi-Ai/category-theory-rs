@@ -51,16 +51,19 @@ where
     <Category as NCategory<'a>>::Object: Clone,
     <Category as NCategory<'a>>::BaseCategory: 'a,
 {
-    fn hash<H>(&self, _: &mut H) where H: Hasher {
+    fn hash<H>(&self, _: &mut H)
+    where
+        H: Hasher,
+    {
         todo!()
     }
 }
-
 
 impl<'a, Category: NCategory<'a> + Eq> Morphism<'a> for GenericMorphism<'a, Category>
 where
     <Category as NCategory<'a>>::Object: Clone,
     <Category as NCategory<'a>>::BaseCategory: 'a,
+    <Category as NCategory<'a>>::Identifier: 'a,
 {
     type Category = Category;
     type Functor = GenericNFunctor<
@@ -80,6 +83,10 @@ where
 
     fn target_object(&self) -> <Category as NCategory<'a>>::Object {
         self.target.clone()
+    }
+
+    fn is_identity(&self) -> bool {
+        todo!()
     }
 
     fn functor(&self) -> &Self::Functor {

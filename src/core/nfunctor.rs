@@ -1,112 +1,12 @@
+use crate::core::functor_mapping::FunctorMappings;
 use crate::core::identifier::Identifier;
+use crate::core::morphism::Morphism;
 use crate::core::ncategory::{NCategory, NCategoryError, UnitCategory};
 use std::collections::HashMap;
 use std::fmt::{Debug, Formatter};
 use std::hash::Hash;
-use crate::core::morphism::Morphism;
 
-pub struct Mapping<'a, Id, SourceCategory, TargetCategory>
-where
-    SourceCategory: NCategory<'a>,
-    TargetCategory: NCategory<'a>,
-    Id: Identifier,
-{
-    pub target_cell: &'a <TargetCategory as NCategory<'a>>::Morphism,
-    pub base_functor: &'a dyn NFunctor<
-        'a,
-        Identifier = Id,
-        SourceCategory = <SourceCategory as NCategory<'a>>::BaseCategory,
-        TargetCategory = <TargetCategory as NCategory<'a>>::BaseCategory,
-    >,
-}
-
-impl<'a, Id, SourceCategory, TargetCategory> Debug
-for Mapping<'a, Id, SourceCategory, TargetCategory>
-where
-    SourceCategory: NCategory<'a>,
-    TargetCategory: NCategory<'a>,
-    Id: Identifier,
-{
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Mapping")
-            .field("target_cell", &self.target_cell)
-            .field("base_functor", &"<NFunctor>") // Placeholder for the trait object
-            .finish()
-    }
-}
-
-impl<'a, Id, SourceCategory, TargetCategory> PartialEq
-for Mapping<'a, Id, SourceCategory, TargetCategory>
-where
-    SourceCategory: NCategory<'a>,
-    TargetCategory: NCategory<'a>,
-    Id: Identifier,
-    <TargetCategory as NCategory<'a>>::Morphism: PartialEq,
-{
-    fn eq(&self, other: &Self) -> bool {
-        self.target_cell.cell_id() == other.target_cell.cell_id()
-            && self.base_functor.functor_id() == other.base_functor.functor_id()
-    }
-}
-
-impl<'a, Id, SourceCategory, TargetCategory> Hash
-for Mapping<'a, Id, SourceCategory, TargetCategory>
-where
-    SourceCategory: NCategory<'a>,
-    TargetCategory: NCategory<'a>,
-    Id: Identifier,
-    <TargetCategory as NCategory<'a>>::Morphism: PartialEq,
-{
-
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.target_cell.cell_id().hash(state);
-        self.base_functor.functor_id().hash(state);
-    }
-}
-
-
-#[derive(Debug)]
-pub struct FunctorMappings<'a, Id, SourceCategory, TargetCategory>
-where
-    SourceCategory: NCategory<'a>,
-    TargetCategory: NCategory<'a>,
-    Id: Identifier,
-{
-    pub mappings: HashMap<
-        &'a <SourceCategory as NCategory<'a>>::Morphism,
-        Mapping<'a, Id, SourceCategory, TargetCategory>,
-    >,
-}
-
-impl<'a, SourceCategory, TargetCategory, Id> PartialEq for FunctorMappings<'a, Id, SourceCategory, TargetCategory>
-where
-    SourceCategory: NCategory<'a>,
-    TargetCategory: NCategory<'a>,
-    Id: Identifier,
-{
-    fn eq(&self, other: &Self) -> bool {
-        self.mappings.len() == other.mappings.len()
-            && self
-                .mappings
-                .iter()
-                .all(|(key, value)| other.mappings.get(key) == Some(value))
-    }
-}
-
-impl<'a, SourceCategory, TargetCategory, Id> FunctorMappings<'a, Id, SourceCategory, TargetCategory>
-where
-    SourceCategory: NCategory<'a>,
-    TargetCategory: NCategory<'a>,
-    Id: Identifier,
-{
-    pub fn new() -> Self {
-        Self {
-            mappings: HashMap::new(),
-        }
-    }
-}
-
-pub trait NFunctor<'a> {
+pub trait NFunctor<'a>: 'a {
     type SourceCategory: NCategory<'a>;
     type TargetCategory: NCategory<'a>;
 
@@ -124,13 +24,58 @@ pub trait NFunctor<'a> {
     fn mappings(
         &self,
     ) -> Result<
-        FunctorMappings<'a, Self::Identifier, Self::SourceCategory, Self::TargetCategory>,
+        &FunctorMappings<'a, Self::Identifier, Self::SourceCategory, Self::TargetCategory>,
         NCategoryError,
     >;
 
     fn validate_level(&self) -> Result<(), NCategoryError> {
         if self.source_category().level() != self.target_category().level() {
             return Err(NCategoryError::InvalidFunctorLevelMissmatch);
+        }
+        Ok(())
+    }
+
+    fn validate_mappings(&self) -> Result<(), NCategoryError> {
+        let functor_mapping = self.mappings()?;
+        // should map all morphisms in source category to target category
+        if functor_mapping.get_morphism_mapping().len()
+            != self.source_category().get_all_morphisms()?.len()
+        {
+            return Err(NCategoryError::InvalidFunctorMappings);
+        }
+
+        // check each mapping in source category is mapped to a target category morphism
+        let target_morphisms = self.target_category().get_all_morphisms()?;
+        for source_morphism in self.source_category().get_all_morphisms()? {
+            let mapped_morphism = functor_mapping
+                .get_morphism_mapping()
+                .get(source_morphism)
+                .ok_or(NCategoryError::InvalidFunctorMappings)?;
+            if !target_morphisms.contains(mapped_morphism) {
+                return Err(NCategoryError::InvalidFunctor);
+            }
+
+            // if its a identity morphism, we should have equivalent functor mapping
+            if source_morphism.is_identity() {
+                // there should be a functor mapping this object to its target object
+                let functor = functor_mapping
+                    .get_functor_mappings()
+                    .get(&source_morphism.source_object())
+                    .ok_or(NCategoryError::InvalidFunctorMappings)?;
+
+                // now confirm that the functor target object is the same as this morphism's target object
+                // mapped_morphism.target_object()
+            }
+            // // now check the base functor has mapping from base category of source to base category of target
+            // let base_functor = &mapping.base_functor;
+            // if base_functor.source_category().category_id() != self.source_category().base_object().category_id(){
+            //     return Err(NCategoryError::InvalidBaseFunctor);
+            // }
+            // if mapping.base_functor.source_category().get_all_morphisms()?.contains(source_cell) {
+            //     continue;
+            // } else {
+            //     return Err(NCategoryError::InvalidFunctor);
+            // }
         }
         Ok(())
     }
@@ -162,8 +107,8 @@ impl<'a, T, SourceCategory, TargetCategory> NFunctor<'a>
     for UnitFunctor<'a, T, SourceCategory, TargetCategory>
 where
     T: Identifier,
-    SourceCategory: NCategory<'a>,
-    TargetCategory: NCategory<'a>,
+    SourceCategory: NCategory<'a> + 'a,
+    TargetCategory: NCategory<'a> + 'a,
 {
     type Identifier = T;
     type SourceCategory = SourceCategory;
@@ -184,7 +129,7 @@ where
     fn mappings(
         &self,
     ) -> Result<
-        FunctorMappings<'a, Self::Identifier, Self::SourceCategory, Self::TargetCategory>,
+        &FunctorMappings<'a, Self::Identifier, Self::SourceCategory, Self::TargetCategory>,
         NCategoryError,
     > {
         todo!()

@@ -146,6 +146,10 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> Morphism<'a>
         self.category_id.clone()
     }
 
+    fn is_identity(&self) -> bool {
+        todo!()
+    }
+
     fn functor(&self) -> &Self::Functor {
         todo!()
     }

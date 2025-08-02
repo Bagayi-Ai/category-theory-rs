@@ -1,17 +1,15 @@
-
 mod core {
     pub mod ncategory;
 
     pub mod generic_ncategory;
 
     pub mod discrete_category;
-    
+
     pub mod morphism;
 
     pub mod generic_morphism;
 
     pub mod generic_nfunctor;
-
 
     pub mod nfunctor;
 

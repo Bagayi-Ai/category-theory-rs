@@ -1,17 +1,17 @@
+use crate::core::discrete_category::DiscreteCategory;
+use crate::core::generic_nfunctor::GenericNFunctor;
+use crate::core::identifier::Identifier;
+use crate::core::morphism::Morphism;
+use crate::core::ncategory::NCategory;
+use crate::core::nfunctor::NFunctor;
 use std::fmt::Debug;
 use std::hash::Hash;
-use crate::core::discrete_category::DiscreteCategory;
-use crate::core::identifier::{Identifier};
-use crate::core::ncategory::NCategory;
-use crate::core::morphism::Morphism;
-use crate::core::generic_nfunctor::GenericNFunctor;
-use crate::core::nfunctor::NFunctor;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct GenericMorphism<'a, Category>
 where
     Category: NCategory<'a>,
-    <Category as NCategory<'a>>::Object: Clone
+    <Category as NCategory<'a>>::Object: Clone,
 {
     id: <Category as NCategory<'a>>::Identifier,
     source: <Category as NCategory<'a>>::Object,
@@ -19,14 +19,15 @@ where
     name: String,
 }
 
-impl <'a, Category: NCategory<'a>> GenericMorphism<'a, Category>
-where <Category as NCategory<'a>>::Object: Clone
+impl<'a, Category: NCategory<'a>> GenericMorphism<'a, Category>
+where
+    <Category as NCategory<'a>>::Object: Clone,
 {
     pub fn new(
         id: <Category as NCategory<'a>>::Identifier,
         source: <Category as NCategory<'a>>::Object,
         target: <Category as NCategory<'a>>::Object,
-        name: String
+        name: String,
     ) -> Self {
         GenericMorphism {
             id,
@@ -45,19 +46,18 @@ where <Category as NCategory<'a>>::Object: Clone
     }
 }
 
-
-impl <'a, Category: NCategory<'a>> Morphism<'a>
-for GenericMorphism<'a, Category>
+impl<'a, Category: NCategory<'a>> Morphism<'a> for GenericMorphism<'a, Category>
 where
     <Category as NCategory<'a>>::Object: Clone,
-    <Category as NCategory<'a>>::BaseCategory: 'a
+    <Category as NCategory<'a>>::BaseCategory: 'a,
 {
     type Category = Category;
     type Functor = GenericNFunctor<
         'a,
         <Category as NCategory<'a>>::Identifier,
         <Category as NCategory<'a>>::BaseCategory,
-        <Category as NCategory<'a>>::BaseCategory>;
+        <Category as NCategory<'a>>::BaseCategory,
+    >;
 
     fn cell_id(&self) -> &<Category as NCategory<'a>>::Identifier {
         &self.id
@@ -70,11 +70,11 @@ where
     fn target_object(&self) -> <Category as NCategory<'a>>::Object {
         self.target.clone()
     }
-    
+
     fn functor(&self) -> &Self::Functor {
         todo!()
     }
-    
+
     // fn functor(&self) -> &<Self::Functor as NFunctor>::Identifier {
     //     todo!()
     // }

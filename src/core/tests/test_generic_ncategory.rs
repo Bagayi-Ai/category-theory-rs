@@ -1,13 +1,13 @@
-use std::collections::HashMap;
-use crate::core::tests::ncategory_test_helper::*;
-use crate::core::discrete_category::{DiscreteCategory};
-use crate::core::generic_ncategory::*;
-use crate::core::ncategory::{NCategory, NCategoryError};
-use crate::core::morphism_tree::MorphismMappingTree;
-use crate::core::morphism::Morphism;
+use crate::core::discrete_category::DiscreteCategory;
 use crate::core::generic_morphism::GenericMorphism;
+use crate::core::generic_ncategory::*;
 use crate::core::generic_nfunctor::GenericNFunctor;
 use crate::core::identifier::Identifier;
+use crate::core::morphism::Morphism;
+use crate::core::morphism_tree::MorphismMappingTree;
+use crate::core::ncategory::{NCategory, NCategoryError};
+use crate::core::tests::ncategory_test_helper::*;
+use std::collections::HashMap;
 
 type DiscreteCategoryString = DiscreteCategory<String>;
 
@@ -15,7 +15,7 @@ pub struct GenericCategory1TestHelper<'a> {
     category: GenericNCategory<'a, String, DiscreteCategoryString>,
 }
 
-impl <'a> GenericCategory1TestHelper<'a> {
+impl<'a> GenericCategory1TestHelper<'a> {
     pub fn new() -> Self {
         GenericCategory1TestHelper {
             category: GenericNCategory::new(),
@@ -23,7 +23,7 @@ impl <'a> GenericCategory1TestHelper<'a> {
     }
 }
 
-impl <'a> NCategoryTestHelper<'a> for GenericCategory1TestHelper<'a> {
+impl<'a> NCategoryTestHelper<'a> for GenericCategory1TestHelper<'a> {
     type Category = GenericNCategory<'a, String, DiscreteCategoryString>;
 
     type CategoryObject = DiscreteCategoryString;
@@ -52,7 +52,12 @@ impl <'a> NCategoryTestHelper<'a> for GenericCategory1TestHelper<'a> {
         todo!()
     }
 
-    fn generate_commuting_cell(&mut self) -> (Vec<<Self::Category as NCategory<'a>>::Identifier>, Vec<<Self::Category as NCategory<'a>>::Identifier>) {
+    fn generate_commuting_cell(
+        &mut self,
+    ) -> (
+        Vec<<Self::Category as NCategory<'a>>::Identifier>,
+        Vec<<Self::Category as NCategory<'a>>::Identifier>,
+    ) {
         // have 3 DiscreteCategory objects A, B, C
         // A will contain {a,b,c} as objects
         // B will contain {1, 2, 3, 4, 5} as objects
@@ -111,7 +116,12 @@ impl <'a> NCategoryTestHelper<'a> for GenericCategory1TestHelper<'a> {
         todo!()
     }
 
-    fn generate_non_commuting_cell(&mut self) -> (Vec<<Self::Category as NCategory<'a>>::Identifier>, Vec<<Self::Category as NCategory<'a>>::Identifier>) {
+    fn generate_non_commuting_cell(
+        &mut self,
+    ) -> (
+        Vec<<Self::Category as NCategory<'a>>::Identifier>,
+        Vec<<Self::Category as NCategory<'a>>::Identifier>,
+    ) {
         // have 3 DiscreteCategory objects D, E, F
         // D will contain {da, db, dc} as objects
         // E will contain {11, 12, 13, 14, 15} as objects
@@ -181,9 +191,7 @@ impl <'a> NCategoryTestHelper<'a> for GenericCategory1TestHelper<'a> {
     fn expected_nested_level(&self) -> isize {
         2
     }
-
 }
-
 
 fn generate_identifier() -> String {
     String::generate()
@@ -195,7 +203,6 @@ fn generate_object() -> DiscreteCategoryString {
     object.add_object(random_string).unwrap();
     object
 }
-
 
 #[test]
 pub fn test_base_scenarios() {
@@ -273,9 +280,9 @@ pub fn test_base_scenarios() {
         cell_id.clone(),
         &object1,
         &object2,
-        "obj1 to obj2".to_string());
+        "obj1 to obj2".to_string(),
+    );
     category.add_moprhism(cell).unwrap();
-
 
     let cell = category.get_moprhism(&cell_id).unwrap();
     assert_eq!(cell.source_object(), &object1);
@@ -321,10 +328,13 @@ pub fn test_identity_cell_tree() {
     discreteCategoryALower.add_object(object_c.clone()).unwrap();
 
     // Add the discrete category A as an object in Set category alphabet
-    setCategoryAlphabet.add_object(
-        &discreteCategoryALower).unwrap();
+    setCategoryAlphabet
+        .add_object(&discreteCategoryALower)
+        .unwrap();
 
-    let identity_cell = setCategoryAlphabet.get_identity_morphism(&discreteCategoryALower).unwrap();
+    let identity_cell = setCategoryAlphabet
+        .get_identity_morphism(&discreteCategoryALower)
+        .unwrap();
     assert_eq!(identity_cell.source_object(), &discreteCategoryALower);
     assert_eq!(identity_cell.target_object(), &discreteCategoryALower);
 
@@ -366,7 +376,6 @@ pub fn test_identity_cell_tree() {
     discreteCategoryAUpper.add_object(object_B.clone()).unwrap();
     discreteCategoryAUpper.add_object(object_C.clone()).unwrap();
 
-
     // create a functor1 from lower to upper
     let functor = GenericNFunctor::new(
         "functor_1".to_string(),
@@ -374,19 +383,34 @@ pub fn test_identity_cell_tree() {
         &discreteCategoryAUpper,
         HashMap::from([
             // a to A
-            (discreteCategoryALower.get_identity_morphism(object_a.clone()).unwrap(),
-             discreteCategoryAUpper.get_identity_morphism(object_A.clone()).unwrap()),
-
+            (
+                discreteCategoryALower
+                    .get_identity_morphism(object_a.clone())
+                    .unwrap(),
+                discreteCategoryAUpper
+                    .get_identity_morphism(object_A.clone())
+                    .unwrap(),
+            ),
             // b to B
-            (discreteCategoryALower.get_identity_morphism(object_b.clone()).unwrap(),
-             discreteCategoryAUpper.get_identity_morphism(object_B.clone()).unwrap()),
-
+            (
+                discreteCategoryALower
+                    .get_identity_morphism(object_b.clone())
+                    .unwrap(),
+                discreteCategoryAUpper
+                    .get_identity_morphism(object_B.clone())
+                    .unwrap(),
+            ),
             // c to C
-            (discreteCategoryALower.get_identity_morphism(object_c.clone()).unwrap(),
-             discreteCategoryAUpper.get_identity_morphism(object_C.clone()).unwrap()),
-        ])
+            (
+                discreteCategoryALower
+                    .get_identity_morphism(object_c.clone())
+                    .unwrap(),
+                discreteCategoryAUpper
+                    .get_identity_morphism(object_C.clone())
+                    .unwrap(),
+            ),
+        ]),
     );
-
 
     // // Add the discrete category A as an object in Set category alphabet
     // setCategoryAlphabet.add_object(

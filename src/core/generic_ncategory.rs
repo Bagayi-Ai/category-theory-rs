@@ -1,25 +1,27 @@
-use std::hash::Hash;
-use std::fmt::Debug;
-use std::collections::{HashMap, HashSet};
+use crate::core::generic_morphism::GenericMorphism;
 use crate::core::generic_nfunctor::GenericNFunctor;
-use crate::core::ncategory::{NCategory, NCategoryError};
 use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
+use crate::core::ncategory::{NCategory, NCategoryError};
 use crate::core::nfunctor::NFunctor;
-use crate::core::generic_morphism::GenericMorphism;
-
+use std::collections::{HashMap, HashSet};
+use std::fmt::Debug;
+use std::hash::Hash;
 
 #[derive(Debug)]
-pub struct GenericNCategory<'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> + Debug + Eq>
-{
+pub struct GenericNCategory<
+    'a,
+    Id: Identifier<Id = Id>,
+    BaseCategory: NCategory<'a, Identifier = Id> + Debug + Eq,
+> {
     id: Id,
     objects: HashMap<Id, &'a BaseCategory>,
     object_mapping: HashMap<Id, HashMap<Id, HashSet<Id>>>,
     cells: HashMap<Id, GenericMorphism<'a, Self>>,
 }
 
-
-impl <'a, Id: Identifier<Id = Id>, Category: NCategory<'a, Identifier = Id> + Debug + Eq> GenericNCategory<'a, Id, Category>
+impl<'a, Id: Identifier<Id = Id>, Category: NCategory<'a, Identifier = Id> + Debug + Eq>
+    GenericNCategory<'a, Id, Category>
 {
     pub fn new() -> Self {
         GenericNCategory {
@@ -31,8 +33,9 @@ impl <'a, Id: Identifier<Id = Id>, Category: NCategory<'a, Identifier = Id> + De
     }
 }
 
-
-impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> + 'a + Debug + Eq> NCategory<'a> for GenericNCategory<'a, Id, BaseCategory>{
+impl<'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> + 'a + Debug + Eq>
+    NCategory<'a> for GenericNCategory<'a, Id, BaseCategory>
+{
     type Identifier = Id;
     type Object = &'a BaseCategory;
     type Morphism = GenericMorphism<'a, Self>;
@@ -77,7 +80,10 @@ impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> 
         }
     }
 
-    fn get_identity_morphism(&self, object_id: Self::Object) -> Result<&Self::Morphism, NCategoryError> {
+    fn get_identity_morphism(
+        &self,
+        object_id: Self::Object,
+    ) -> Result<&Self::Morphism, NCategoryError> {
         // it's basically the cell with the same id as the object
         self.get_moprhism(object_id.category_id())
     }
@@ -97,7 +103,10 @@ impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> 
         Ok(result)
     }
 
-    fn get_object_morphisms(&self, object: Self::Object) -> Result<Vec<&Self::Morphism>, NCategoryError> {
+    fn get_object_morphisms(
+        &self,
+        object: Self::Object,
+    ) -> Result<Vec<&Self::Morphism>, NCategoryError> {
         if let Some(cells) = self.object_mapping.get(object.category_id()) {
             let mut result: Vec<&Self::Morphism> = Vec::new();
             for (_to, cell_set) in cells {
@@ -123,7 +132,10 @@ impl <'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> 
         }
     }
 
-    fn base_object(&self, object_id: &Self::Identifier) -> Result<&Self::BaseCategory, NCategoryError> {
+    fn base_object(
+        &self,
+        object_id: &Self::Identifier,
+    ) -> Result<&Self::BaseCategory, NCategoryError> {
         todo!()
     }
 }

@@ -4,13 +4,19 @@ use crate::core::identifier::Identifier;
 use crate::core::ncategory::{NCategory, NCategoryError};
 use crate::core::nfunctor::NFunctor;
 
-pub struct GenericNFunctor<'a, Id: Identifier, SourceCategory: NCategory<'a>,  TargetCategory: NCategory<'a>>{
+pub struct GenericNFunctor<
+    'a,
+    Id: Identifier,
+    SourceCategory: NCategory<'a>,
+    TargetCategory: NCategory<'a>,
+> {
     id: Id,
     source_category: &'a SourceCategory,
     target_category: &'a TargetCategory,
     mappings: HashMap<
         &'a <SourceCategory as NCategory<'a>>::Morphism,
-        &'a <TargetCategory as NCategory<'a>>::Morphism>,
+        &'a <TargetCategory as NCategory<'a>>::Morphism,
+    >,
 }
 
 impl<'a, Id, SourceCategory, TargetCategory> GenericNFunctor<'a, Id, SourceCategory, TargetCategory>
@@ -25,7 +31,8 @@ where
         target_category: &'a TargetCategory,
         mappings: HashMap<
             &'a <SourceCategory as NCategory<'a>>::Morphism,
-            &'a <TargetCategory as NCategory<'a>>::Morphism>,
+            &'a <TargetCategory as NCategory<'a>>::Morphism,
+        >,
     ) -> Self {
         let functor = GenericNFunctor {
             id,
@@ -33,13 +40,15 @@ where
             target_category,
             mappings,
         };
-        functor.validate_level().expect("Functor level validation failed");
+        functor
+            .validate_level()
+            .expect("Functor level validation failed");
         functor
     }
 }
 
-
-impl <'a, Id, SourceCategory, TargetCategory> NFunctor<'a> for GenericNFunctor<'a, Id, SourceCategory, TargetCategory>
+impl<'a, Id, SourceCategory, TargetCategory> NFunctor<'a>
+    for GenericNFunctor<'a, Id, SourceCategory, TargetCategory>
 where
     SourceCategory: NCategory<'a, Identifier = Id>,
     TargetCategory: NCategory<'a, Identifier = Id>,
@@ -60,11 +69,18 @@ where
     fn target_category(&self) -> &Self::TargetCategory {
         self.target_category
     }
-    
-    fn mappings(&self) -> Result<
-        super::nfunctor::FunctorMappings<'a, Self::SourceCategory, Self::TargetCategory, Self::Identifier>,
-        NCategoryError> {
+
+    fn mappings(
+        &self,
+    ) -> Result<
+        super::nfunctor::FunctorMappings<
+            'a,
+            Self::SourceCategory,
+            Self::TargetCategory,
+            Self::Identifier,
+        >,
+        NCategoryError,
+    > {
         todo!()
     }
-
 }

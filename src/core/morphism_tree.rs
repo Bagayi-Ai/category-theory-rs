@@ -4,8 +4,7 @@ use std::hash::Hash;
 use crate::core::identifier::Identifier;
 use crate::core::ncategory::NCategory;
 
-
-pub trait MorphismMappingTreeTrait<'a> : Debug {
+pub trait MorphismMappingTreeTrait<'a>: Debug {
     type SourceCategory: NCategory<'a>;
     type TargetCategory: NCategory<'a>;
     type Id: Identifier;
@@ -16,27 +15,34 @@ pub trait MorphismMappingTreeTrait<'a> : Debug {
 }
 
 #[derive(Debug)]
-pub struct MorphismMappingTree<'a, Id: Identifier, SourceCategory: NCategory<'a>, TargetCategory: NCategory<'a>>{
+pub struct MorphismMappingTree<
+    'a,
+    Id: Identifier,
+    SourceCategory: NCategory<'a>,
+    TargetCategory: NCategory<'a>,
+> {
     id: &'a Id,
     source_cell: &'a SourceCategory::Morphism,
     target_cell: &'a TargetCategory::Morphism,
     children: Vec<
         Box<
             dyn MorphismMappingTreeTrait<
-                'a,
-                SourceCategory = <SourceCategory as NCategory<'a>>::BaseCategory,
-                TargetCategory = <TargetCategory as NCategory<'a>>::BaseCategory,
-                Id = Id
-            >
-        >
+                    'a,
+                    SourceCategory = <SourceCategory as NCategory<'a>>::BaseCategory,
+                    TargetCategory = <TargetCategory as NCategory<'a>>::BaseCategory,
+                    Id = Id,
+                >,
+        >,
     >,
 }
 
-impl <'a, Id: Identifier, SourceCategory: NCategory<'a>, TargetCategory: NCategory<'a>> MorphismMappingTree<'a, Id, SourceCategory, TargetCategory> {
+impl<'a, Id: Identifier, SourceCategory: NCategory<'a>, TargetCategory: NCategory<'a>>
+    MorphismMappingTree<'a, Id, SourceCategory, TargetCategory>
+{
     pub fn new(
         id: &'a Id,
         source_cell: &'a SourceCategory::Morphism,
-        target_cell: &'a TargetCategory::Morphism
+        target_cell: &'a TargetCategory::Morphism,
     ) -> Self {
         MorphismMappingTree {
             id,
@@ -45,16 +51,21 @@ impl <'a, Id: Identifier, SourceCategory: NCategory<'a>, TargetCategory: NCatego
             children: Vec::new(),
         }
     }
-    
+
     pub fn new_with_children(
         id: &'a Id,
         source_cell: &'a SourceCategory::Morphism,
         target_cell: &'a TargetCategory::Morphism,
-        children: Vec<Box<dyn MorphismMappingTreeTrait<
-            'a,
-            SourceCategory = <SourceCategory as NCategory<'a>>::BaseCategory,
-            TargetCategory = <TargetCategory as NCategory<'a>>::BaseCategory,
-            Id = Id>>>,
+        children: Vec<
+            Box<
+                dyn MorphismMappingTreeTrait<
+                        'a,
+                        SourceCategory = <SourceCategory as NCategory<'a>>::BaseCategory,
+                        TargetCategory = <TargetCategory as NCategory<'a>>::BaseCategory,
+                        Id = Id,
+                    >,
+            >,
+        >,
     ) -> Self {
         MorphismMappingTree {
             id,
@@ -64,7 +75,10 @@ impl <'a, Id: Identifier, SourceCategory: NCategory<'a>, TargetCategory: NCatego
         }
     }
 
-    pub fn add_child(&mut self, child: MorphismMappingTree<'a, Id, SourceCategory, TargetCategory>) {
+    pub fn add_child(
+        &mut self,
+        child: MorphismMappingTree<'a, Id, SourceCategory, TargetCategory>,
+    ) {
         todo!()
     }
 
@@ -81,8 +95,9 @@ impl <'a, Id: Identifier, SourceCategory: NCategory<'a>, TargetCategory: NCatego
     }
 }
 
-impl <'a, Id: Identifier, SourceCategory: NCategory<'a>, TargetCategory: NCategory<'a>> MorphismMappingTreeTrait<'a> for
-MorphismMappingTree<'a, Id, SourceCategory, TargetCategory> {
+impl<'a, Id: Identifier, SourceCategory: NCategory<'a>, TargetCategory: NCategory<'a>>
+    MorphismMappingTreeTrait<'a> for MorphismMappingTree<'a, Id, SourceCategory, TargetCategory>
+{
     type SourceCategory = SourceCategory;
     type TargetCategory = TargetCategory;
     type Id = Id;

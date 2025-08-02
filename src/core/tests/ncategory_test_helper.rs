@@ -1,9 +1,9 @@
-use rand::{distributions::Alphanumeric, Rng};
 use crate::core::discrete_category::DiscreteCategory;
-use crate::core::ncategory::{NCategory};
 use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
+use crate::core::ncategory::NCategory;
 use crate::core::tests::test_generic_ncategory::GenericCategory1TestHelper;
+use rand::{Rng, distributions::Alphanumeric};
 
 pub trait NCategoryTestHelper<'a> {
     type Category: NCategory<'a>;
@@ -18,19 +18,23 @@ pub trait NCategoryTestHelper<'a> {
     }
 
     fn generate_commuting_cell(
-        &mut self
-    ) -> (Vec<<Self::Category as NCategory<'a>>::Identifier>, Vec<<Self::Category as NCategory<'a>>::Identifier>);
+        &mut self,
+    ) -> (
+        Vec<<Self::Category as NCategory<'a>>::Identifier>,
+        Vec<<Self::Category as NCategory<'a>>::Identifier>,
+    );
 
     fn generate_non_commuting_cell(
-        &mut self
-    ) -> (Vec<<Self::Category as NCategory<'a>>::Identifier>, Vec<<Self::Category as NCategory<'a>>::Identifier>);
+        &mut self,
+    ) -> (
+        Vec<<Self::Category as NCategory<'a>>::Identifier>,
+        Vec<<Self::Category as NCategory<'a>>::Identifier>,
+    );
 
     fn generate_object(&self) -> Self::CategoryObject;
 
     fn expected_nested_level(&self) -> isize;
-
 }
-
 
 pub fn random_string(len: usize) -> String {
     rand::thread_rng()
@@ -157,5 +161,4 @@ where
     //     let commute_result = commute_result.unwrap();
     //     assert!(!commute_result);
     // }
-
 }

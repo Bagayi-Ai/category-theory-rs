@@ -1,17 +1,17 @@
-use std::fmt::Debug;
 use crate::core::identifier::Identifier;
 use crate::core::ncategory::{NCategory, UnitCategory};
 use crate::core::nfunctor::{NFunctor, UnitFunctor};
+use std::fmt::Debug;
 
-pub trait Morphism<'a> : Debug
-{
+pub trait Morphism<'a>: Debug {
     type Category: NCategory<'a>;
 
-    type Functor: NFunctor<'a,
-        Identifier = <Self::Category as NCategory<'a>>::Identifier,
-        SourceCategory = <Self::Category as NCategory<'a>>::BaseCategory,
-        TargetCategory = <Self::Category as NCategory<'a>>::BaseCategory
-    >;
+    type Functor: NFunctor<
+            'a,
+            Identifier = <Self::Category as NCategory<'a>>::Identifier,
+            SourceCategory = <Self::Category as NCategory<'a>>::BaseCategory,
+            TargetCategory = <Self::Category as NCategory<'a>>::BaseCategory,
+        >;
 
     fn cell_id(&self) -> &<Self::Category as NCategory<'a>>::Identifier;
 
@@ -27,9 +27,7 @@ pub struct UnitMorphism<T: Identifier> {
     _phantom: std::marker::PhantomData<T>,
 }
 
-
-
-impl <'a, T: Identifier + 'a> Morphism<'a> for UnitMorphism<T> {
+impl<'a, T: Identifier + 'a> Morphism<'a> for UnitMorphism<T> {
     type Category = UnitCategory<T>;
 
     type Functor = UnitFunctor<'a, T, Self::Category, Self::Category>;
@@ -45,7 +43,7 @@ impl <'a, T: Identifier + 'a> Morphism<'a> for UnitMorphism<T> {
     fn target_object(&self) -> <Self::Category as NCategory<'a>>::Object {
         todo!()
     }
-    
+
     fn functor(&self) -> &Self::Functor {
         todo!()
     }

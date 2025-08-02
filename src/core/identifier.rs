@@ -10,7 +10,6 @@ pub trait Identifier: Clone + Eq + Hash + Debug {
     fn generate() -> Self;
 }
 
-
 impl Identifier for String {
     type Id = String;
 

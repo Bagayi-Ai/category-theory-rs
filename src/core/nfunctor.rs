@@ -105,6 +105,19 @@ pub struct UnitFunctor<
     _phantom2: std::marker::PhantomData<SourceCategory>,
     _phantom3: std::marker::PhantomData<TargetCategory>,
 }
+
+impl<'a>
+    UnitFunctor<'a, (), UnitCategory<()>, UnitCategory<()>>
+{
+    pub fn new() -> Self {
+        UnitFunctor {
+            _phantom: std::marker::PhantomData,
+            _phantom2: std::marker::PhantomData,
+            _phantom3: std::marker::PhantomData,
+        }
+    }
+}
+
 impl<'a, T, SourceCategory, TargetCategory> NFunctor<'a>
     for UnitFunctor<'a, T, SourceCategory, TargetCategory>
 where

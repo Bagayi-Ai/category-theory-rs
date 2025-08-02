@@ -3,7 +3,7 @@ use crate::core::morphism::Morphism;
 use crate::core::ncategory::{NCategory, NCategoryError, UnitCategory};
 use crate::core::nfunctor::{NFunctor, UnitFunctor};
 use std::collections::{HashMap, HashSet};
-use std::fmt::Debug;
+use std::fmt::{Debug, Display};
 use std::hash::{Hash, Hasher};
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -11,7 +11,7 @@ pub struct DiscreteCategory<T: Hash + Eq + Clone> {
     category_id: T,
     // TODO: Find a way of avoiding storing identity cells
     // as we could derive them from the objects.
-    cells: Option<HashMap<T, Self>>,
+    cells: Option<HashMap<String, Self>>,
 }
 
 impl<T: Hash + Eq + Clone> Hash for DiscreteCategory<T> {
@@ -41,25 +41,26 @@ impl<T: Eq + Clone + Debug + Hash + Identifier> DiscreteCategory<T> {
     }
 }
 
-impl<'a, T: Eq + Clone + Hash + Debug + Identifier<Id = T> + 'a> NCategory<'a>
+impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> NCategory<'a>
     for DiscreteCategory<T>
 {
-    type Identifier = T;
+    type Identifier = String;
     type Object = T;
     type Morphism = Self;
-    type BaseCategory = UnitCategory<T>;
+    type BaseCategory = UnitCategory<String>;
 
-    fn category_id(&self) -> &Self::Identifier {
-        &self.category_id
+    fn category_id(&self) -> Self::Identifier {
+        self.category_id.to_string()
     }
 
     fn add_object(&mut self, object: Self::Object) -> Result<(), NCategoryError> {
         let cell = Self::new_with_id(object.clone());
+        let cell_id = object.to_string();
         if let Some(cells) = &mut self.cells {
-            cells.insert(object.clone(), cell);
+            cells.insert(cell_id, cell);
         } else {
             self.cells = Some(HashMap::new());
-            self.cells.as_mut().unwrap().insert(object.clone(), cell);
+            self.cells.as_mut().unwrap().insert(cell_id, cell);
         }
         Ok(())
     }
@@ -70,8 +71,8 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier<Id = T> + 'a> NCategory<'a>
 
     fn get_object(&self, object_id: &Self::Identifier) -> Result<Self::Object, NCategoryError> {
         if let Some(cells) = &self.cells {
-            if let Some((key, _value)) = cells.get_key_value(object_id) {
-                return Ok(key.clone());
+            if let Some((key, value)) = cells.get_key_value(object_id) {
+                return Ok(value.category_id.clone());
             }
         }
         Err(NCategoryError::ObjectNotFound)
@@ -81,12 +82,12 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier<Id = T> + 'a> NCategory<'a>
         &self,
         object_id: Self::Object,
     ) -> Result<&Self::Morphism, NCategoryError> {
-        self.get_moprhism(&object_id)
+        self.get_moprhism(&object_id.to_string())
     }
 
-    fn get_all_objects(&self) -> Result<HashSet<Self::Identifier>, NCategoryError> {
+    fn get_all_objects(&self) -> Result<HashSet<Self::Object>, NCategoryError> {
         if let Some(cells) = &self.cells {
-            Ok(cells.keys().map(|item| item.clone()).collect())
+            Ok(cells.values().map(|item| item.category_id.clone()).collect())
         } else {
             Err(NCategoryError::NoObjectsInCategory)
         }
@@ -124,11 +125,11 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier<Id = T> + 'a> NCategory<'a>
     }
 }
 
-impl<'a, T: Eq + Clone + Hash + Debug + Identifier<Id = T> + 'a> Morphism<'a>
+impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> Morphism<'a>
     for DiscreteCategory<T>
 {
     type Category = Self;
-    type Functor = UnitFunctor<'a, T, UnitCategory<T>, UnitCategory<T>>;
+    type Functor = UnitFunctor<'a, String, UnitCategory<String>, UnitCategory<String>>;
 
     fn cell_id(&self) -> &<Self::Category as NCategory<'a>>::Identifier {
         todo!()
@@ -147,7 +148,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier<Id = T> + 'a> Morphism<'a>
     }
 }
 
-impl<T: Eq + Clone + Hash + Debug + Identifier<Id = T>> From<T> for DiscreteCategory<T> {
+impl<T: Eq + Clone + Hash + Debug + Identifier + Display> From<T> for DiscreteCategory<T> {
     fn from(object: T) -> Self {
         let mut category = DiscreteCategory::new();
         category.add_object(object).unwrap();
@@ -155,7 +156,7 @@ impl<T: Eq + Clone + Hash + Debug + Identifier<Id = T>> From<T> for DiscreteCate
     }
 }
 
-impl<T: Eq + Clone + Hash + Debug + Identifier<Id = T>> From<Vec<T>> for DiscreteCategory<T> {
+impl<T: Eq + Clone + Hash + Debug + Identifier + Display> From<Vec<T>> for DiscreteCategory<T> {
     fn from(objects: Vec<T>) -> Self {
         let mut category = DiscreteCategory::new();
         for object in objects {

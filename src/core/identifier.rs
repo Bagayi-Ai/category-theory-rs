@@ -1,6 +1,7 @@
 use std::fmt::Debug;
 use std::hash::Hash;
 use uuid::Uuid;
+use rand::Rng;
 
 pub trait Identifier: Clone + Eq + Hash + Debug {
     type Id: Eq + Hash + Clone + Debug;
@@ -19,5 +20,30 @@ impl Identifier for String {
 
     fn generate() -> Self::Id {
         Uuid::new_v4().to_string()
+    }
+}
+
+impl Identifier for () {
+    type Id = ();
+
+    fn id(&self) -> &Self::Id {
+        self
+    }
+
+    fn generate() -> Self::Id {
+        ()
+    }
+}
+
+impl Identifier for usize {
+    type Id = usize;
+
+    fn id(&self) -> &Self::Id {
+        self
+    }
+
+    fn generate() -> Self::Id {
+        let mut rng = rand::thread_rng();
+        rng.r#gen::<usize>()
     }
 }

@@ -5,9 +5,10 @@ use crate::core::generic_nfunctor::GenericNFunctor;
 use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
 use crate::core::morphism_tree::MorphismMappingTree;
-use crate::core::ncategory::{NCategory, NCategoryError};
+use crate::core::ncategory::{NCategory, NCategoryError, UnitCategory};
 use crate::core::tests::ncategory_test_helper::*;
 use std::collections::HashMap;
+use crate::core::nfunctor::{FunctorMappings, Mapping, NFunctor, UnitFunctor};
 
 type DiscreteCategoryString = DiscreteCategory<String>;
 
@@ -327,10 +328,132 @@ pub fn test_identity_cell_tree() {
     discreteCategoryALower.add_object(object_b.clone()).unwrap();
     discreteCategoryALower.add_object(object_c.clone()).unwrap();
 
+    // Discrete category A with a, b, c as objects
+    let mut discreteCategoryAUpper = DiscreteCategory::new_with_id("alphabet_upper".to_string());
+    let object_A = "A".to_string();
+    let object_B = "B".to_string();
+    let object_C = "C".to_string();
+    discreteCategoryAUpper.add_object(object_A.clone()).unwrap();
+    discreteCategoryAUpper.add_object(object_B.clone()).unwrap();
+    discreteCategoryAUpper.add_object(object_C.clone()).unwrap();
+
+
+    let mut discreteCategoryANumber = DiscreteCategory::new();
+    let object_1 = 1;
+    let object_2 = 2;
+    let object_3 = 3;
+    discreteCategoryANumber.add_object(object_1).unwrap();
+    discreteCategoryANumber.add_object(object_2).unwrap();
+    discreteCategoryANumber.add_object(object_3).unwrap();
+
+    let unit_functor = UnitFunctor::new();
+
+    // // create a functor from lower to number
+    // let functor_lower_to_number = GenericNFunctor::new(
+    //     "functor_lower_to_number".to_string(),
+    //     &discreteCategoryALower,
+    //     &discreteCategoryANumber,
+    //     HashMap::from([
+    //         // a to 1
+    //         (
+    //             discreteCategoryALower
+    //                 .get_identity_morphism(object_a.clone())
+    //                 .unwrap(),
+    //             discreteCategoryANumber
+    //                 .get_identity_morphism(object_1)
+    //                 .unwrap(),
+    //         ),
+    //         // b to 2
+    //         (
+    //             discreteCategoryALower
+    //                 .get_identity_morphism(object_b.clone())
+    //                 .unwrap(),
+    //             discreteCategoryANumber
+    //                 .get_identity_morphism(object_2)
+    //                 .unwrap(),
+    //         ),
+    //         // c to 3
+    //         (
+    //             discreteCategoryALower
+    //                 .get_identity_morphism(object_c.clone())
+    //                 .unwrap(),
+    //             discreteCategoryANumber
+    //                 .get_identity_morphism(object_3)
+    //                 .unwrap(),
+    //         ),
+    //     ]),
+    // );
+
+    // create a functor1 from lower to upper
+    let functor_lower_to_upper = GenericNFunctor::new(
+        "functor_1".to_string(),
+        &discreteCategoryALower,
+        &discreteCategoryAUpper,
+        HashMap::from([
+            // a to A
+            (
+                discreteCategoryALower
+                    .get_identity_morphism(object_a.clone())
+                    .unwrap(),
+                discreteCategoryAUpper
+                    .get_identity_morphism(object_A.clone())
+                    .unwrap(),
+            ),
+            // b to B
+            (
+                discreteCategoryALower
+                    .get_identity_morphism(object_b.clone())
+                    .unwrap(),
+                discreteCategoryAUpper
+                    .get_identity_morphism(object_B.clone())
+                    .unwrap(),
+            ),
+            // c to C
+            (
+                discreteCategoryALower
+                    .get_identity_morphism(object_c.clone())
+                    .unwrap(),
+                discreteCategoryAUpper
+                    .get_identity_morphism(object_C.clone())
+                    .unwrap(),
+            ),
+        ]),
+    );
+
+    // // expected functor mapping
+    // let actual_mapping =
+    //     functor_lower_to_upper.mappings().unwrap();
+
+    // let expected_mapping: FunctorMappings<'_, DiscreteCategoryString, DiscreteCategoryString, _> = FunctorMappings {
+    //     mappings: HashMap::from(
+    //         [
+    //             (
+    //                 discreteCategoryALower
+    //                     .get_identity_morphism(object_a.clone())
+    //                     .unwrap(),
+    //                 Mapping{
+    //                     target_cell: discreteCategoryAUpper
+    //                         .get_identity_morphism(object_A.clone())
+    //                         .unwrap(),
+    //                     base_functor: &functor_lower_to_upper,
+    //                 }
+    //                 )
+    //         ]
+    //     )
+    // };
+
+
+
     // Add the discrete category A as an object in Set category alphabet
     setCategoryAlphabet
         .add_object(&discreteCategoryALower)
         .unwrap();
+
+    // Add the discrete category A as an object in Set category alphabet
+    setCategoryAlphabet.add_object(
+        &discreteCategoryAUpper).unwrap();
+
+    // setCategoryAlphabet.add_object(&discreteCategoryANumber).unwrap();
 
     let identity_cell = setCategoryAlphabet
         .get_identity_morphism(&discreteCategoryALower)
@@ -367,50 +490,6 @@ pub fn test_identity_cell_tree() {
     //
     // assert_eq!(actual_cell_tree, expected_cell_tree);
     //
-    // Discrete category A with a, b, c as objects
-    let mut discreteCategoryAUpper = DiscreteCategory::new_with_id("alphabet_upper".to_string());
-    let object_A = "A".to_string();
-    let object_B = "B".to_string();
-    let object_C = "C".to_string();
-    discreteCategoryAUpper.add_object(object_A.clone()).unwrap();
-    discreteCategoryAUpper.add_object(object_B.clone()).unwrap();
-    discreteCategoryAUpper.add_object(object_C.clone()).unwrap();
-
-    // create a functor1 from lower to upper
-    let functor = GenericNFunctor::new(
-        "functor_1".to_string(),
-        &discreteCategoryALower,
-        &discreteCategoryAUpper,
-        HashMap::from([
-            // a to A
-            (
-                discreteCategoryALower
-                    .get_identity_morphism(object_a.clone())
-                    .unwrap(),
-                discreteCategoryAUpper
-                    .get_identity_morphism(object_A.clone())
-                    .unwrap(),
-            ),
-            // b to B
-            (
-                discreteCategoryALower
-                    .get_identity_morphism(object_b.clone())
-                    .unwrap(),
-                discreteCategoryAUpper
-                    .get_identity_morphism(object_B.clone())
-                    .unwrap(),
-            ),
-            // c to C
-            (
-                discreteCategoryALower
-                    .get_identity_morphism(object_c.clone())
-                    .unwrap(),
-                discreteCategoryAUpper
-                    .get_identity_morphism(object_C.clone())
-                    .unwrap(),
-            ),
-        ]),
-    );
 
     // // Add the discrete category A as an object in Set category alphabet
     // setCategoryAlphabet.add_object(

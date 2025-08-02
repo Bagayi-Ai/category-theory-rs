@@ -41,7 +41,7 @@ impl<'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> +
     type Morphism = GenericMorphism<'a, Self>;
     type BaseCategory = BaseCategory;
 
-    fn category_id(&self) -> &Self::Identifier {
+    fn category_id(&self) -> Self::Identifier {
         todo!()
     }
 
@@ -85,7 +85,7 @@ impl<'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> +
         object_id: Self::Object,
     ) -> Result<&Self::Morphism, NCategoryError> {
         // it's basically the cell with the same id as the object
-        self.get_moprhism(object_id.category_id())
+        self.get_moprhism(&object_id.category_id())
     }
 
     fn get_all_objects(&self) -> Result<HashSet<Self::Object>, NCategoryError> {
@@ -107,7 +107,7 @@ impl<'a, Id: Identifier<Id = Id>, BaseCategory: NCategory<'a, Identifier = Id> +
         &self,
         object: Self::Object,
     ) -> Result<Vec<&Self::Morphism>, NCategoryError> {
-        if let Some(cells) = self.object_mapping.get(object.category_id()) {
+        if let Some(cells) = self.object_mapping.get(&object.category_id()) {
             let mut result: Vec<&Self::Morphism> = Vec::new();
             for (_to, cell_set) in cells {
                 for cell_id in cell_set {

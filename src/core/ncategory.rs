@@ -39,7 +39,7 @@ where
         Self::nested_level()
     }
 
-    fn category_id(&self) -> &Self::Identifier;
+    fn category_id(&self) -> Self::Identifier;
 
     fn add_object(&mut self, object: Self::Object) -> Result<(), NCategoryError>;
 
@@ -213,7 +213,7 @@ impl<'a, T: Identifier + 'a> NCategory<'a> for UnitCategory<T> {
 
     type BaseCategory = UnitCategory<T>;
 
-    fn category_id(&self) -> &Self::Identifier {
+    fn category_id(&self) -> Self::Identifier {
         todo!()
     }
 

@@ -24,7 +24,7 @@ use std::collections::HashMap;
 //     fn target_cell(&self) -> &'a <Self::TargetCategory as NCategory<'a>>::Cell;
 // }
 
-pub struct Mapping<'a, SourceCategory, TargetCategory, Id>
+pub struct Mapping<'a, Id, SourceCategory, TargetCategory>
 where
     SourceCategory: NCategory<'a>,
     TargetCategory: NCategory<'a>,
@@ -39,7 +39,7 @@ where
     >,
 }
 
-pub struct FunctorMappings<'a, SourceCategory, TargetCategory, Id>
+pub struct FunctorMappings<'a, Id, SourceCategory, TargetCategory>
 where
     SourceCategory: NCategory<'a>,
     TargetCategory: NCategory<'a>,
@@ -47,11 +47,11 @@ where
 {
     pub mappings: HashMap<
         &'a <SourceCategory as NCategory<'a>>::Morphism,
-        Mapping<'a, SourceCategory, TargetCategory, Id>,
+        Mapping<'a, Id, SourceCategory, TargetCategory>,
     >,
 }
 
-impl<'a, SourceCategory, TargetCategory, Id> FunctorMappings<'a, SourceCategory, TargetCategory, Id>
+impl<'a, SourceCategory, TargetCategory, Id> FunctorMappings<'a, Id, SourceCategory, TargetCategory>
 where
     SourceCategory: NCategory<'a>,
     TargetCategory: NCategory<'a>,
@@ -82,7 +82,7 @@ pub trait NFunctor<'a> {
     fn mappings(
         &self,
     ) -> Result<
-        FunctorMappings<'a, Self::SourceCategory, Self::TargetCategory, Self::Identifier>,
+        FunctorMappings<'a, Self::Identifier, Self::SourceCategory, Self::TargetCategory>,
         NCategoryError,
     >;
 
@@ -106,9 +106,7 @@ pub struct UnitFunctor<
     _phantom3: std::marker::PhantomData<TargetCategory>,
 }
 
-impl<'a>
-    UnitFunctor<'a, String, UnitCategory<String>, UnitCategory<String>>
-{
+impl<'a> UnitFunctor<'a, String, UnitCategory<String>, UnitCategory<String>> {
     pub fn new() -> Self {
         UnitFunctor {
             _phantom: std::marker::PhantomData,
@@ -144,7 +142,7 @@ where
     fn mappings(
         &self,
     ) -> Result<
-        FunctorMappings<'a, Self::SourceCategory, Self::TargetCategory, Self::Identifier>,
+        FunctorMappings<'a, Self::Identifier, Self::SourceCategory, Self::TargetCategory>,
         NCategoryError,
     > {
         todo!()

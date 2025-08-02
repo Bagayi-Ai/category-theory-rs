@@ -75,9 +75,9 @@ where
     ) -> Result<
         super::nfunctor::FunctorMappings<
             'a,
+            Self::Identifier,
             Self::SourceCategory,
             Self::TargetCategory,
-            Self::Identifier,
         >,
         NCategoryError,
     > {

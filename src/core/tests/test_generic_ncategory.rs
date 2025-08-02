@@ -6,9 +6,9 @@ use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
 use crate::core::morphism_tree::MorphismMappingTree;
 use crate::core::ncategory::{NCategory, NCategoryError, UnitCategory};
+use crate::core::nfunctor::{FunctorMappings, Mapping, NFunctor, UnitFunctor};
 use crate::core::tests::ncategory_test_helper::*;
 use std::collections::HashMap;
-use crate::core::nfunctor::{FunctorMappings, Mapping, NFunctor, UnitFunctor};
 
 type DiscreteCategoryString = DiscreteCategory<String>;
 
@@ -337,7 +337,6 @@ pub fn test_identity_cell_tree() {
     discreteCategoryAUpper.add_object(object_B.clone()).unwrap();
     discreteCategoryAUpper.add_object(object_C.clone()).unwrap();
 
-
     let mut discreteCategoryANumber = DiscreteCategory::new();
     let object_1 = 1;
     let object_2 = 2;
@@ -384,12 +383,11 @@ pub fn test_identity_cell_tree() {
         ]),
     );
 
-
     // let actual_mapping = functor_lower_to_number.mappings().unwrap();
 
-    let expected_mapping: FunctorMappings<DiscreteCategoryString, DiscreteCategory<usize>, String>  = FunctorMappings {
-        mappings: HashMap::from(
-            [
+    let expected_mapping: FunctorMappings<String, DiscreteCategoryString, DiscreteCategory<usize>> =
+        FunctorMappings {
+            mappings: HashMap::from([
                 (
                     discreteCategoryALower
                         .get_identity_morphism(object_a.clone())
@@ -399,33 +397,32 @@ pub fn test_identity_cell_tree() {
                             .get_identity_morphism(object_1)
                             .unwrap(),
                         base_functor: &unit_functor,
-                    }
+                    },
                 ),
                 (
                     discreteCategoryALower
                         .get_identity_morphism(object_b.clone())
                         .unwrap(),
-                    Mapping{
+                    Mapping {
                         target_cell: discreteCategoryANumber
                             .get_identity_morphism(object_2)
                             .unwrap(),
                         base_functor: &unit_functor,
-                    }
+                    },
                 ),
                 (
                     discreteCategoryALower
                         .get_identity_morphism(object_c.clone())
                         .unwrap(),
-                    Mapping{
+                    Mapping {
                         target_cell: discreteCategoryANumber
                             .get_identity_morphism(object_3)
                             .unwrap(),
                         base_functor: &unit_functor,
-                    }
+                    },
                 ),
-            ]
-        )
-    };
+            ]),
+        };
 
     // create a functor1 from lower to upper
     let functor_lower_to_upper = GenericNFunctor::new(
@@ -485,16 +482,15 @@ pub fn test_identity_cell_tree() {
     //     )
     // };
 
-
-
     // Add the discrete category A as an object in Set category alphabet
     setCategoryAlphabet
         .add_object(&discreteCategoryALower)
         .unwrap();
 
     // Add the discrete category A as an object in Set category alphabet
-    setCategoryAlphabet.add_object(
-        &discreteCategoryAUpper).unwrap();
+    setCategoryAlphabet
+        .add_object(&discreteCategoryAUpper)
+        .unwrap();
 
     // setCategoryAlphabet.add_object(&discreteCategoryANumber).unwrap();
 

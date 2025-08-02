@@ -87,7 +87,10 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> NC
 
     fn get_all_objects(&self) -> Result<HashSet<Self::Object>, NCategoryError> {
         if let Some(cells) = &self.cells {
-            Ok(cells.values().map(|item| item.category_id.clone()).collect())
+            Ok(cells
+                .values()
+                .map(|item| item.category_id.clone())
+                .collect())
         } else {
             Err(NCategoryError::NoObjectsInCategory)
         }

@@ -1,7 +1,7 @@
+use rand::Rng;
 use std::fmt::Debug;
 use std::hash::Hash;
 use uuid::Uuid;
-use rand::Rng;
 
 pub trait Identifier: Clone + Eq + Hash + Debug {
     type Id: Eq + Hash + Clone + Debug;

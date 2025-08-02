@@ -107,7 +107,7 @@ pub struct UnitFunctor<
 }
 
 impl<'a>
-    UnitFunctor<'a, (), UnitCategory<()>, UnitCategory<()>>
+    UnitFunctor<'a, String, UnitCategory<String>, UnitCategory<String>>
 {
     pub fn new() -> Self {
         UnitFunctor {

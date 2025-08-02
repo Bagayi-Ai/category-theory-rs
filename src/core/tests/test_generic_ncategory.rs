@@ -348,41 +348,84 @@ pub fn test_identity_cell_tree() {
 
     let unit_functor = UnitFunctor::new();
 
-    // // create a functor from lower to number
-    // let functor_lower_to_number = GenericNFunctor::new(
-    //     "functor_lower_to_number".to_string(),
-    //     &discreteCategoryALower,
-    //     &discreteCategoryANumber,
-    //     HashMap::from([
-    //         // a to 1
-    //         (
-    //             discreteCategoryALower
-    //                 .get_identity_morphism(object_a.clone())
-    //                 .unwrap(),
-    //             discreteCategoryANumber
-    //                 .get_identity_morphism(object_1)
-    //                 .unwrap(),
-    //         ),
-    //         // b to 2
-    //         (
-    //             discreteCategoryALower
-    //                 .get_identity_morphism(object_b.clone())
-    //                 .unwrap(),
-    //             discreteCategoryANumber
-    //                 .get_identity_morphism(object_2)
-    //                 .unwrap(),
-    //         ),
-    //         // c to 3
-    //         (
-    //             discreteCategoryALower
-    //                 .get_identity_morphism(object_c.clone())
-    //                 .unwrap(),
-    //             discreteCategoryANumber
-    //                 .get_identity_morphism(object_3)
-    //                 .unwrap(),
-    //         ),
-    //     ]),
-    // );
+    // create a functor from lower to number
+    let functor_lower_to_number = GenericNFunctor::new(
+        "functor_lower_to_number".to_string(),
+        &discreteCategoryALower,
+        &discreteCategoryANumber,
+        HashMap::from([
+            // a to 1
+            (
+                discreteCategoryALower
+                    .get_identity_morphism(object_a.clone())
+                    .unwrap(),
+                discreteCategoryANumber
+                    .get_identity_morphism(object_1)
+                    .unwrap(),
+            ),
+            // b to 2
+            (
+                discreteCategoryALower
+                    .get_identity_morphism(object_b.clone())
+                    .unwrap(),
+                discreteCategoryANumber
+                    .get_identity_morphism(object_2)
+                    .unwrap(),
+            ),
+            // c to 3
+            (
+                discreteCategoryALower
+                    .get_identity_morphism(object_c.clone())
+                    .unwrap(),
+                discreteCategoryANumber
+                    .get_identity_morphism(object_3)
+                    .unwrap(),
+            ),
+        ]),
+    );
+
+
+    // let actual_mapping = functor_lower_to_number.mappings().unwrap();
+
+    let expected_mapping: FunctorMappings<DiscreteCategoryString, DiscreteCategory<usize>, String>  = FunctorMappings {
+        mappings: HashMap::from(
+            [
+                (
+                    discreteCategoryALower
+                        .get_identity_morphism(object_a.clone())
+                        .unwrap(),
+                    Mapping {
+                        target_cell: discreteCategoryANumber
+                            .get_identity_morphism(object_1)
+                            .unwrap(),
+                        base_functor: &unit_functor,
+                    }
+                ),
+                (
+                    discreteCategoryALower
+                        .get_identity_morphism(object_b.clone())
+                        .unwrap(),
+                    Mapping{
+                        target_cell: discreteCategoryANumber
+                            .get_identity_morphism(object_2)
+                            .unwrap(),
+                        base_functor: &unit_functor,
+                    }
+                ),
+                (
+                    discreteCategoryALower
+                        .get_identity_morphism(object_c.clone())
+                        .unwrap(),
+                    Mapping{
+                        target_cell: discreteCategoryANumber
+                            .get_identity_morphism(object_3)
+                            .unwrap(),
+                        base_functor: &unit_functor,
+                    }
+                ),
+            ]
+        )
+    };
 
     // create a functor1 from lower to upper
     let functor_lower_to_upper = GenericNFunctor::new(

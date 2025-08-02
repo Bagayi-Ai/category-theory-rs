@@ -4,27 +4,6 @@ use std::collections::HashMap;
 use std::fmt::{Debug, Formatter};
 use std::hash::Hash;
 use crate::core::morphism::Morphism;
-// pub struct FunctorMapping<'a, SourceCategory: NCategory<'a>, TargetCategory: NCategory<'a>> {
-//     source_cell: &'a <SourceCategory as NCategory<'a>>::Cell,
-//     target_cell: &'a <TargetCategory as NCategory<'a>>::Cell,
-//     children: Vec<
-//         Box<
-//             dyn FunctorMappingTrait<
-//                 'a,
-//                 SourceCategory = <SourceCategory as NCategory<'a>>::BaseCategory,
-//                 TargetCategory = <TargetCategory as NCategory<'a>>::BaseCategory
-//             >
-//         >
-//     >
-// }
-//
-// pub trait FunctorMappingTrait<'a> {
-//     type SourceCategory: NCategory<'a>;
-//     type TargetCategory: NCategory<'a>;
-//
-//     fn source_cell(&self) -> &'a <Self::SourceCategory as NCategory<'a>>::Cell;
-//     fn target_cell(&self) -> &'a <Self::TargetCategory as NCategory<'a>>::Cell;
-// }
 
 pub struct Mapping<'a, Id, SourceCategory, TargetCategory>
 where

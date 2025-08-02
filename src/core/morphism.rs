@@ -1,9 +1,10 @@
+use std::hash::Hash;
 use crate::core::identifier::Identifier;
 use crate::core::ncategory::{NCategory, UnitCategory};
 use crate::core::nfunctor::{NFunctor, UnitFunctor};
 use std::fmt::Debug;
 
-pub trait Morphism<'a>: Debug {
+pub trait Morphism<'a>: Debug + Eq + Hash {
     type Category: NCategory<'a>;
 
     type Functor: NFunctor<

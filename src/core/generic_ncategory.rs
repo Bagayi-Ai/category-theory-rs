@@ -8,7 +8,7 @@ use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::hash::Hash;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq,Eq)]
 pub struct GenericNCategory<
     'a,
     Id: Identifier<Id = Id>,

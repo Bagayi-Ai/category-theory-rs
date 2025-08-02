@@ -1,7 +1,9 @@
 use crate::core::identifier::Identifier;
 use crate::core::ncategory::{NCategory, NCategoryError, UnitCategory};
 use std::collections::HashMap;
-
+use std::fmt::{Debug, Formatter};
+use std::hash::Hash;
+use crate::core::morphism::Morphism;
 // pub struct FunctorMapping<'a, SourceCategory: NCategory<'a>, TargetCategory: NCategory<'a>> {
 //     source_cell: &'a <SourceCategory as NCategory<'a>>::Cell,
 //     target_cell: &'a <TargetCategory as NCategory<'a>>::Cell,
@@ -39,6 +41,52 @@ where
     >,
 }
 
+impl<'a, Id, SourceCategory, TargetCategory> Debug
+for Mapping<'a, Id, SourceCategory, TargetCategory>
+where
+    SourceCategory: NCategory<'a>,
+    TargetCategory: NCategory<'a>,
+    Id: Identifier,
+{
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Mapping")
+            .field("target_cell", &self.target_cell)
+            .field("base_functor", &"<NFunctor>") // Placeholder for the trait object
+            .finish()
+    }
+}
+
+impl<'a, Id, SourceCategory, TargetCategory> PartialEq
+for Mapping<'a, Id, SourceCategory, TargetCategory>
+where
+    SourceCategory: NCategory<'a>,
+    TargetCategory: NCategory<'a>,
+    Id: Identifier,
+    <TargetCategory as NCategory<'a>>::Morphism: PartialEq,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.target_cell.cell_id() == other.target_cell.cell_id()
+            && self.base_functor.functor_id() == other.base_functor.functor_id()
+    }
+}
+
+impl<'a, Id, SourceCategory, TargetCategory> Hash
+for Mapping<'a, Id, SourceCategory, TargetCategory>
+where
+    SourceCategory: NCategory<'a>,
+    TargetCategory: NCategory<'a>,
+    Id: Identifier,
+    <TargetCategory as NCategory<'a>>::Morphism: PartialEq,
+{
+
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.target_cell.cell_id().hash(state);
+        self.base_functor.functor_id().hash(state);
+    }
+}
+
+
+#[derive(Debug)]
 pub struct FunctorMappings<'a, Id, SourceCategory, TargetCategory>
 where
     SourceCategory: NCategory<'a>,
@@ -49,6 +97,21 @@ where
         &'a <SourceCategory as NCategory<'a>>::Morphism,
         Mapping<'a, Id, SourceCategory, TargetCategory>,
     >,
+}
+
+impl<'a, SourceCategory, TargetCategory, Id> PartialEq for FunctorMappings<'a, Id, SourceCategory, TargetCategory>
+where
+    SourceCategory: NCategory<'a>,
+    TargetCategory: NCategory<'a>,
+    Id: Identifier,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.mappings.len() == other.mappings.len()
+            && self
+                .mappings
+                .iter()
+                .all(|(key, value)| other.mappings.get(key) == Some(value))
+    }
 }
 
 impl<'a, SourceCategory, TargetCategory, Id> FunctorMappings<'a, Id, SourceCategory, TargetCategory>

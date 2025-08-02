@@ -5,7 +5,7 @@ use crate::core::morphism::Morphism;
 use crate::core::ncategory::NCategory;
 use crate::core::nfunctor::NFunctor;
 use std::fmt::Debug;
-use std::hash::Hash;
+use std::hash::{Hash, Hasher};
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct GenericMorphism<'a, Category>
@@ -46,7 +46,18 @@ where
     }
 }
 
-impl<'a, Category: NCategory<'a>> Morphism<'a> for GenericMorphism<'a, Category>
+impl<'a, Category: NCategory<'a>> Hash for GenericMorphism<'a, Category>
+where
+    <Category as NCategory<'a>>::Object: Clone,
+    <Category as NCategory<'a>>::BaseCategory: 'a,
+{
+    fn hash<H>(&self, _: &mut H) where H: Hasher {
+        todo!()
+    }
+}
+
+
+impl<'a, Category: NCategory<'a> + Eq> Morphism<'a> for GenericMorphism<'a, Category>
 where
     <Category as NCategory<'a>>::Object: Clone,
     <Category as NCategory<'a>>::BaseCategory: 'a,

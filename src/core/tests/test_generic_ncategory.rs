@@ -39,7 +39,9 @@ impl<'a> NCategoryTestHelper<'a> for GenericCategory1TestHelper<'a> {
 
     fn generate_cell(&mut self) -> <Self::Category as NCategory<'a>>::Identifier {
         // let object1 = self.generate_object();
-        // let object2 = self.generate_object();
+        // let object2 = self.generate_object()#[derive(PartialEq)]
+// #[derive(PartialEq)]
+// ;
         // let object1_id = self.get_mut_category().add_object(&object1).unwrap();
         // let object2_id = self.get_mut_category().add_object(&object2).unwrap();
         // let cell_id = self.generate_identifier();
@@ -423,6 +425,8 @@ pub fn test_identity_cell_tree() {
                 ),
             ]),
         };
+
+    // assert_eq!(actual_mapping, expected_mapping);
 
     // create a functor1 from lower to upper
     let functor_lower_to_upper = GenericNFunctor::new(

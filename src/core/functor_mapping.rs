@@ -1,8 +1,9 @@
+use crate::core::discrete_category::DiscreteCategory;
 use crate::core::identifier::Identifier;
 use crate::core::ncategory::NCategory;
-use crate::core::nfunctor::NFunctor;
+use crate::core::nfunctor::{NFunctor, UnitFunctor};
 use std::collections::HashMap;
-use std::fmt::{Debug, Formatter};
+use std::fmt::{Debug, Display, Formatter};
 
 pub struct FunctorMappings<'a, Id, SourceCategory, TargetCategory>
 where
@@ -10,20 +11,18 @@ where
     TargetCategory: NCategory<'a>,
     Id: Identifier,
 {
-    SourceCategory: &'a SourceCategory,
-    TargetCategory: &'a TargetCategory,
     MorphismMapping: HashMap<
         &'a <SourceCategory as NCategory<'a>>::Morphism,
         &'a <TargetCategory as NCategory<'a>>::Morphism,
     >,
     FunctorMappings: HashMap<
         &'a <SourceCategory as NCategory<'a>>::Object,
-        &'a dyn NFunctor<
+        Box<dyn NFunctor<
             'a,
             Identifier = Id,
-            SourceCategory = <SourceCategory as NCategory<'a>>::BaseCategory,
-            TargetCategory = <TargetCategory as NCategory<'a>>::BaseCategory,
-        >,
+            SourceCategory = <SourceCategory as NCategory<'a>>::Object,
+            TargetCategory = <TargetCategory as NCategory<'a>>::Object,
+        >>,
     >,
 }
 
@@ -35,10 +34,7 @@ where
     Id: Identifier,
 {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("FunctorMappings")
-            .field("SourceCategory", &self.SourceCategory)
-            .field("TargetCategory", &self.TargetCategory)
-            .finish()
+        f.debug_struct("FunctorMappings").finish()
     }
 }
 
@@ -80,10 +76,59 @@ where
         &'a dyn NFunctor<
             'a,
             Identifier = Id,
-            SourceCategory = <SourceCategory as NCategory<'a>>::BaseCategory,
-            TargetCategory = <TargetCategory as NCategory<'a>>::BaseCategory,
+            SourceCategory = <SourceCategory as NCategory<'a>>::Object,
+            TargetCategory = <TargetCategory as NCategory<'a>>::Object,
         >,
     > {
-        &self.FunctorMappings
+        // &self.FunctorMappings
+        todo!()
+    }
+}
+
+impl<
+    'a,
+    Id: Identifier + 'a,
+    SourceObject: Eq + Clone + Identifier + Display + 'a,
+    TargetObject: Eq + Clone + Identifier + Display + 'a,
+>
+    From<
+        Vec<(
+            &'a DiscreteCategory<SourceObject>,
+            &'a DiscreteCategory<TargetObject>,
+        )>,
+    > for FunctorMappings<'a, Id, DiscreteCategory<SourceObject>, DiscreteCategory<TargetObject>>
+{
+    fn from(
+        value: Vec<(
+            &'a DiscreteCategory<SourceObject>,
+            &'a DiscreteCategory<TargetObject>,
+        )>,
+    ) -> Self {
+        let mut morphism_mapping = HashMap::new();
+        let mut functor_mappings:
+            HashMap<
+                &DiscreteCategory<SourceObject>,
+                Box<dyn NFunctor<
+                    'a,
+                    Identifier = Id,
+                    SourceCategory = DiscreteCategory<SourceObject>,
+                    TargetCategory = DiscreteCategory<TargetObject>,
+                >>>
+            = HashMap::new();
+
+        for (source_morphism, target_morphism) in value {
+            // Assuming the morphisms are identity morphisms in discrete categories
+
+            morphism_mapping.insert(source_morphism, target_morphism);
+            functor_mappings.insert(source_morphism,
+                                    Box::new(UnitFunctor::<
+                                        Id,DiscreteCategory<SourceObject>,
+                                        DiscreteCategory<TargetObject>>::new()));
+        }
+
+        FunctorMappings {
+            MorphismMapping: morphism_mapping,
+            FunctorMappings: functor_mappings,
+        }
     }
 }

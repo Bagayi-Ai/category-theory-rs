@@ -32,7 +32,9 @@ fn generate_identifier() -> String {
 fn generate_object() -> DiscreteCategoryString {
     let random_string = random_string(5);
     let mut object = DiscreteCategory::new();
-    object.add_object(&DiscreteCategory::new_with_id(random_string)).unwrap();
+    object
+        .add_object(&DiscreteCategory::new_with_id(random_string))
+        .unwrap();
     object
 }
 
@@ -176,43 +178,42 @@ pub fn test_identity_cell_tree() {
     discreteCategoryANumber.add_object(&object_2).unwrap();
     discreteCategoryANumber.add_object(&object_3).unwrap();
 
-    // let unit_functor = UnitFunctor::new();
-    //
-    // // create a functor from lower to number
-    // let functor_lower_to_number = GenericNFunctor::new(
-    //     "functor_lower_to_number".to_string(),
-    //     &discreteCategoryALower,
-    //     &discreteCategoryANumber,
-    //     HashMap::from([
-    //         // a to 1
-    //         (
-    //             discreteCategoryALower
-    //                 .get_identity_morphism(object_a.clone())
-    //                 .unwrap(),
-    //             discreteCategoryANumber
-    //                 .get_identity_morphism(object_1)
-    //                 .unwrap(),
-    //         ),
-    //         // b to 2
-    //         (
-    //             discreteCategoryALower
-    //                 .get_identity_morphism(object_b.clone())
-    //                 .unwrap(),
-    //             discreteCategoryANumber
-    //                 .get_identity_morphism(object_2)
-    //                 .unwrap(),
-    //         ),
-    //         // c to 3
-    //         (
-    //             discreteCategoryALower
-    //                 .get_identity_morphism(object_c.clone())
-    //                 .unwrap(),
-    //             discreteCategoryANumber
-    //                 .get_identity_morphism(object_3)
-    //                 .unwrap(),
-    //         ),
-    //     ]),
-    // );
+    // create a functor from lower to number
+    let functor_lower_to_number = GenericNFunctor::new(
+        "functor_lower_to_number".to_string(),
+        &discreteCategoryALower,
+        &discreteCategoryANumber,
+        vec![
+            // a to 1
+            (
+                discreteCategoryALower
+                    .get_identity_morphism(&object_a)
+                    .unwrap(),
+                discreteCategoryANumber
+                    .get_identity_morphism(&object_1)
+                    .unwrap(),
+            ),
+            // b to 2
+            (
+                discreteCategoryALower
+                    .get_identity_morphism(&object_b)
+                    .unwrap(),
+                discreteCategoryANumber
+                    .get_identity_morphism(&object_2)
+                    .unwrap(),
+            ),
+            // c to 3
+            (
+                discreteCategoryALower
+                    .get_identity_morphism(&object_c)
+                    .unwrap(),
+                discreteCategoryANumber
+                    .get_identity_morphism(&object_3)
+                    .unwrap(),
+            ),
+        ]
+        .into(),
+    );
     //
     // let actual_mapping = functor_lower_to_number.mappings().unwrap();
     //

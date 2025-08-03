@@ -20,8 +20,11 @@ pub struct GenericNCategory<
     cells: HashMap<Id, GenericMorphism<'a, Self>>,
 }
 
-impl<'a, Id: Identifier<Id = Id>, Category: NCategory<'a, Identifier = Id> + Debug + Eq + Hash + Clone>
-    GenericNCategory<'a, Id, Category>
+impl<
+    'a,
+    Id: Identifier<Id = Id>,
+    Category: NCategory<'a, Identifier = Id> + Debug + Eq + Hash + Clone,
+> GenericNCategory<'a, Id, Category>
 {
     pub fn new() -> Self {
         GenericNCategory {

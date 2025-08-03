@@ -24,7 +24,7 @@ impl<'a, Id, SourceCategory, TargetCategory> GenericNFunctor<'a, Id, SourceCateg
 where
     SourceCategory: NCategory<'a>,
     TargetCategory: NCategory<'a>,
-    Id: Identifier,
+    Id: Identifier + 'a,
 {
     pub fn new(
         id: Id,
@@ -50,7 +50,7 @@ impl<'a, Id, SourceCategory, TargetCategory> NFunctor<'a>
 where
     SourceCategory: NCategory<'a>,
     TargetCategory: NCategory<'a>,
-    Id: Identifier,
+    Id: Identifier + 'a,
 {
     type SourceCategory = SourceCategory;
     type TargetCategory = TargetCategory;

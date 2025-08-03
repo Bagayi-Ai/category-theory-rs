@@ -88,29 +88,32 @@ pub struct UnitFunctor<
     SourceCategory: NCategory<'a>,
     TargetCategory: NCategory<'a>,
 > {
-    _phantom: std::marker::PhantomData<&'a T>,
+    _phantom1: std::marker::PhantomData<&'a T>,
     _phantom2: std::marker::PhantomData<SourceCategory>,
     _phantom3: std::marker::PhantomData<TargetCategory>,
 }
 
-impl<'a> UnitFunctor<'a, String, UnitCategory<String>, UnitCategory<String>> {
+impl<'a, T, SourceCategory, TargetCategory> UnitFunctor<'a, T, SourceCategory, TargetCategory>
+where
+    T: Identifier + 'a,
+    SourceCategory: NCategory<'a> + 'a,
+    TargetCategory: NCategory<'a> + 'a,
+{
     pub fn new() -> Self {
         UnitFunctor {
-            _phantom: std::marker::PhantomData,
+            _phantom1: std::marker::PhantomData,
             _phantom2: std::marker::PhantomData,
             _phantom3: std::marker::PhantomData,
         }
     }
 }
 
-impl<'a, T, SourceCategory, TargetCategory> NFunctor<'a>
-    for UnitFunctor<'a, T, SourceCategory, TargetCategory>
+impl<'a, Id: Identifier, SourceCategory, TargetCategory> NFunctor<'a> for UnitFunctor<'a, Id, SourceCategory, TargetCategory>
 where
-    T: Identifier,
     SourceCategory: NCategory<'a> + 'a,
     TargetCategory: NCategory<'a> + 'a,
 {
-    type Identifier = T;
+    type Identifier = Id;
     type SourceCategory = SourceCategory;
     type TargetCategory = TargetCategory;
 

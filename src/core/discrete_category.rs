@@ -14,13 +14,11 @@ pub struct DiscreteCategory<T: Hash + Eq + Clone> {
     cells: Option<HashMap<String, Self>>,
 }
 
-impl<T: Hash + Eq + Clone + Display> Display for DiscreteCategory<T>
-{
+impl<T: Hash + Eq + Clone + Display> Display for DiscreteCategory<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.category_id)
     }
 }
-
 
 impl<T: Hash + Eq + Clone> Hash for DiscreteCategory<T> {
     fn hash<H: Hasher>(&self, state: &mut H) {

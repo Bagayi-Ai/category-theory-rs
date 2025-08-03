@@ -16,9 +16,9 @@ pub trait Morphism<'a>: Debug + Eq + Hash {
 
     fn cell_id(&self) -> &<Self::Category as NCategory<'a>>::Identifier;
 
-    fn source_object(&self) -> <Self::Category as NCategory<'a>>::Object;
+    fn source_object(&self) -> &<Self::Category as NCategory<'a>>::Object;
 
-    fn target_object(&self) -> <Self::Category as NCategory<'a>>::Object;
+    fn target_object(&self) -> &<Self::Category as NCategory<'a>>::Object;
 
     fn is_identity(&self) -> bool;
 
@@ -39,11 +39,11 @@ impl<'a, T: Identifier + 'a> Morphism<'a> for UnitMorphism<T> {
         todo!()
     }
 
-    fn source_object(&self) -> <Self::Category as NCategory<'a>>::Object {
+    fn source_object(&self) -> &<Self::Category as NCategory<'a>>::Object {
         todo!()
     }
 
-    fn target_object(&self) -> <Self::Category as NCategory<'a>>::Object {
+    fn target_object(&self) -> &<Self::Category as NCategory<'a>>::Object {
         todo!()
     }
 

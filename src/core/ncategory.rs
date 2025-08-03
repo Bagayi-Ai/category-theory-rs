@@ -30,7 +30,7 @@ where
     Self::BaseCategory: NCategory<'a, Identifier = Self::Identifier>,
 {
     type Identifier: Identifier;
-    type Object: 'a + Eq + Debug + Hash;
+    type Object: 'a + Eq + Debug + Hash + NCategory<'a>;
     type Morphism: Morphism<'a, Category = Self>;
     type BaseCategory: NCategory<'a>;
 
@@ -43,24 +43,24 @@ where
 
     fn category_id(&self) -> Self::Identifier;
 
-    fn add_object(&mut self, object: Self::Object) -> Result<(), NCategoryError>;
+    fn add_object(&mut self, object: &'a Self::Object) -> Result<(), NCategoryError>;
 
     fn add_moprhism(&mut self, cell: Self::Morphism) -> Result<Self::Identifier, NCategoryError>;
 
-    fn get_object(&self, object_id: &Self::Identifier) -> Result<Self::Object, NCategoryError>;
+    fn get_object(&self, object_id: &Self::Identifier) -> Result<&Self::Object, NCategoryError>;
 
     fn get_identity_morphism(
         &self,
-        object: Self::Object,
+        object: &Self::Object,
     ) -> Result<&Self::Morphism, NCategoryError>;
 
-    fn get_all_objects(&self) -> Result<HashSet<Self::Object>, NCategoryError>;
+    fn get_all_objects(&self) -> Result<HashSet<&Self::Object>, NCategoryError>;
 
     fn get_all_morphisms(&self) -> Result<HashSet<&Self::Morphism>, NCategoryError>;
 
     fn get_object_morphisms(
         &self,
-        object_id: Self::Object,
+        object: &Self::Object,
     ) -> Result<Vec<&Self::Morphism>, NCategoryError>;
 
     fn get_object_targets(
@@ -209,7 +209,7 @@ pub struct UnitCategory<T: Identifier> {
 impl<'a, T: Identifier + 'a> NCategory<'a> for UnitCategory<T> {
     type Identifier = T;
 
-    type Object = ();
+    type Object = Self;
 
     type Morphism = UnitMorphism<T>;
 
@@ -219,7 +219,7 @@ impl<'a, T: Identifier + 'a> NCategory<'a> for UnitCategory<T> {
         todo!()
     }
 
-    fn add_object(&mut self, object: Self::Object) -> Result<(), NCategoryError> {
+    fn add_object(&mut self, object: &'a Self::Object) -> Result<(), NCategoryError> {
         todo!()
     }
 
@@ -227,18 +227,18 @@ impl<'a, T: Identifier + 'a> NCategory<'a> for UnitCategory<T> {
         todo!()
     }
 
-    fn get_object(&self, object_id: &Self::Identifier) -> Result<Self::Object, NCategoryError> {
+    fn get_object(&self, object_id: &Self::Identifier) -> Result<&Self::Object, NCategoryError> {
         todo!()
     }
 
     fn get_identity_morphism(
         &self,
-        object_id: Self::Object,
+        object_id: &Self::Object,
     ) -> Result<&Self::Morphism, NCategoryError> {
         todo!()
     }
 
-    fn get_all_objects(&self) -> Result<HashSet<Self::Object>, NCategoryError> {
+    fn get_all_objects(&self) -> Result<HashSet<&Self::Object>, NCategoryError> {
         todo!()
     }
 
@@ -248,7 +248,7 @@ impl<'a, T: Identifier + 'a> NCategory<'a> for UnitCategory<T> {
 
     fn get_object_morphisms(
         &self,
-        object_id: Self::Object,
+        object_id: &Self::Object,
     ) -> Result<Vec<&Self::Morphism>, NCategoryError> {
         todo!()
     }

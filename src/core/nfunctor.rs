@@ -64,7 +64,7 @@ pub trait NFunctor<'a>: 'a {
                     .ok_or(NCategoryError::InvalidFunctorMappings)?;
 
                 // now confirm that the functor target object is the same as this morphism's target object
-                // mapped_morphism.target_object()
+                mapped_morphism.target_object();
             }
             // // now check the base functor has mapping from base category of source to base category of target
             // let base_functor = &mapping.base_functor;

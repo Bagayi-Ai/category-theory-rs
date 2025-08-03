@@ -14,8 +14,8 @@ where
     <Category as NCategory<'a>>::Object: Clone,
 {
     id: <Category as NCategory<'a>>::Identifier,
-    source: <Category as NCategory<'a>>::Object,
-    target: <Category as NCategory<'a>>::Object,
+    source: &'a <Category as NCategory<'a>>::Object,
+    target: &'a <Category as NCategory<'a>>::Object,
     name: String,
 }
 
@@ -25,8 +25,8 @@ where
 {
     pub fn new(
         id: <Category as NCategory<'a>>::Identifier,
-        source: <Category as NCategory<'a>>::Object,
-        target: <Category as NCategory<'a>>::Object,
+        source: &'a <Category as NCategory<'a>>::Object,
+        target: &'a <Category as NCategory<'a>>::Object,
         name: String,
     ) -> Self {
         GenericMorphism {
@@ -61,7 +61,7 @@ where
 
 impl<'a, Category: NCategory<'a> + Eq> Morphism<'a> for GenericMorphism<'a, Category>
 where
-    <Category as NCategory<'a>>::Object: Clone,
+    <Category as NCategory<'a>>::Object: Clone + 'a + NCategory<'a>,
     <Category as NCategory<'a>>::BaseCategory: 'a,
     <Category as NCategory<'a>>::Identifier: 'a,
 {
@@ -77,12 +77,12 @@ where
         &self.id
     }
 
-    fn source_object(&self) -> <Category as NCategory<'a>>::Object {
-        self.source.clone()
+    fn source_object(&self) -> &<Category as NCategory<'a>>::Object {
+        self.source
     }
 
-    fn target_object(&self) -> <Category as NCategory<'a>>::Object {
-        self.target.clone()
+    fn target_object(&self) -> &<Category as NCategory<'a>>::Object {
+        self.target
     }
 
     fn is_identity(&self) -> bool {

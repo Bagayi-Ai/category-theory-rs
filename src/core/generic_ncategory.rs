@@ -12,7 +12,7 @@ use std::hash::Hash;
 pub struct GenericNCategory<
     'a,
     Id: Identifier<Id = Id> + 'a,
-    Category: NCategory<'a, Identifier = Id> + Debug + Eq + Hash,
+    Category: NCategory<'a, Identifier = Id> + Debug + Eq + Hash + Clone,
 > {
     id: Id,
     objects: HashMap<Id, &'a Category>,
@@ -20,7 +20,7 @@ pub struct GenericNCategory<
     cells: HashMap<Id, GenericMorphism<'a, Self>>,
 }
 
-impl<'a, Id: Identifier<Id = Id>, Category: NCategory<'a, Identifier = Id> + Debug + Eq + Hash>
+impl<'a, Id: Identifier<Id = Id>, Category: NCategory<'a, Identifier = Id> + Debug + Eq + Hash + Clone>
     GenericNCategory<'a, Id, Category>
 {
     pub fn new() -> Self {
@@ -36,11 +36,11 @@ impl<'a, Id: Identifier<Id = Id>, Category: NCategory<'a, Identifier = Id> + Deb
 impl<
     'a,
     Id: Identifier<Id = Id> + 'a,
-    Category: NCategory<'a, Identifier = Id> + 'a + Debug + Eq + Hash,
+    Category: NCategory<'a, Identifier = Id> + 'a + Debug + Eq + Hash + Clone,
 > NCategory<'a> for GenericNCategory<'a, Id, Category>
 {
     type Identifier = Id;
-    type Object = &'a Category;
+    type Object = Category;
     type Morphism = GenericMorphism<'a, Self>;
     type BaseCategory = Category;
 
@@ -48,7 +48,7 @@ impl<
         todo!()
     }
 
-    fn add_object(&mut self, object: Self::Object) -> Result<(), NCategoryError> {
+    fn add_object(&mut self, object: &'a Self::Object) -> Result<(), NCategoryError> {
         self.objects.insert(object.category_id().clone(), object);
         let identity_cell = GenericMorphism::new(
             object.category_id().clone(),
@@ -75,7 +75,7 @@ impl<
         Ok(cell_id)
     }
 
-    fn get_object(&self, object_id: &Self::Identifier) -> Result<Self::Object, NCategoryError> {
+    fn get_object(&self, object_id: &Self::Identifier) -> Result<&Self::Object, NCategoryError> {
         if let Some(object) = self.objects.get(object_id) {
             Ok(object)
         } else {
@@ -85,13 +85,13 @@ impl<
 
     fn get_identity_morphism(
         &self,
-        object_id: Self::Object,
+        object_id: &Self::Object,
     ) -> Result<&Self::Morphism, NCategoryError> {
         // it's basically the cell with the same id as the object
         self.get_moprhism(&object_id.category_id())
     }
 
-    fn get_all_objects(&self) -> Result<HashSet<Self::Object>, NCategoryError> {
+    fn get_all_objects(&self) -> Result<HashSet<&Self::Object>, NCategoryError> {
         todo!()
     }
 
@@ -108,7 +108,7 @@ impl<
 
     fn get_object_morphisms(
         &self,
-        object: Self::Object,
+        object: &Self::Object,
     ) -> Result<Vec<&Self::Morphism>, NCategoryError> {
         if let Some(cells) = self.object_mapping.get(&object.category_id()) {
             let mut result: Vec<&Self::Morphism> = Vec::new();

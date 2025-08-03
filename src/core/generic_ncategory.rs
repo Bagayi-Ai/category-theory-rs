@@ -12,10 +12,10 @@ use std::hash::Hash;
 pub struct GenericNCategory<
     'a,
     Id: Identifier<Id = Id> + 'a,
-    BaseCategory: NCategory<'a, Identifier = Id> + Debug + Eq + Hash,
+    Category: NCategory<'a, Identifier = Id> + Debug + Eq + Hash,
 > {
     id: Id,
-    objects: HashMap<Id, &'a BaseCategory>,
+    objects: HashMap<Id, &'a Category>,
     object_mapping: HashMap<Id, HashMap<Id, HashSet<Id>>>,
     cells: HashMap<Id, GenericMorphism<'a, Self>>,
 }

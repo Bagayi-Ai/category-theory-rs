@@ -36,13 +36,13 @@ impl<'a, Id: Identifier<Id = Id>, Category: NCategory<'a, Identifier = Id> + Deb
 impl<
     'a,
     Id: Identifier<Id = Id> + 'a,
-    BaseCategory: NCategory<'a, Identifier = Id> + 'a + Debug + Eq + Hash,
-> NCategory<'a> for GenericNCategory<'a, Id, BaseCategory>
+    Category: NCategory<'a, Identifier = Id> + 'a + Debug + Eq + Hash,
+> NCategory<'a> for GenericNCategory<'a, Id, Category>
 {
     type Identifier = Id;
-    type Object = &'a BaseCategory;
+    type Object = &'a Category;
     type Morphism = GenericMorphism<'a, Self>;
-    type BaseCategory = BaseCategory;
+    type BaseCategory = Category;
 
     fn category_id(&self) -> Self::Identifier {
         todo!()

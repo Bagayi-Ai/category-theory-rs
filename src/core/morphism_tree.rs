@@ -28,8 +28,8 @@ pub struct MorphismMappingTree<
         Box<
             dyn MorphismMappingTreeTrait<
                     'a,
-                    SourceCategory = <SourceCategory as NCategory<'a>>::BaseCategory,
-                    TargetCategory = <TargetCategory as NCategory<'a>>::BaseCategory,
+                    SourceCategory = <SourceCategory as NCategory<'a>>::Object,
+                    TargetCategory = <TargetCategory as NCategory<'a>>::Object,
                     Id = Id,
                 >,
         >,
@@ -60,8 +60,8 @@ impl<'a, Id: Identifier, SourceCategory: NCategory<'a>, TargetCategory: NCategor
             Box<
                 dyn MorphismMappingTreeTrait<
                         'a,
-                        SourceCategory = <SourceCategory as NCategory<'a>>::BaseCategory,
-                        TargetCategory = <TargetCategory as NCategory<'a>>::BaseCategory,
+                        SourceCategory = <SourceCategory as NCategory<'a>>::Object,
+                        TargetCategory = <TargetCategory as NCategory<'a>>::Object,
                         Id = Id,
                     >,
             >,

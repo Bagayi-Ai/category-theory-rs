@@ -49,7 +49,7 @@ where
 impl<'a, Category: NCategory<'a>> Hash for GenericMorphism<'a, Category>
 where
     <Category as NCategory<'a>>::Object: Clone,
-    <Category as NCategory<'a>>::BaseCategory: 'a,
+    <Category as NCategory<'a>>::Object: 'a,
 {
     fn hash<H>(&self, _: &mut H)
     where
@@ -62,15 +62,14 @@ where
 impl<'a, Category: NCategory<'a> + Eq> Morphism<'a> for GenericMorphism<'a, Category>
 where
     <Category as NCategory<'a>>::Object: Clone + 'a + NCategory<'a>,
-    <Category as NCategory<'a>>::BaseCategory: 'a,
     <Category as NCategory<'a>>::Identifier: 'a,
 {
     type Category = Category;
     type Functor = GenericNFunctor<
         'a,
         <Category as NCategory<'a>>::Identifier,
-        <Category as NCategory<'a>>::BaseCategory,
-        <Category as NCategory<'a>>::BaseCategory,
+        <Category as NCategory<'a>>::Object,
+        <Category as NCategory<'a>>::Object,
     >;
 
     fn cell_id(&self) -> &<Category as NCategory<'a>>::Identifier {

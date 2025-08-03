@@ -10,8 +10,8 @@ pub trait Morphism<'a>: Debug + Eq + Hash {
     type Functor: NFunctor<
             'a,
             Identifier = <Self::Category as NCategory<'a>>::Identifier,
-            SourceCategory = <Self::Category as NCategory<'a>>::BaseCategory,
-            TargetCategory = <Self::Category as NCategory<'a>>::BaseCategory,
+            SourceCategory = <Self::Category as NCategory<'a>>::Object,
+            TargetCategory = <Self::Category as NCategory<'a>>::Object,
         >;
 
     fn cell_id(&self) -> &<Self::Category as NCategory<'a>>::Identifier;

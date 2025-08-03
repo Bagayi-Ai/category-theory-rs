@@ -45,7 +45,6 @@ impl<
     type Identifier = Id;
     type Object = Category;
     type Morphism = GenericMorphism<'a, Self>;
-    type BaseCategory = Category;
 
     fn category_id(&self) -> Self::Identifier {
         todo!()
@@ -136,12 +135,5 @@ impl<
         } else {
             Err(NCategoryError::MorphismNotFound)
         }
-    }
-
-    fn base_object(
-        &self,
-        object_id: &Self::Identifier,
-    ) -> Result<&Self::BaseCategory, NCategoryError> {
-        todo!()
     }
 }

@@ -26,13 +26,10 @@ pub enum NCategoryError {
 }
 
 pub trait NCategory<'a>: Debug
-where
-    Self::BaseCategory: NCategory<'a, Identifier = Self::Identifier>,
 {
     type Identifier: Identifier;
     type Object: 'a + Eq + Debug + Hash + NCategory<'a>;
     type Morphism: Morphism<'a, Category = Self>;
-    type BaseCategory: NCategory<'a>;
 
     fn level(&self) -> usize
     where
@@ -188,16 +185,12 @@ where
         false
     }
 
-    fn base_object(
-        &self,
-        object_id: &Self::Identifier,
-    ) -> Result<&Self::BaseCategory, NCategoryError>;
 
     fn nested_level() -> usize
     where
         Self: Sized,
     {
-        1 + <Self::BaseCategory as NCategory>::nested_level()
+        1 + <Self::Object as NCategory>::nested_level()
     }
 }
 
@@ -212,8 +205,6 @@ impl<'a, T: Identifier + 'a> NCategory<'a> for UnitCategory<T> {
     type Object = Self;
 
     type Morphism = UnitMorphism<T>;
-
-    type BaseCategory = UnitCategory<T>;
 
     fn category_id(&self) -> Self::Identifier {
         todo!()
@@ -256,13 +247,7 @@ impl<'a, T: Identifier + 'a> NCategory<'a> for UnitCategory<T> {
     fn get_moprhism(&self, cell_id: &Self::Identifier) -> Result<&Self::Morphism, NCategoryError> {
         todo!()
     }
-
-    fn base_object(
-        &self,
-        object_id: &Self::Identifier,
-    ) -> Result<&Self::BaseCategory, NCategoryError> {
-        todo!()
-    }
+    
 
     fn nested_level() -> usize {
         0

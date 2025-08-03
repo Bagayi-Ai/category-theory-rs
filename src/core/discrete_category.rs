@@ -53,7 +53,6 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> NC
     type Identifier = String;
     type Object = Self;
     type Morphism = Self;
-    type BaseCategory = UnitCategory<String>;
 
     fn category_id(&self) -> Self::Identifier {
         self.category_id.to_string()
@@ -122,20 +121,17 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> NC
         }
         Err(NCategoryError::MorphismNotFound)
     }
-
-    fn base_object(
-        &self,
-        _object_id: &Self::Identifier,
-    ) -> Result<&Self::BaseCategory, NCategoryError> {
-        todo!()
+    fn nested_level() -> usize {
+        1
     }
+
 }
 
 impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> Morphism<'a>
     for DiscreteCategory<T>
 {
     type Category = Self;
-    type Functor = UnitFunctor<'a, String, UnitCategory<String>, UnitCategory<String>>;
+    type Functor = UnitFunctor<'a, String, Self, Self>;
 
     fn cell_id(&self) -> &<Self::Category as NCategory<'a>>::Identifier {
         todo!()

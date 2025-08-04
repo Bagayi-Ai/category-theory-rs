@@ -7,11 +7,11 @@ use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
 use crate::core::morphism_tree::MorphismMappingTree;
 use crate::core::ncategory::{NCategory, NCategoryError};
-use crate::core::nfunctor::{NFunctor};
-use crate::core::unit::unit_functor::UnitFunctor;
+use crate::core::nfunctor::NFunctor;
 use crate::core::tests::ncategory_test_helper::*;
-use std::collections::HashMap;
 use crate::core::unit::unit_category::UnitCategory;
+use crate::core::unit::unit_functor::UnitFunctor;
+use std::collections::HashMap;
 
 type DiscreteCategoryString = DiscreteCategory<String>;
 
@@ -35,7 +35,9 @@ fn generate_object() -> DiscreteCategoryString {
     let random_string = random_string(5);
     let mut object = DiscreteCategory::new();
     object
-        .add_object(&UnitCategory{category_id: random_string.clone()})
+        .add_object(&UnitCategory {
+            category_id: random_string.clone(),
+        })
         .unwrap();
     object
 }
@@ -293,7 +295,8 @@ pub fn test_identity_cell_tree() {
                     .get_identity_morphism(&object_C)
                     .unwrap(),
             ),
-        ].into(),
+        ]
+        .into(),
     );
 
     // // expected functor mapping

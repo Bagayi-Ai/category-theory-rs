@@ -20,8 +20,8 @@ mod core {
     pub mod identifier;
 
     pub mod unit {
-        pub mod unit_functor;
         pub mod unit_category;
+        pub mod unit_functor;
 
         pub mod unit_morphism;
 

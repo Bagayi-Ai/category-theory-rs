@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use std::hash::Hash;
 
 use crate::core::identifier::Identifier;
-use crate::core::morphism::{Morphism};
+use crate::core::morphism::Morphism;
 use crate::core::morphism_tree::MorphismMappingTree;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -25,8 +25,7 @@ pub enum NCategoryError {
     InvalidBaseFunctor,
 }
 
-pub trait NCategory<'a>: Debug
-{
+pub trait NCategory<'a>: Debug {
     type Identifier: Identifier;
     type Object: 'a + Eq + Debug + Hash + NCategory<'a>;
     type Morphism: Morphism<'a, Object = Self::Object, Identifier = Self::Identifier>;
@@ -42,7 +41,10 @@ pub trait NCategory<'a>: Debug
 
     fn add_object(&mut self, object: &'a Self::Object) -> Result<(), NCategoryError>;
 
-    fn add_morphism(&mut self, morphism: Self::Morphism) -> Result<Self::Identifier, NCategoryError>;
+    fn add_morphism(
+        &mut self,
+        morphism: Self::Morphism,
+    ) -> Result<Self::Identifier, NCategoryError>;
 
     fn get_object(&self, object_id: &Self::Identifier) -> Result<&Self::Object, NCategoryError>;
 
@@ -184,7 +186,6 @@ pub trait NCategory<'a>: Debug
     fn is_zero_category(&self) -> bool {
         false
     }
-
 
     fn nested_level() -> usize
     where

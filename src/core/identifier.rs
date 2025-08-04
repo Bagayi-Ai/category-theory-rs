@@ -23,7 +23,6 @@ impl Identifier for String {
     }
 }
 
-
 impl Identifier for usize {
     type Id = usize;
 

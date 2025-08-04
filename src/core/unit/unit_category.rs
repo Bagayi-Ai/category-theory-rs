@@ -1,17 +1,16 @@
-use std::collections::HashSet;
-use std::fmt::{Debug, Display};
-use std::hash::Hash;
 use crate::core::discrete_category::DiscreteCategory;
 use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
-use crate::core::unit::unit_morphism::UnitMorphism;
 use crate::core::ncategory::{NCategory, NCategoryError};
-use crate::core::unit::unit_identifier::UnitIdentifier;
 use crate::core::unit::unit_functor::UnitFunctor;
+use crate::core::unit::unit_identifier::UnitIdentifier;
+use crate::core::unit::unit_morphism::UnitMorphism;
+use std::collections::HashSet;
+use std::fmt::{Debug, Display};
+use std::hash::Hash;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct UnitCategory<T: Identifier>
-{
+pub struct UnitCategory<T: Identifier> {
     pub category_id: T,
 }
 
@@ -64,15 +63,12 @@ impl<'a, T: Identifier + 'a> NCategory<'a> for UnitCategory<T> {
         todo!()
     }
 
-
     fn nested_level() -> usize {
         0
     }
 }
 
-
-impl <'a, T: Identifier + 'a> Morphism<'a> for UnitCategory<T>
-{
+impl<'a, T: Identifier + 'a> Morphism<'a> for UnitCategory<T> {
     type Object = Self;
     type Identifier = T;
     type Functor = UnitFunctor<'a, T, Self, Self>;
@@ -100,6 +96,8 @@ impl <'a, T: Identifier + 'a> Morphism<'a> for UnitCategory<T>
 
 impl<T: Eq + Clone + Hash + Debug + Identifier + Display> From<T> for UnitCategory<T> {
     fn from(object: T) -> Self {
-        UnitCategory{category_id: object}
+        UnitCategory {
+            category_id: object,
+        }
     }
 }

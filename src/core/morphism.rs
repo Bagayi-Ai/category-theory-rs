@@ -1,13 +1,13 @@
 use crate::core::identifier::Identifier;
+use crate::core::ncategory::NCategory;
+use crate::core::nfunctor::NFunctor;
 use crate::core::unit::unit_category::UnitCategory;
-use crate::core::ncategory::{NCategory};
-use crate::core::nfunctor::{NFunctor};
 use std::fmt::Debug;
 use std::hash::Hash;
 
 pub trait Morphism<'a>: Debug + Eq + Hash
 where
-    <Self as Morphism<'a>>::Object: NCategory<'a>
+    <Self as Morphism<'a>>::Object: NCategory<'a>,
 {
     type Object;
     type Identifier;

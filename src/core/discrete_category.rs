@@ -1,8 +1,8 @@
 use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
 use crate::core::ncategory::{NCategory, NCategoryError};
+use crate::core::nfunctor::NFunctor;
 use crate::core::unit::unit_category::UnitCategory;
-use crate::core::nfunctor::{NFunctor};
 use crate::core::unit::unit_functor::UnitFunctor;
 use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Display};
@@ -65,7 +65,10 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> NC
         Ok(())
     }
 
-    fn add_morphism(&mut self, morphism: Self::Morphism) -> Result<Self::Identifier, NCategoryError> {
+    fn add_morphism(
+        &mut self,
+        morphism: Self::Morphism,
+    ) -> Result<Self::Identifier, NCategoryError> {
         // morphsims in discrete category are only identity morphisms,
         if morphism.source_object() != morphism.target_object() {
             return Err(NCategoryError::OnlyIdentityMorphismDiscreteCategory);
@@ -80,7 +83,10 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> NC
             cells.insert(cell_id.clone(), morphism);
         } else {
             self.cells = Some(HashMap::new());
-            self.cells.as_mut().unwrap().insert(cell_id.clone(), morphism);
+            self.cells
+                .as_mut()
+                .unwrap()
+                .insert(cell_id.clone(), morphism);
         }
 
         Ok(cell_id)
@@ -136,7 +142,6 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> NC
     fn nested_level() -> usize {
         1
     }
-
 }
 
 impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> Morphism<'a>
@@ -172,7 +177,9 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> Morphism<'a>
 impl<T: Eq + Clone + Hash + Debug + Identifier + Display> From<T> for DiscreteCategory<T> {
     fn from(object: T) -> Self {
         let mut category = DiscreteCategory::new();
-        let object = UnitCategory{category_id: object};
+        let object = UnitCategory {
+            category_id: object,
+        };
         category.add_object(&object).unwrap();
         category
     }
@@ -182,7 +189,9 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + Display> From<Vec<T>> for Discr
     fn from(objects: Vec<T>) -> Self {
         let mut category = DiscreteCategory::new();
         for object in objects {
-            let object = UnitCategory{category_id: object};
+            let object = UnitCategory {
+                category_id: object,
+            };
             category.add_object(&object).unwrap();
         }
         category
@@ -195,7 +204,9 @@ mod tests {
     use crate::core::tests::ncategory_test_helper::*;
 
     fn generate_object() -> UnitCategory<String> {
-        UnitCategory{category_id: random_string(5)}
+        UnitCategory {
+            category_id: random_string(5),
+        }
     }
 
     fn generate_identifier() -> String {

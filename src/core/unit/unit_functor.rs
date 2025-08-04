@@ -5,7 +5,7 @@
 // use crate::core::ncategory::{NCategory, NCategoryError};
 // use crate::core::unit::unit_identifier::UnitIdentifier;
 // use crate::core::unit::unit_category::UnitCategory;
-// 
+//
 // macro_rules! create_unit_functor_instance {
 //     ($name:ident, $id_type:ty) => {
 //         pub const $name: UnitFunctor<$id_type> = UnitFunctor {
@@ -13,10 +13,10 @@
 //         };
 //     };
 // }
-// 
+//
 // create_unit_functor_instance!(UNIT_FUNCTOR_STRING, String);
 // create_unit_functor_instance!(UNIT_FUNCTOR_UNIT_IDENTIFIER, UnitIdentifier);
-// 
+//
 // macro_rules! match_unit_functor_instance {
 //     ($id_type:ty, $($name:ident => $type:ty),*) => {
 //         {
@@ -30,14 +30,14 @@
 //         }
 //     };
 // }
-// 
+//
 // pub fn get_unit_functor_instance<'a, Id: Identifier + 'static>() -> Option<&'a UnitFunctor<Id>> {
 //     match_unit_functor_instance!(Id,
 //         UNIT_FUNCTOR_STRING => String,
 //         UNIT_FUNCTOR_UNIT_IDENTIFIER => UnitIdentifier
 //     )
 // }
-// 
+//
 // // Helper function to cast to the expected type
 // // pub fn get_unit_functor_instance<'a, Id: Identifier>() -> &'a UnitFunctor<Id> {
 // //     // SAFETY: This assumes the caller ensures the type matches
@@ -55,10 +55,10 @@ pub const UNIT_FUNCTOR_STRING: UnitFunctor<String, UnitCategory<String>, UnitCat
     UnitFunctor {
         _phantom1: std::marker::PhantomData,
         _phantom2: std::marker::PhantomData,
-        _phantom3: std::marker::PhantomData};
+        _phantom3: std::marker::PhantomData,
+    };
 
-
-        #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UnitFunctor<
     'a,
     T: Identifier,
@@ -85,8 +85,7 @@ where
     }
 }
 
-impl<'a> UnitFunctor<'a, String, UnitCategory<String>, UnitCategory<String>>
-{
+impl<'a> UnitFunctor<'a, String, UnitCategory<String>, UnitCategory<String>> {
     pub fn new_string() -> Self {
         UnitFunctor {
             _phantom1: std::marker::PhantomData,
@@ -96,7 +95,8 @@ impl<'a> UnitFunctor<'a, String, UnitCategory<String>, UnitCategory<String>>
     }
 }
 
-impl<'a, Id: Identifier, SourceCategory, TargetCategory> NFunctor<'a> for UnitFunctor<'a, Id, SourceCategory, TargetCategory>
+impl<'a, Id: Identifier, SourceCategory, TargetCategory> NFunctor<'a>
+    for UnitFunctor<'a, Id, SourceCategory, TargetCategory>
 where
     SourceCategory: NCategory<'a> + 'a,
     TargetCategory: NCategory<'a> + 'a,

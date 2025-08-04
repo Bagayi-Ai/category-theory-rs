@@ -1,11 +1,11 @@
 use crate::core::discrete_category::DiscreteCategory;
 use crate::core::identifier::Identifier;
 use crate::core::ncategory::NCategory;
-use crate::core::nfunctor::{NFunctor};
-use std::collections::HashMap;
-use std::fmt::{Debug, Display, Formatter};
+use crate::core::nfunctor::NFunctor;
 use crate::core::unit::unit_category::UnitCategory;
 use crate::core::unit::unit_functor::UnitFunctor;
+use std::collections::HashMap;
+use std::fmt::{Debug, Display, Formatter};
 use std::rc::Rc;
 use std::sync::Arc;
 
@@ -21,12 +21,14 @@ where
     >,
     FunctorMappings: HashMap<
         &'a <SourceCategory as NCategory<'a>>::Object,
-        Arc<dyn NFunctor<
-            'a,
-            Identifier = Id,
-            SourceCategory = <SourceCategory as NCategory<'a>>::Object,
-            TargetCategory = <TargetCategory as NCategory<'a>>::Object,
-        >>,
+        Arc<
+            dyn NFunctor<
+                    'a,
+                    Identifier = Id,
+                    SourceCategory = <SourceCategory as NCategory<'a>>::Object,
+                    TargetCategory = <TargetCategory as NCategory<'a>>::Object,
+                >,
+        >,
     >,
 }
 
@@ -77,30 +79,31 @@ where
         &self,
     ) -> &HashMap<
         &'a <SourceCategory as NCategory<'a>>::Object,
-        Arc<dyn NFunctor<
-            'a,
-            Identifier = Id,
-            SourceCategory = <SourceCategory as NCategory<'a>>::Object,
-            TargetCategory = <TargetCategory as NCategory<'a>>::Object,
-        >>,
-    >
-    {
+        Arc<
+            dyn NFunctor<
+                    'a,
+                    Identifier = Id,
+                    SourceCategory = <SourceCategory as NCategory<'a>>::Object,
+                    TargetCategory = <TargetCategory as NCategory<'a>>::Object,
+                >,
+        >,
+    > {
         &self.FunctorMappings
     }
 }
-
 
 impl<
     'a,
     SourceObject: Eq + Clone + Identifier + Display + 'a,
     TargetObject: Eq + Clone + Identifier + Display + 'a,
 >
-From<
-    Vec<(
-        &'a UnitCategory<SourceObject>,
-        &'a UnitCategory<TargetObject>,
-    )>,
-> for FunctorMappings<'a, String, DiscreteCategory<SourceObject>, DiscreteCategory<TargetObject>>
+    From<
+        Vec<(
+            &'a UnitCategory<SourceObject>,
+            &'a UnitCategory<TargetObject>,
+        )>,
+    >
+    for FunctorMappings<'a, String, DiscreteCategory<SourceObject>, DiscreteCategory<TargetObject>>
 {
     fn from(
         value: Vec<(
@@ -111,22 +114,21 @@ From<
         let mut morphism_mapping = HashMap::new();
         let mut functor_mappings = HashMap::new();
 
-        let unit_functor: Arc<dyn NFunctor<
-            'a,
-            Identifier = String,
-            SourceCategory = UnitCategory<SourceObject>,
-            TargetCategory = UnitCategory<TargetObject>,
-        >> = Arc::new(UnitFunctor::<
+        let unit_functor: Arc<
+            dyn NFunctor<
+                    'a,
+                    Identifier = String,
+                    SourceCategory = UnitCategory<SourceObject>,
+                    TargetCategory = UnitCategory<TargetObject>,
+                >,
+        > = Arc::new(UnitFunctor::<
             String,
             UnitCategory<SourceObject>,
             UnitCategory<TargetObject>,
         >::new());
         for (source_morphism, target_morphism) in value {
             morphism_mapping.insert(source_morphism, target_morphism);
-            functor_mappings.insert(
-                source_morphism,
-                Arc::clone(&unit_functor),
-            );
+            functor_mappings.insert(source_morphism, Arc::clone(&unit_functor));
         }
 
         FunctorMappings {

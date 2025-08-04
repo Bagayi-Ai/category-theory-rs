@@ -7,6 +7,7 @@ use std::fmt::{Debug, Display, Formatter};
 use crate::core::unit::unit_category::UnitCategory;
 use crate::core::unit::unit_functor::UnitFunctor;
 use std::rc::Rc;
+use std::sync::Arc;
 
 pub struct FunctorMappings<'a, Id, SourceCategory, TargetCategory>
 where
@@ -20,7 +21,7 @@ where
     >,
     FunctorMappings: HashMap<
         &'a <SourceCategory as NCategory<'a>>::Object,
-        Rc<dyn NFunctor<
+        Arc<dyn NFunctor<
             'a,
             Identifier = Id,
             SourceCategory = <SourceCategory as NCategory<'a>>::Object,
@@ -76,7 +77,7 @@ where
         &self,
     ) -> &HashMap<
         &'a <SourceCategory as NCategory<'a>>::Object,
-        Rc<dyn NFunctor<
+        Arc<dyn NFunctor<
             'a,
             Identifier = Id,
             SourceCategory = <SourceCategory as NCategory<'a>>::Object,
@@ -110,12 +111,12 @@ From<
         let mut morphism_mapping = HashMap::new();
         let mut functor_mappings = HashMap::new();
 
-        let unit_functor: Rc<dyn NFunctor<
+        let unit_functor: Arc<dyn NFunctor<
             'a,
             Identifier = String,
             SourceCategory = UnitCategory<SourceObject>,
             TargetCategory = UnitCategory<TargetObject>,
-        >> = Rc::new(UnitFunctor::<
+        >> = Arc::new(UnitFunctor::<
             String,
             UnitCategory<SourceObject>,
             UnitCategory<TargetObject>,
@@ -124,7 +125,7 @@ From<
             morphism_mapping.insert(source_morphism, target_morphism);
             functor_mappings.insert(
                 source_morphism,
-                Rc::clone(&unit_functor),
+                Arc::clone(&unit_functor),
             );
         }
 

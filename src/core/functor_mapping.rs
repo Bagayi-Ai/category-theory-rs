@@ -76,65 +76,18 @@ where
         &self,
     ) -> &HashMap<
         &'a <SourceCategory as NCategory<'a>>::Object,
-        &'a dyn NFunctor<
+        Rc<dyn NFunctor<
             'a,
             Identifier = Id,
             SourceCategory = <SourceCategory as NCategory<'a>>::Object,
             TargetCategory = <TargetCategory as NCategory<'a>>::Object,
-        >,
-    > {
-        // &self.FunctorMappings
-        todo!()
+        >>,
+    >
+    {
+        &self.FunctorMappings
     }
 }
 
-impl<
-    'a,
-    SourceObject: Eq + Clone + Identifier + Display + 'a,
-    TargetObject: Eq + Clone + Identifier + Display + 'a,
->
-    From<
-        Vec<(
-            &'a UnitCategory<SourceObject>,
-            &'a UnitCategory<TargetObject>,
-        )>,
-    > for FunctorMappings<'a, String, UnitCategory<SourceObject>, UnitCategory<TargetObject>>
-{
-    fn from(
-        value: Vec<(
-            &'a UnitCategory<SourceObject>,
-            &'a UnitCategory<TargetObject>,
-        )>,
-    ) -> Self {
-        // let mut morphism_mapping = HashMap::new();
-        // let mut functor_mappings:
-        //     HashMap<
-        //         &DiscreteCategory<SourceObject>,
-        //         Box<dyn NFunctor<
-        //             'a,
-        //             Identifier = Id,
-        //             SourceCategory = DiscreteCategory<SourceObject>,
-        //             TargetCategory = DiscreteCategory<TargetObject>,
-        //         >>>
-        //     = HashMap::new();
-        // 
-        // for (source_morphism, target_morphism) in value {
-        //     // Assuming the morphisms are identity morphisms in discrete categories
-        // 
-        //     morphism_mapping.insert(source_morphism, target_morphism);
-        //     functor_mappings.insert(source_morphism,
-        //                             Box::new(UnitFunctor::<
-        //                                 Id,DiscreteCategory<SourceObject>,
-        //                                 DiscreteCategory<TargetObject>>::new()));
-        // }
-        // 
-        // FunctorMappings {
-        //     MorphismMapping: morphism_mapping,
-        //     FunctorMappings: functor_mappings,
-        // }
-        todo!()
-    }
-}
 
 impl<
     'a,

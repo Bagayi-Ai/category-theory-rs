@@ -61,11 +61,11 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> NC
     }
 
     fn add_object(&mut self, object: &Self::Object) -> Result<(), NCategoryError> {
-        self.add_moprhism(object.clone())?;
+        self.add_morphism(object.clone())?;
         Ok(())
     }
 
-    fn add_moprhism(&mut self, morphism: Self::Morphism) -> Result<Self::Identifier, NCategoryError> {
+    fn add_morphism(&mut self, morphism: Self::Morphism) -> Result<Self::Identifier, NCategoryError> {
         // morphsims in discrete category are only identity morphisms,
         if morphism.source_object() != morphism.target_object() {
             return Err(NCategoryError::OnlyIdentityMorphismDiscreteCategory);

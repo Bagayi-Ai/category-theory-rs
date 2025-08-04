@@ -118,7 +118,7 @@ pub fn test_base_scenarios() {
         &object2,
         "obj1 to obj2".to_string(),
     );
-    category.add_moprhism(cell).unwrap();
+    category.add_morphism(cell).unwrap();
 
     let cell = category.get_moprhism(&cell_id).unwrap();
     assert_eq!(cell.source_object(), &object1);

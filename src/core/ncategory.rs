@@ -42,7 +42,7 @@ pub trait NCategory<'a>: Debug
 
     fn add_object(&mut self, object: &'a Self::Object) -> Result<(), NCategoryError>;
 
-    fn add_moprhism(&mut self, cell: Self::Morphism) -> Result<Self::Identifier, NCategoryError>;
+    fn add_morphism(&mut self, morphism: Self::Morphism) -> Result<Self::Identifier, NCategoryError>;
 
     fn get_object(&self, object_id: &Self::Identifier) -> Result<&Self::Object, NCategoryError>;
 

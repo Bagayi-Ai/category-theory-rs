@@ -30,7 +30,7 @@ impl<'a, T: Identifier + 'a> NCategory<'a> for UnitCategory<T> {
         todo!()
     }
 
-    fn add_moprhism(&mut self, cell: Self::Morphism) -> Result<Self::Identifier, NCategoryError> {
+    fn add_morphism(&mut self, cell: Self::Morphism) -> Result<Self::Identifier, NCategoryError> {
         todo!()
     }
 

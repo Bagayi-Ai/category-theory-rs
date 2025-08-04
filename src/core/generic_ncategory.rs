@@ -58,11 +58,11 @@ impl<
             object,
             "identity".to_string(),
         );
-        self.add_moprhism(identity_cell)?;
+        self.add_morphism(identity_cell)?;
         Ok(())
     }
 
-    fn add_moprhism(&mut self, cell: Self::Morphism) -> Result<Self::Identifier, NCategoryError> {
+    fn add_morphism(&mut self, cell: Self::Morphism) -> Result<Self::Identifier, NCategoryError> {
         if self.cells.contains_key(&cell.id()) {
             return Err(NCategoryError::MorphismAlreadyExists);
         }

@@ -15,11 +15,11 @@ where
     TargetCategory: NCategory<'a>,
     Id: Identifier,
 {
-    MorphismMapping: HashMap<
+    morphism_mapping: HashMap<
         &'a <SourceCategory as NCategory<'a>>::Morphism,
         &'a <TargetCategory as NCategory<'a>>::Morphism,
     >,
-    FunctorMappings: HashMap<
+    functor_mappings: HashMap<
         &'a <SourceCategory as NCategory<'a>>::Object,
         Arc<
             dyn NFunctor<
@@ -40,7 +40,7 @@ where
     Id: Identifier,
 {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("FunctorMappings").finish()
+        f.debug_struct("functor_mappings").finish()
     }
 }
 
@@ -72,7 +72,7 @@ where
         &'a <SourceCategory as NCategory<'a>>::Morphism,
         &'a <TargetCategory as NCategory<'a>>::Morphism,
     > {
-        &self.MorphismMapping
+        &self.morphism_mapping
     }
 
     pub fn get_functor_mappings(
@@ -88,7 +88,7 @@ where
                 >,
         >,
     > {
-        &self.FunctorMappings
+        &self.functor_mappings
     }
 }
 
@@ -132,8 +132,8 @@ impl<
         }
 
         FunctorMappings {
-            MorphismMapping: morphism_mapping,
-            FunctorMappings: functor_mappings,
+            morphism_mapping: morphism_mapping,
+            functor_mappings: functor_mappings,
         }
     }
 }

@@ -1,5 +1,5 @@
 use rand::Rng;
-use std::fmt::Debug;
+use std::fmt::{Debug, Display};
 use std::hash::Hash;
 use uuid::Uuid;
 
@@ -23,17 +23,6 @@ impl Identifier for String {
     }
 }
 
-impl Identifier for () {
-    type Id = ();
-
-    fn id(&self) -> &Self::Id {
-        self
-    }
-
-    fn generate() -> Self::Id {
-        ()
-    }
-}
 
 impl Identifier for usize {
     type Id = usize;

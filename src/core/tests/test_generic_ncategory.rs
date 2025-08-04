@@ -6,10 +6,12 @@ use crate::core::generic_nfunctor::GenericNFunctor;
 use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
 use crate::core::morphism_tree::MorphismMappingTree;
-use crate::core::ncategory::{NCategory, NCategoryError, UnitCategory};
-use crate::core::nfunctor::{NFunctor, UnitFunctor};
+use crate::core::ncategory::{NCategory, NCategoryError};
+use crate::core::nfunctor::{NFunctor};
+use crate::core::unit::unit_functor::UnitFunctor;
 use crate::core::tests::ncategory_test_helper::*;
 use std::collections::HashMap;
+use crate::core::unit::unit_category::UnitCategory;
 
 type DiscreteCategoryString = DiscreteCategory<String>;
 
@@ -33,7 +35,7 @@ fn generate_object() -> DiscreteCategoryString {
     let random_string = random_string(5);
     let mut object = DiscreteCategory::new();
     object
-        .add_object(&DiscreteCategory::new_with_id(random_string))
+        .add_object(&UnitCategory{category_id: random_string.clone()})
         .unwrap();
     object
 }
@@ -214,7 +216,7 @@ pub fn test_identity_cell_tree() {
         ]
         .into(),
     );
-    //
+
     // let actual_mapping = functor_lower_to_number.mappings().unwrap();
     //
     // let expected_mapping: FunctorMappings<String, DiscreteCategoryString, DiscreteCategory<usize>> =
@@ -258,41 +260,41 @@ pub fn test_identity_cell_tree() {
     //
     // assert_eq!(actual_mapping, expected_mapping);
     //
-    // // create a functor1 from lower to upper
-    // let functor_lower_to_upper = GenericNFunctor::new(
-    //     "functor_1".to_string(),
-    //     &discreteCategoryALower,
-    //     &discreteCategoryAUpper,
-    //     HashMap::from([
-    //         // a to A
-    //         (
-    //             discreteCategoryALower
-    //                 .get_identity_morphism(object_a.clone())
-    //                 .unwrap(),
-    //             discreteCategoryAUpper
-    //                 .get_identity_morphism(object_A.clone())
-    //                 .unwrap(),
-    //         ),
-    //         // b to B
-    //         (
-    //             discreteCategoryALower
-    //                 .get_identity_morphism(object_b.clone())
-    //                 .unwrap(),
-    //             discreteCategoryAUpper
-    //                 .get_identity_morphism(object_B.clone())
-    //                 .unwrap(),
-    //         ),
-    //         // c to C
-    //         (
-    //             discreteCategoryALower
-    //                 .get_identity_morphism(object_c.clone())
-    //                 .unwrap(),
-    //             discreteCategoryAUpper
-    //                 .get_identity_morphism(object_C.clone())
-    //                 .unwrap(),
-    //         ),
-    //     ]),
-    // );
+    // create a functor1 from lower to upper
+    let functor_lower_to_upper = GenericNFunctor::new(
+        "functor_1".to_string(),
+        &discreteCategoryALower,
+        &discreteCategoryAUpper,
+        vec![
+            // a to A
+            (
+                discreteCategoryALower
+                    .get_identity_morphism(&object_a)
+                    .unwrap(),
+                discreteCategoryAUpper
+                    .get_identity_morphism(&object_A)
+                    .unwrap(),
+            ),
+            // b to B
+            (
+                discreteCategoryALower
+                    .get_identity_morphism(&object_b)
+                    .unwrap(),
+                discreteCategoryAUpper
+                    .get_identity_morphism(&object_B)
+                    .unwrap(),
+            ),
+            // c to C
+            (
+                discreteCategoryALower
+                    .get_identity_morphism(&object_c)
+                    .unwrap(),
+                discreteCategoryAUpper
+                    .get_identity_morphism(&object_C)
+                    .unwrap(),
+            ),
+        ].into(),
+    );
 
     // // expected functor mapping
     // let actual_mapping =

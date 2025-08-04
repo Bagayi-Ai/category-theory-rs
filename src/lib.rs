@@ -19,6 +19,15 @@ mod core {
 
     pub mod identifier;
 
+    pub mod unit {
+        pub mod unit_functor;
+        pub mod unit_category;
+
+        pub mod unit_morphism;
+
+        pub mod unit_identifier;
+    }
+
     #[cfg(test)]
     mod tests {
         pub mod ncategory_test_helper;

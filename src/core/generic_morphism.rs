@@ -64,23 +64,25 @@ where
     <Category as NCategory<'a>>::Object: Clone + 'a + NCategory<'a>,
     <Category as NCategory<'a>>::Identifier: 'a,
 {
-    type Category = Category;
+    type Object = <Category as NCategory<'a>>::Object;
+    type Identifier = <Category as NCategory<'a>>::Identifier;
+
     type Functor = GenericNFunctor<
         'a,
-        <Category as NCategory<'a>>::Identifier,
-        <Category as NCategory<'a>>::Object,
-        <Category as NCategory<'a>>::Object,
+        Self::Identifier,
+        <Self::Object as NCategory<'a>>::Object,
+        <Self::Object as NCategory<'a>>::Object,
     >;
 
-    fn cell_id(&self) -> &<Category as NCategory<'a>>::Identifier {
+    fn cell_id(&self) -> &Self::Identifier {
         &self.id
     }
 
-    fn source_object(&self) -> &<Category as NCategory<'a>>::Object {
+    fn source_object(&self) -> &Self::Object {
         self.source
     }
 
-    fn target_object(&self) -> &<Category as NCategory<'a>>::Object {
+    fn target_object(&self) -> &Self::Object {
         self.target
     }
 

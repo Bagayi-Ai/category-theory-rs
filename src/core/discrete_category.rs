@@ -1,26 +1,28 @@
 use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
-use crate::core::ncategory::{NCategory, NCategoryError, UnitCategory};
-use crate::core::nfunctor::{NFunctor, UnitFunctor};
+use crate::core::ncategory::{NCategory, NCategoryError};
+use crate::core::unit::unit_category::UnitCategory;
+use crate::core::nfunctor::{NFunctor};
+use crate::core::unit::unit_functor::UnitFunctor;
 use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Display};
 use std::hash::{Hash, Hasher};
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct DiscreteCategory<T: Hash + Eq + Clone> {
+pub struct DiscreteCategory<T: Identifier> {
     category_id: T,
     // TODO: Find a way of avoiding storing identity cells
     // as we could derive them from the objects.
-    cells: Option<HashMap<String, Self>>,
+    cells: Option<HashMap<T, UnitCategory<T>>>,
 }
 
-impl<T: Hash + Eq + Clone + Display> Display for DiscreteCategory<T> {
+impl<T: Identifier + Display> Display for DiscreteCategory<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.category_id)
     }
 }
 
-impl<T: Hash + Eq + Clone> Hash for DiscreteCategory<T> {
+impl<T: Identifier> Hash for DiscreteCategory<T> {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.category_id.hash(state);
         if let Some(cells) = &self.cells {
@@ -50,34 +52,44 @@ impl<T: Eq + Clone + Debug + Hash + Identifier> DiscreteCategory<T> {
 impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> NCategory<'a>
     for DiscreteCategory<T>
 {
-    type Identifier = String;
-    type Object = Self;
-    type Morphism = Self;
+    type Identifier = T;
+    type Object = UnitCategory<T>;
+    type Morphism = UnitCategory<T>;
 
     fn category_id(&self) -> Self::Identifier {
-        self.category_id.to_string()
+        self.category_id.clone()
     }
 
     fn add_object(&mut self, object: &Self::Object) -> Result<(), NCategoryError> {
-        let cell = Self::new_with_id(object.category_id.clone());
-        let cell_id = object.to_string();
-        if let Some(cells) = &mut self.cells {
-            cells.insert(cell_id, cell);
-        } else {
-            self.cells = Some(HashMap::new());
-            self.cells.as_mut().unwrap().insert(cell_id, cell);
-        }
+        self.add_moprhism(object.clone())?;
         Ok(())
     }
 
-    fn add_moprhism(&mut self, _cell: Self::Morphism) -> Result<Self::Identifier, NCategoryError> {
-        Err(NCategoryError::OnlyIdentityMorphismDiscreteCategory)
+    fn add_moprhism(&mut self, morphism: Self::Morphism) -> Result<Self::Identifier, NCategoryError> {
+        // morphsims in discrete category are only identity morphisms,
+        if morphism.source_object() != morphism.target_object() {
+            return Err(NCategoryError::OnlyIdentityMorphismDiscreteCategory);
+        }
+
+        let cell_id = morphism.cell_id().clone();
+
+        if let Some(cells) = &mut self.cells {
+            if cells.contains_key(&cell_id) {
+                return Err(NCategoryError::MorphismAlreadyExists);
+            }
+            cells.insert(cell_id.clone(), morphism);
+        } else {
+            self.cells = Some(HashMap::new());
+            self.cells.as_mut().unwrap().insert(cell_id.clone(), morphism);
+        }
+
+        Ok(cell_id)
     }
 
     fn get_object(&self, object_id: &Self::Identifier) -> Result<&Self::Object, NCategoryError> {
         if let Some(cells) = &self.cells {
-            if let Some((key, value)) = cells.get_key_value(object_id) {
-                return Ok(&value);
+            if let Some(cell) = cells.get(object_id) {
+                return Ok(cell);
             }
         }
         Err(NCategoryError::ObjectNotFound)
@@ -87,7 +99,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> NC
         &self,
         object_id: &Self::Object,
     ) -> Result<&Self::Morphism, NCategoryError> {
-        self.get_moprhism(&object_id.to_string())
+        self.get_moprhism(&object_id.category_id)
     }
 
     fn get_all_objects(&self) -> Result<HashSet<&Self::Object>, NCategoryError> {
@@ -130,19 +142,22 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> NC
 impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> Morphism<'a>
     for DiscreteCategory<T>
 {
-    type Category = Self;
-    type Functor = UnitFunctor<'a, String, Self, Self>;
+    type Identifier = T;
+    type Object = UnitCategory<T>;
+    type Functor = UnitFunctor<'a, T, UnitCategory<T>, UnitCategory<T>>;
 
-    fn cell_id(&self) -> &<Self::Category as NCategory<'a>>::Identifier {
+    fn cell_id(&self) -> &Self::Identifier {
         todo!()
     }
 
-    fn source_object(&self) -> &<Self::Category as NCategory<'a>>::Object {
-        &self
+    fn source_object(&self) -> &Self::Object {
+        // &self
+        todo!()
     }
 
-    fn target_object(&self) -> &<Self::Category as NCategory<'a>>::Object {
-        &self
+    fn target_object(&self) -> &Self::Object {
+        // &self
+        todo!()
     }
 
     fn is_identity(&self) -> bool {
@@ -157,7 +172,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> Morphism<'a>
 impl<T: Eq + Clone + Hash + Debug + Identifier + Display> From<T> for DiscreteCategory<T> {
     fn from(object: T) -> Self {
         let mut category = DiscreteCategory::new();
-        let object = DiscreteCategory::new_with_id(object);
+        let object = UnitCategory{category_id: object};
         category.add_object(&object).unwrap();
         category
     }
@@ -167,7 +182,7 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + Display> From<Vec<T>> for Discr
     fn from(objects: Vec<T>) -> Self {
         let mut category = DiscreteCategory::new();
         for object in objects {
-            let object = DiscreteCategory::new_with_id(object);
+            let object = UnitCategory{category_id: object};
             category.add_object(&object).unwrap();
         }
         category
@@ -179,8 +194,8 @@ mod tests {
     use super::*;
     use crate::core::tests::ncategory_test_helper::*;
 
-    fn generate_object() -> DiscreteCategory<String> {
-        DiscreteCategory::new_with_id(random_string(5))
+    fn generate_object() -> UnitCategory<String> {
+        UnitCategory{category_id: random_string(5)}
     }
 
     fn generate_identifier() -> String {

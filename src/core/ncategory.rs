@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use std::hash::Hash;
 
 use crate::core::identifier::Identifier;
-use crate::core::morphism::{Morphism, UnitMorphism};
+use crate::core::morphism::{Morphism};
 use crate::core::morphism_tree::MorphismMappingTree;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -29,7 +29,7 @@ pub trait NCategory<'a>: Debug
 {
     type Identifier: Identifier;
     type Object: 'a + Eq + Debug + Hash + NCategory<'a>;
-    type Morphism: Morphism<'a, Category = Self>;
+    type Morphism: Morphism<'a, Object = Self::Object, Identifier = Self::Identifier>;
 
     fn level(&self) -> usize
     where
@@ -191,65 +191,5 @@ pub trait NCategory<'a>: Debug
         Self: Sized,
     {
         1 + <Self::Object as NCategory>::nested_level()
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct UnitCategory<T: Identifier> {
-    _phantom: std::marker::PhantomData<T>,
-}
-
-impl<'a, T: Identifier + 'a> NCategory<'a> for UnitCategory<T> {
-    type Identifier = T;
-
-    type Object = Self;
-
-    type Morphism = UnitMorphism<T>;
-
-    fn category_id(&self) -> Self::Identifier {
-        todo!()
-    }
-
-    fn add_object(&mut self, object: &'a Self::Object) -> Result<(), NCategoryError> {
-        todo!()
-    }
-
-    fn add_moprhism(&mut self, cell: Self::Morphism) -> Result<Self::Identifier, NCategoryError> {
-        todo!()
-    }
-
-    fn get_object(&self, object_id: &Self::Identifier) -> Result<&Self::Object, NCategoryError> {
-        todo!()
-    }
-
-    fn get_identity_morphism(
-        &self,
-        object_id: &Self::Object,
-    ) -> Result<&Self::Morphism, NCategoryError> {
-        todo!()
-    }
-
-    fn get_all_objects(&self) -> Result<HashSet<&Self::Object>, NCategoryError> {
-        todo!()
-    }
-
-    fn get_all_morphisms(&self) -> Result<HashSet<&Self::Morphism>, NCategoryError> {
-        todo!()
-    }
-
-    fn get_object_morphisms(
-        &self,
-        object_id: &Self::Object,
-    ) -> Result<Vec<&Self::Morphism>, NCategoryError> {
-        todo!()
-    }
-
-    fn get_moprhism(&self, cell_id: &Self::Identifier) -> Result<&Self::Morphism, NCategoryError> {
-        todo!()
-    }
-    
-
-    fn nested_level() -> usize {
-        0
     }
 }

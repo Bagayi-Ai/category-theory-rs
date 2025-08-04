@@ -1,7 +1,7 @@
 use crate::core::functor_mapping::FunctorMappings;
 use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
-use crate::core::ncategory::{NCategory, NCategoryError, UnitCategory};
+use crate::core::ncategory::{NCategory, NCategoryError};
 use std::collections::HashMap;
 use std::fmt::{Debug, Formatter};
 use std::hash::Hash;
@@ -78,63 +78,5 @@ pub trait NFunctor<'a>: 'a {
             // }
         }
         Ok(())
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct UnitFunctor<
-    'a,
-    T: Identifier,
-    SourceCategory: NCategory<'a>,
-    TargetCategory: NCategory<'a>,
-> {
-    _phantom1: std::marker::PhantomData<&'a T>,
-    _phantom2: std::marker::PhantomData<SourceCategory>,
-    _phantom3: std::marker::PhantomData<TargetCategory>,
-}
-
-impl<'a, T, SourceCategory, TargetCategory> UnitFunctor<'a, T, SourceCategory, TargetCategory>
-where
-    T: Identifier + 'a,
-    SourceCategory: NCategory<'a> + 'a,
-    TargetCategory: NCategory<'a> + 'a,
-{
-    pub fn new() -> Self {
-        UnitFunctor {
-            _phantom1: std::marker::PhantomData,
-            _phantom2: std::marker::PhantomData,
-            _phantom3: std::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, Id: Identifier, SourceCategory, TargetCategory> NFunctor<'a> for UnitFunctor<'a, Id, SourceCategory, TargetCategory>
-where
-    SourceCategory: NCategory<'a> + 'a,
-    TargetCategory: NCategory<'a> + 'a,
-{
-    type Identifier = Id;
-    type SourceCategory = SourceCategory;
-    type TargetCategory = TargetCategory;
-
-    fn functor_id(&self) -> &Self::Identifier {
-        todo!()
-    }
-
-    fn source_category(&self) -> &Self::SourceCategory {
-        todo!()
-    }
-
-    fn target_category(&self) -> &Self::TargetCategory {
-        todo!()
-    }
-
-    fn mappings(
-        &self,
-    ) -> Result<
-        &FunctorMappings<'a, Self::Identifier, Self::SourceCategory, Self::TargetCategory>,
-        NCategoryError,
-    > {
-        todo!()
     }
 }

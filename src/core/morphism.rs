@@ -1,57 +1,31 @@
 use crate::core::identifier::Identifier;
-use crate::core::ncategory::{NCategory, UnitCategory};
-use crate::core::nfunctor::{NFunctor, UnitFunctor};
+use crate::core::unit::unit_category::UnitCategory;
+use crate::core::ncategory::{NCategory};
+use crate::core::nfunctor::{NFunctor};
 use std::fmt::Debug;
 use std::hash::Hash;
 
-pub trait Morphism<'a>: Debug + Eq + Hash {
-    type Category: NCategory<'a>;
+pub trait Morphism<'a>: Debug + Eq + Hash
+where
+    <Self as Morphism<'a>>::Object: NCategory<'a>
+{
+    type Object;
+    type Identifier;
 
     type Functor: NFunctor<
             'a,
-            Identifier = <Self::Category as NCategory<'a>>::Identifier,
-            SourceCategory = <Self::Category as NCategory<'a>>::Object,
-            TargetCategory = <Self::Category as NCategory<'a>>::Object,
+            Identifier = Self::Identifier,
+            SourceCategory = <Self::Object as NCategory<'a>>::Object,
+            TargetCategory = <Self::Object as NCategory<'a>>::Object,
         >;
 
-    fn cell_id(&self) -> &<Self::Category as NCategory<'a>>::Identifier;
+    fn cell_id(&self) -> &Self::Identifier;
 
-    fn source_object(&self) -> &<Self::Category as NCategory<'a>>::Object;
+    fn source_object(&self) -> &Self::Object;
 
-    fn target_object(&self) -> &<Self::Category as NCategory<'a>>::Object;
+    fn target_object(&self) -> &Self::Object;
 
     fn is_identity(&self) -> bool;
 
     fn functor(&self) -> &Self::Functor;
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct UnitMorphism<T: Identifier> {
-    _phantom: std::marker::PhantomData<T>,
-}
-
-impl<'a, T: Identifier + 'a> Morphism<'a> for UnitMorphism<T> {
-    type Category = UnitCategory<T>;
-
-    type Functor = UnitFunctor<'a, T, Self::Category, Self::Category>;
-
-    fn cell_id(&self) -> &<Self::Category as NCategory<'a>>::Identifier {
-        todo!()
-    }
-
-    fn source_object(&self) -> &<Self::Category as NCategory<'a>>::Object {
-        todo!()
-    }
-
-    fn target_object(&self) -> &<Self::Category as NCategory<'a>>::Object {
-        todo!()
-    }
-
-    fn is_identity(&self) -> bool {
-        todo!()
-    }
-
-    fn functor(&self) -> &Self::Functor {
-        todo!()
-    }
 }

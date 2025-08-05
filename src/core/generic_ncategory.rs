@@ -77,23 +77,15 @@ impl<
         Ok(cell_id)
     }
 
-    fn get_object(&self, object_id: &Self::Identifier) -> Result<&Self::Object, NCategoryError> {
-        if let Some(object) = self.objects.get(object_id) {
-            Ok(object)
-        } else {
-            Err(NCategoryError::ObjectNotFound)
-        }
-    }
-
     fn get_identity_morphism(
         &self,
-        object_id: &Self::Object,
+        object_id: &Self::Identifier,
     ) -> Result<&Self::Morphism, NCategoryError> {
         // it's basically the cell with the same id as the object
-        self.get_moprhism(&object_id.category_id())
+        self.get_moprhism(&object_id)
     }
 
-    fn get_all_objects(&self) -> Result<HashSet<&Self::Object>, NCategoryError> {
+    fn get_all_object_ids(&self) -> Result<HashSet<&Self::Identifier>, NCategoryError> {
         todo!()
     }
 
@@ -110,14 +102,14 @@ impl<
 
     fn get_object_morphisms(
         &self,
-        object: &Self::Object,
+        object_id: &Self::Identifier,
     ) -> Result<Vec<&Self::Morphism>, NCategoryError> {
-        if let Some(cells) = self.object_mapping.get(&object.category_id()) {
+        if let Some(cells) = self.object_mapping.get(&object_id) {
             let mut result: Vec<&Self::Morphism> = Vec::new();
             for (_to, cell_set) in cells {
                 for cell_id in cell_set {
                     if let Some(cell) = self.cells.get(cell_id) {
-                        if cell.source_object() == object {
+                        if &cell.source_object().category_id() == object_id {
                             result.push(&cell);
                         }
                     }

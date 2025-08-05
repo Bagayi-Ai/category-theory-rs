@@ -46,20 +46,19 @@ pub trait NCategory<'a>: Debug {
         morphism: Self::Morphism,
     ) -> Result<Self::Identifier, NCategoryError>;
 
-    fn get_object(&self, object_id: &Self::Identifier) -> Result<&Self::Object, NCategoryError>;
 
     fn get_identity_morphism(
         &self,
-        object: &Self::Object,
+        object_id: &Self::Identifier,
     ) -> Result<&Self::Morphism, NCategoryError>;
 
-    fn get_all_objects(&self) -> Result<HashSet<&Self::Object>, NCategoryError>;
+    fn get_all_object_ids(&self) -> Result<HashSet<&Self::Identifier>, NCategoryError>;
 
     fn get_all_morphisms(&self) -> Result<HashSet<&Self::Morphism>, NCategoryError>;
 
     fn get_object_morphisms(
         &self,
-        object: &Self::Object,
+        object_id: &Self::Identifier,
     ) -> Result<Vec<&Self::Morphism>, NCategoryError>;
 
     fn get_object_targets(

@@ -51,9 +51,8 @@ pub fn test_base_scenarios() {
     let object2_id = generate_identifier();
 
     category.add_object(&object1).unwrap();
-    assert!(category.get_object(&object1_id).is_ok());
     // check identity morphism
-    let cell = category.get_object_morphisms(&object1);
+    let cell = category.get_object_morphisms(&object1.category_id());
     assert!(cell.is_ok());
     let cell = cell.unwrap();
     assert_eq!(cell.len(), 1);
@@ -63,11 +62,8 @@ pub fn test_base_scenarios() {
 
     // TODO: implement comparison of the object assert_eq!(category.get_object(&object1_id).unwrap(), &object);
 
-    // check object 2 does not exist yet
-    assert!(!category.get_object(&object2_id).is_ok());
-
     // check identity morphism
-    let cell = category.get_object_morphisms(&object1);
+    let cell = category.get_object_morphisms(&object1.category_id());
     assert!(cell.is_ok());
     let cell = cell.unwrap();
     assert_eq!(cell.len(), 1);
@@ -76,18 +72,14 @@ pub fn test_base_scenarios() {
     assert_eq!(cell.target_object(), &object1);
 
     // TODO: implement comparison of the object assert_eq!(category.get_object(&object1_id).unwrap(), &object);
-
-    // check object 2 does not exist yet
-    assert!(!category.get_object(&object2_id).is_ok());
 
     // add object 2
     let object2 = generate_object();
     category.add_object(&object2).unwrap();
     let object2_id = NCategory::category_id(&object2).clone();
-    assert!(category.get_object(&object2_id).is_ok());
 
     // check identity morphism
-    let cells = category.get_object_morphisms(&object2);
+    let cells = category.get_object_morphisms(&object2.category_id());
     assert!(cells.is_ok());
     let cells = cells.unwrap();
     assert_eq!(cells.len(), 1);
@@ -100,11 +92,8 @@ pub fn test_base_scenarios() {
     let object3_id = NCategory::category_id(&object3);
     category.add_object(&object3);
 
-    // check object 3 exists
-    assert!(category.get_object(&object3_id).is_ok());
-
     // check identity morphism
-    let cells = category.get_object_morphisms(&object3);
+    let cells = category.get_object_morphisms(&object3.category_id());
     assert!(cells.is_ok());
     let cells = cells.unwrap();
     assert_eq!(cells.len(), 1);
@@ -193,28 +182,28 @@ pub fn test_identity_cell_tree() {
             // a to 1
             (
                 discreteCategoryALower
-                    .get_identity_morphism(&object_a)
+                    .get_identity_morphism(&object_a.category_id)
                     .unwrap(),
                 discreteCategoryANumber
-                    .get_identity_morphism(&object_1)
+                    .get_identity_morphism(&object_1.category_id)
                     .unwrap(),
             ),
             // b to 2
             (
                 discreteCategoryALower
-                    .get_identity_morphism(&object_b)
+                    .get_identity_morphism(&object_b.category_id)
                     .unwrap(),
                 discreteCategoryANumber
-                    .get_identity_morphism(&object_2)
+                    .get_identity_morphism(&object_2.category_id)
                     .unwrap(),
             ),
             // c to 3
             (
                 discreteCategoryALower
-                    .get_identity_morphism(&object_c)
+                    .get_identity_morphism(&object_c.category_id)
                     .unwrap(),
                 discreteCategoryANumber
-                    .get_identity_morphism(&object_3)
+                    .get_identity_morphism(&object_3.category_id)
                     .unwrap(),
             ),
         ]),
@@ -274,28 +263,28 @@ pub fn test_identity_cell_tree() {
             // a to A
             (
                 discreteCategoryALower
-                    .get_identity_morphism(&object_a)
+                    .get_identity_morphism(&object_a.category_id)
                     .unwrap(),
                 discreteCategoryAUpper
-                    .get_identity_morphism(&object_A)
+                    .get_identity_morphism(&object_A.category_id)
                     .unwrap(),
             ),
             // b to B
             (
                 discreteCategoryALower
-                    .get_identity_morphism(&object_b)
+                    .get_identity_morphism(&object_b.category_id)
                     .unwrap(),
                 discreteCategoryAUpper
-                    .get_identity_morphism(&object_B)
+                    .get_identity_morphism(&object_B.category_id)
                     .unwrap(),
             ),
             // c to C
             (
                 discreteCategoryALower
-                    .get_identity_morphism(&object_c)
+                    .get_identity_morphism(&object_c.category_id)
                     .unwrap(),
                 discreteCategoryAUpper
-                    .get_identity_morphism(&object_C)
+                    .get_identity_morphism(&object_C.category_id)
                     .unwrap(),
             ),
         ])
@@ -336,7 +325,7 @@ pub fn test_identity_cell_tree() {
     // setCategoryAlphabet.add_object(&discreteCategoryANumber).unwrap();
 
     let identity_cell = setCategoryAlphabet
-        .get_identity_morphism(&discreteCategoryALower)
+        .get_identity_morphism(&discreteCategoryALower.category_id())
         .unwrap();
     assert_eq!(identity_cell.source_object(), &discreteCategoryALower);
     assert_eq!(identity_cell.target_object(), &discreteCategoryALower);

@@ -1,5 +1,4 @@
 use crate::core::discrete_category::DiscreteCategory;
-use crate::core::functor_mapping::FunctorMappings;
 use crate::core::generic_morphism::GenericMorphism;
 use crate::core::generic_ncategory::*;
 use crate::core::generic_nfunctor::GenericNFunctor;
@@ -7,7 +6,6 @@ use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
 use crate::core::ncategory::NCategory;
 use crate::core::tests::ncategory_test_helper::*;
-use crate::core::unit::unit_functor::UNIT_FUNCTOR_STRING;
 
 type DiscreteCategoryString = DiscreteCategory<String>;
 

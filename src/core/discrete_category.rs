@@ -7,13 +7,14 @@ use crate::core::unit::unit_functor::UnitFunctor;
 use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Display};
 use std::hash::{Hash, Hasher};
+use crate::core::unit::unit_morphism::UnitMorphism;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct DiscreteCategory<T: Identifier> {
     category_id: T,
     // TODO: Find a way of avoiding storing identity cells
     // as we could derive them from the objects.
-    cells: Option<HashMap<T, UnitCategory<T>>>,
+    cells: Option<HashMap<T, Self>>,
 }
 
 impl<T: Identifier + Display> Display for DiscreteCategory<T> {
@@ -53,16 +54,15 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> NC
     for DiscreteCategory<T>
 {
     type Identifier = T;
-    type Object = UnitCategory<T>;
-    type Morphism = UnitCategory<T>;
+    type Object = UnitCategory;
+    type Morphism = Self;
 
     fn category_id(&self) -> &Self::Identifier {
         &self.category_id
     }
 
     fn add_object(&mut self, object: &Self::Object) -> Result<(), NCategoryError> {
-        self.add_morphism(object.clone())?;
-        Ok(())
+        Err(NCategoryError::CannotAddObjectInDiscreteCategoryOnlyIdentityMorphism)
     }
 
     fn add_morphism(
@@ -140,25 +140,23 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> Morphism<'a>
     for DiscreteCategory<T>
 {
     type Identifier = T;
-    type Object = UnitCategory<T>;
-    type Functor = UnitFunctor<'a, T, UnitCategory<T>, UnitCategory<T>>;
+    type Object = UnitCategory;
+    type Functor = UnitFunctor<T>;
 
     fn cell_id(&self) -> &Self::Identifier {
-        todo!()
+        &self.category_id
     }
 
     fn source_object(&self) -> &Self::Object {
-        // &self
-        todo!()
+        &UnitCategory{}
     }
 
     fn target_object(&self) -> &Self::Object {
-        // &self
-        todo!()
+        &UnitCategory{}
     }
 
     fn is_identity(&self) -> bool {
-        todo!()
+        true
     }
 
     fn functor(&self) -> &Self::Functor {
@@ -168,12 +166,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> Morphism<'a>
 
 impl<T: Eq + Clone + Hash + Debug + Identifier + Display> From<T> for DiscreteCategory<T> {
     fn from(object: T) -> Self {
-        let mut category = DiscreteCategory::new();
-        let object = UnitCategory {
-            category_id: object,
-        };
-        category.add_object(&object).unwrap();
-        category
+        DiscreteCategory::new_with_id(object)
     }
 }
 
@@ -181,10 +174,8 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + Display> From<Vec<T>> for Discr
     fn from(objects: Vec<T>) -> Self {
         let mut category = DiscreteCategory::new();
         for object in objects {
-            let object = UnitCategory {
-                category_id: object,
-            };
-            category.add_object(&object).unwrap();
+            let object = DiscreteCategory::new_with_id(object);
+            category.add_morphism(object).unwrap();
         }
         category
     }
@@ -195,10 +186,8 @@ mod tests {
     use super::*;
     use crate::core::tests::ncategory_test_helper::*;
 
-    fn generate_object() -> UnitCategory<String> {
-        UnitCategory {
-            category_id: random_string(5),
-        }
+    fn generate_morphism() -> DiscreteCategory<String> {
+        DiscreteCategory::new_with_id(random_string(5))
     }
 
     fn generate_identifier() -> String {
@@ -209,17 +198,17 @@ mod tests {
     pub fn test_base_scenarios() {
         let mut category = DiscreteCategory::new();
         // add object 1
-        let object1 = generate_object();
+        let object1 = generate_morphism();
 
-        category.add_object(&object1.clone()).unwrap();
+        category.add_morphism(object1.clone()).unwrap();
         // check identity morphism
         let cell = category.get_object_morphisms(&object1.category_id);
         assert!(cell.is_ok());
         let cell = cell.unwrap();
         assert_eq!(cell.len(), 1);
         let cell = cell.first().unwrap();
-        assert_eq!(cell.source_object(), &object1);
-        assert_eq!(cell.target_object(), &object1);
+        assert_eq!(cell.source_object(), object1.source_object());
+        assert_eq!(cell.target_object(), object1.target_object());
 
         // check identity morphism
         let cell = category.get_object_morphisms(&object1.category_id);
@@ -227,14 +216,14 @@ mod tests {
         let cell = cell.unwrap();
         assert_eq!(cell.len(), 1);
         let cell = cell.first().unwrap();
-        assert_eq!(cell.source_object(), &object1);
-        assert_eq!(cell.target_object(), &object1);
+        assert_eq!(cell.source_object(), object1.source_object());
+        assert_eq!(cell.target_object(), object1.target_object());
 
         // TODO: implement comparison of the object assert_eq!(category.get_object(&object1_id).unwrap(), &object);
 
         // add object 2
-        let object2 = generate_object();
-        assert!(category.add_object(&object2.clone()).is_ok());
+        let object2 = generate_morphism();
+        assert!(category.add_morphism(object2.clone()).is_ok());
 
         // check identity morphism
         let cells = category.get_object_morphisms(&object2.category_id);
@@ -242,12 +231,12 @@ mod tests {
         let cells = cells.unwrap();
         assert_eq!(cells.len(), 1);
         let cell = cells.first().unwrap();
-        assert_eq!(cell.source_object(), &object2);
-        assert_eq!(cell.target_object(), &object2);
+        assert_eq!(cell.source_object(), object2.source_object());
+        assert_eq!(cell.target_object(), object2.target_object());
 
         // add object 3 without id
-        let object3 = generate_object();
-        assert!(category.add_object(&object3.clone()).is_ok());
+        let object3 = generate_morphism();
+        assert!(category.add_morphism(object3.clone()).is_ok());
 
         // check identity morphism
         let cells = category.get_object_morphisms(&object3.category_id);
@@ -255,7 +244,7 @@ mod tests {
         let cells = cells.unwrap();
         assert_eq!(cells.len(), 1);
         let cell = cells.first().unwrap();
-        assert_eq!(cell.source_object(), &object3);
-        assert_eq!(cell.target_object(), &object3);
+        assert_eq!(cell.source_object(), object3.source_object());
+        assert_eq!(cell.target_object(), object3.target_object());
     }
 }

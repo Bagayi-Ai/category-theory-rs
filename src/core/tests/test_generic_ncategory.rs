@@ -35,9 +35,7 @@ fn generate_object() -> DiscreteCategoryString {
     let random_string = random_string(5);
     let mut object = DiscreteCategory::new();
     object
-        .add_object(&UnitCategory {
-            category_id: random_string.clone(),
-        })
+        .add_morphism(DiscreteCategory::new_with_id(random_string))
         .unwrap();
     object
 }
@@ -147,29 +145,29 @@ pub fn test_identity_cell_tree() {
 
     // Discrete category A with a, b, c as objects
     let mut discreteCategoryALower = DiscreteCategory::new_with_id("alphabet_lower".to_string());
-    let object_a = "a".to_string().into();
-    let object_b = "b".to_string().into();
-    let object_c = "c".to_string().into();
-    discreteCategoryALower.add_object(&object_a).unwrap();
-    discreteCategoryALower.add_object(&object_b).unwrap();
-    discreteCategoryALower.add_object(&object_c).unwrap();
+    let object_a: DiscreteCategory<String> = "a".to_string().into();
+    let object_b: DiscreteCategory<String> = "b".to_string().into();
+    let object_c: DiscreteCategory<String> = "c".to_string().into();
+    discreteCategoryALower.add_morphism(object_a.clone()).unwrap();
+    discreteCategoryALower.add_morphism(object_b.clone()).unwrap();
+    discreteCategoryALower.add_morphism(object_c.clone()).unwrap();
 
     // Discrete category A with a, b, c as objects
     let mut discreteCategoryAUpper = DiscreteCategory::new_with_id("alphabet_upper".to_string());
-    let object_A = "A".to_string().into();
-    let object_B = "B".to_string().into();
-    let object_C = "C".to_string().into();
-    discreteCategoryAUpper.add_object(&object_A).unwrap();
-    discreteCategoryAUpper.add_object(&object_B).unwrap();
-    discreteCategoryAUpper.add_object(&object_C).unwrap();
+    let object_A: DiscreteCategory<String> = "A".to_string().into();
+    let object_B: DiscreteCategory<String> = "B".to_string().into();
+    let object_C: DiscreteCategory<String> = "C".to_string().into();
+    discreteCategoryAUpper.add_morphism(object_A.clone()).unwrap();
+    discreteCategoryAUpper.add_morphism(object_B.clone()).unwrap();
+    discreteCategoryAUpper.add_morphism(object_C.clone()).unwrap();
 
     let mut discreteCategoryANumber = DiscreteCategory::new();
-    let object_1 = 1.into();
-    let object_2 = 2.into();
-    let object_3 = 3.into();
-    discreteCategoryANumber.add_object(&object_1).unwrap();
-    discreteCategoryANumber.add_object(&object_2).unwrap();
-    discreteCategoryANumber.add_object(&object_3).unwrap();
+    let object_1: DiscreteCategory<usize> = 1.into();
+    let object_2: DiscreteCategory<usize> = 2.into();
+    let object_3: DiscreteCategory<usize> = 3.into();
+    discreteCategoryANumber.add_morphism(object_1.clone()).unwrap();
+    discreteCategoryANumber.add_morphism(object_2.clone()).unwrap();
+    discreteCategoryANumber.add_morphism(object_3.clone()).unwrap();
 
     // create a functor from lower to number
     let functor_lower_to_number = GenericNFunctor::new(
@@ -177,33 +175,33 @@ pub fn test_identity_cell_tree() {
         &discreteCategoryALower,
         &discreteCategoryANumber,
         FunctorMappings::from_vec(
-            &UNIT_FUNCTOR_STRING_USize,
+            &UNIT_FUNCTOR_STRING,
             vec![
             // a to 1
             (
                 discreteCategoryALower
-                    .get_identity_morphism(&object_a.category_id)
+                    .get_identity_morphism(object_a.category_id())
                     .unwrap(),
                 discreteCategoryANumber
-                    .get_identity_morphism(&object_1.category_id)
+                    .get_identity_morphism(object_1.category_id())
                     .unwrap(),
             ),
             // b to 2
             (
                 discreteCategoryALower
-                    .get_identity_morphism(&object_b.category_id)
+                    .get_identity_morphism(object_b.category_id())
                     .unwrap(),
                 discreteCategoryANumber
-                    .get_identity_morphism(&object_2.category_id)
+                    .get_identity_morphism(object_2.category_id())
                     .unwrap(),
             ),
             // c to 3
             (
                 discreteCategoryALower
-                    .get_identity_morphism(&object_c.category_id)
+                    .get_identity_morphism(object_c.category_id())
                     .unwrap(),
                 discreteCategoryANumber
-                    .get_identity_morphism(&object_3.category_id)
+                    .get_identity_morphism(object_3.category_id())
                     .unwrap(),
             ),
         ]),
@@ -263,28 +261,28 @@ pub fn test_identity_cell_tree() {
             // a to A
             (
                 discreteCategoryALower
-                    .get_identity_morphism(&object_a.category_id)
+                    .get_identity_morphism(object_a.category_id())
                     .unwrap(),
                 discreteCategoryAUpper
-                    .get_identity_morphism(&object_A.category_id)
+                    .get_identity_morphism(object_A.category_id())
                     .unwrap(),
             ),
             // b to B
             (
                 discreteCategoryALower
-                    .get_identity_morphism(&object_b.category_id)
+                    .get_identity_morphism(object_b.category_id())
                     .unwrap(),
                 discreteCategoryAUpper
-                    .get_identity_morphism(&object_B.category_id)
+                    .get_identity_morphism(object_B.category_id())
                     .unwrap(),
             ),
             // c to C
             (
                 discreteCategoryALower
-                    .get_identity_morphism(&object_c.category_id)
+                    .get_identity_morphism(object_c.category_id())
                     .unwrap(),
                 discreteCategoryAUpper
-                    .get_identity_morphism(&object_C.category_id)
+                    .get_identity_morphism(object_C.category_id())
                     .unwrap(),
             ),
         ])

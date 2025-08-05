@@ -50,67 +50,35 @@ use crate::core::identifier::Identifier;
 use crate::core::ncategory::{NCategory, NCategoryError};
 use crate::core::nfunctor::NFunctor;
 use crate::core::unit::unit_category::UnitCategory;
+use crate::core::unit::unit_identifier::UnitIdentifier;
 
-pub const UNIT_FUNCTOR_STRING: UnitFunctor<String, UnitCategory<String>, UnitCategory<String>> =
-    UnitFunctor {
-        _phantom1: std::marker::PhantomData,
-        _phantom2: std::marker::PhantomData,
-        _phantom3: std::marker::PhantomData,
-    };
 
-pub const UNIT_FUNCTOR_STRING_USize: UnitFunctor<String, UnitCategory<String>, UnitCategory<usize>> =
-    UnitFunctor {
-        _phantom1: std::marker::PhantomData,
-        _phantom2: std::marker::PhantomData,
-        _phantom3: std::marker::PhantomData,
-    };
+pub const UNIT_FUNCTOR_STRING: UnitFunctor<String> = UnitFunctor {
+    _phantom1: std::marker::PhantomData,
+};
+
+pub const UNIT_FUNCTOR_UNIT_IDENTIFIER: UnitFunctor<UnitIdentifier> = UnitFunctor {
+    _phantom1: std::marker::PhantomData,
+};
+
+pub const UNIT_FUNCTOR_STRING_USize: UnitFunctor<usize> = UnitFunctor {
+    _phantom1: std::marker::PhantomData,
+};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UnitFunctor<
-    'a,
     T: Identifier,
-    SourceCategory: NCategory<'a>,
-    TargetCategory: NCategory<'a>,
 > {
-    _phantom1: std::marker::PhantomData<&'a T>,
-    _phantom2: std::marker::PhantomData<SourceCategory>,
-    _phantom3: std::marker::PhantomData<TargetCategory>,
+    _phantom1: std::marker::PhantomData<T>
 }
 
-impl<'a, T, SourceCategory, TargetCategory> UnitFunctor<'a, T, SourceCategory, TargetCategory>
-where
-    T: Identifier + 'a,
-    SourceCategory: NCategory<'a> + 'a,
-    TargetCategory: NCategory<'a> + 'a,
+
+impl<'a, T: Identifier + 'a> NFunctor<'a>
+    for UnitFunctor<T>
 {
-    pub fn new() -> Self {
-        UnitFunctor {
-            _phantom1: std::marker::PhantomData,
-            _phantom2: std::marker::PhantomData,
-            _phantom3: std::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a> UnitFunctor<'a, String, UnitCategory<String>, UnitCategory<String>> {
-    pub fn new_string() -> Self {
-        UnitFunctor {
-            _phantom1: std::marker::PhantomData,
-            _phantom2: std::marker::PhantomData,
-            _phantom3: std::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, Id: Identifier, SourceCategory, TargetCategory> NFunctor<'a>
-    for UnitFunctor<'a, Id, SourceCategory, TargetCategory>
-where
-    SourceCategory: NCategory<'a> + 'a,
-    TargetCategory: NCategory<'a> + 'a,
-{
-    type Identifier = Id;
-    type SourceCategory = SourceCategory;
-    type TargetCategory = TargetCategory;
+    type Identifier = T;
+    type SourceCategory = UnitCategory;
+    type TargetCategory = UnitCategory;
 
     fn functor_id(&self) -> &Self::Identifier {
         todo!()

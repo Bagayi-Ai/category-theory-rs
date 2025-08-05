@@ -23,6 +23,7 @@ pub enum NCategoryError {
     InvalidFunctor,
     InvalidFunctorMappings,
     InvalidBaseFunctor,
+    CannotAddObjectInDiscreteCategoryOnlyIdentityMorphism
 }
 
 pub trait NCategory<'a>: Debug {

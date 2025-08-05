@@ -10,10 +10,10 @@ pub struct UnitMorphism<T: Identifier> {
 }
 
 impl<'a, T: Identifier + 'a> Morphism<'a> for UnitMorphism<T> {
-    type Object = UnitCategory<T>;
+    type Object = UnitCategory;
     type Identifier = T;
 
-    type Functor = UnitFunctor<'a, T, Self::Object, Self::Object>;
+    type Functor = UnitFunctor<T>;
 
     fn cell_id(&self) -> &Self::Identifier {
         todo!()

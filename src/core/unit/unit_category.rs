@@ -10,19 +10,17 @@ use std::fmt::{Debug, Display};
 use std::hash::Hash;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct UnitCategory<T: Identifier> {
-    pub category_id: T,
-}
+pub struct UnitCategory{}
 
-impl<'a, T: Identifier + 'a> NCategory<'a> for UnitCategory<T> {
-    type Identifier = T;
+impl<'a> NCategory<'a> for UnitCategory {
+    type Identifier = UnitIdentifier;
 
     type Object = Self;
 
-    type Morphism = UnitMorphism<T>;
+    type Morphism = UnitMorphism<UnitIdentifier>;
 
     fn category_id(&self) -> &Self::Identifier {
-        &self.category_id
+        todo!()
     }
 
     fn add_object(&mut self, object: &'a Self::Object) -> Result<(), NCategoryError> {
@@ -61,39 +59,5 @@ impl<'a, T: Identifier + 'a> NCategory<'a> for UnitCategory<T> {
 
     fn nested_level() -> usize {
         0
-    }
-}
-
-impl<'a, T: Identifier + 'a> Morphism<'a> for UnitCategory<T> {
-    type Object = Self;
-    type Identifier = T;
-    type Functor = UnitFunctor<'a, T, Self, Self>;
-
-    fn cell_id(&self) -> &Self::Identifier {
-        &self.category_id
-    }
-
-    fn source_object(&self) -> &Self::Object {
-        &self
-    }
-
-    fn target_object(&self) -> &Self::Object {
-        &self
-    }
-
-    fn is_identity(&self) -> bool {
-        true
-    }
-
-    fn functor(&self) -> &Self::Functor {
-        todo!()
-    }
-}
-
-impl<T: Eq + Clone + Hash + Debug + Identifier + Display> From<T> for UnitCategory<T> {
-    fn from(object: T) -> Self {
-        UnitCategory {
-            category_id: object,
-        }
     }
 }

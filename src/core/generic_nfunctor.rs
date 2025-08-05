@@ -1,12 +1,7 @@
-use crate::core::discrete_category::DiscreteCategory;
 use crate::core::functor_mapping::FunctorMappings;
 use crate::core::identifier::Identifier;
 use crate::core::ncategory::{NCategory, NCategoryError};
 use crate::core::nfunctor::NFunctor;
-use std::collections::HashMap;
-use std::fmt::Display;
-use std::hash::Hash;
-use uuid::Uuid;
 
 pub struct GenericNFunctor<
     'a,

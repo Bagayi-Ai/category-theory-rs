@@ -1,12 +1,8 @@
-use crate::core::discrete_category::DiscreteCategory;
-use crate::core::identifier::Identifier;
-use crate::core::morphism::Morphism;
 use crate::core::ncategory::{NCategory, NCategoryError};
-use crate::core::unit::unit_functor::UnitFunctor;
 use crate::core::unit::unit_identifier::UnitIdentifier;
 use crate::core::unit::unit_morphism::UnitMorphism;
 use std::collections::HashSet;
-use std::fmt::{Debug, Display};
+use std::fmt::Debug;
 use std::hash::Hash;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

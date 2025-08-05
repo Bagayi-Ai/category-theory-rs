@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 use std::fmt::Debug;
 use std::hash::Hash;
 
@@ -124,11 +124,11 @@ pub trait NCategory<'a>: Debug {
         // source and target of left cells id should be same with right cells
         let left_source_object = left_morphisms
             .first()
-            .ok_or_else(|| NCategoryError::InvalidMorphismCommutation)?
+            .ok_or(NCategoryError::InvalidMorphismCommutation)?
             .source_object();
         let right_source_object = right_morphisms
             .first()
-            .ok_or_else(|| NCategoryError::InvalidMorphismCommutation)?
+            .ok_or(NCategoryError::InvalidMorphismCommutation)?
             .source_object();
 
         if left_source_object != right_source_object {
@@ -137,11 +137,11 @@ pub trait NCategory<'a>: Debug {
 
         let left_target_object = left_morphisms
             .first()
-            .ok_or_else(|| NCategoryError::InvalidMorphismCommutation)?
+            .ok_or(NCategoryError::InvalidMorphismCommutation)?
             .target_object();
         let right_target_object = right_morphisms
             .first()
-            .ok_or_else(|| NCategoryError::InvalidMorphismCommutation)?
+            .ok_or(NCategoryError::InvalidMorphismCommutation)?
             .target_object();
 
         if left_target_object != right_target_object {
@@ -170,7 +170,7 @@ pub trait NCategory<'a>: Debug {
         // target of first cell needs to be the source of subsequent cell
         let mut target_object = morphims
             .first()
-            .ok_or_else(|| NCategoryError::InvalidMorphismComposition)?
+            .ok_or(NCategoryError::InvalidMorphismComposition)?
             .target_object();
 
         for morphism in &morphims[1..] {

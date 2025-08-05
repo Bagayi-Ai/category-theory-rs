@@ -2,9 +2,6 @@ use crate::core::functor_mapping::FunctorMappings;
 use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
 use crate::core::ncategory::{NCategory, NCategoryError};
-use std::collections::HashMap;
-use std::fmt::{Debug, Formatter};
-use std::hash::Hash;
 
 pub trait NFunctor<'a>: 'a {
     type SourceCategory: NCategory<'a>;

@@ -1,9 +1,7 @@
-use crate::core::discrete_category::DiscreteCategory;
 use crate::core::generic_nfunctor::GenericNFunctor;
 use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
 use crate::core::ncategory::NCategory;
-use crate::core::nfunctor::NFunctor;
 use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 

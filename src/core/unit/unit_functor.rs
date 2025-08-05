@@ -47,7 +47,7 @@
 
 use crate::core::functor_mapping::FunctorMappings;
 use crate::core::identifier::Identifier;
-use crate::core::ncategory::{NCategory, NCategoryError};
+use crate::core::ncategory::NCategoryError;
 use crate::core::nfunctor::NFunctor;
 use crate::core::unit::unit_category::UnitCategory;
 

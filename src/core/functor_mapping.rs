@@ -1,14 +1,9 @@
-use crate::core::discrete_category::DiscreteCategory;
 use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
 use crate::core::ncategory::NCategory;
 use crate::core::nfunctor::NFunctor;
-use crate::core::unit::unit_category::UnitCategory;
-use crate::core::unit::unit_functor::UnitFunctor;
 use std::collections::HashMap;
-use std::fmt::{Debug, Display, Formatter};
-use std::rc::Rc;
-use std::sync::Arc;
+use std::fmt::{Debug, Formatter};
 
 pub struct FunctorMappings<'a, Id, SourceCategory, TargetCategory>
 where
@@ -110,7 +105,7 @@ where
 
         FunctorMappings {
             morphism_mappings: morphism_mapping,
-            functor_mappings: functor_mappings,
+            functor_mappings,
         }
     }
 }

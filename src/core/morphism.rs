@@ -1,7 +1,5 @@
-use crate::core::identifier::Identifier;
 use crate::core::ncategory::NCategory;
 use crate::core::nfunctor::NFunctor;
-use crate::core::unit::unit_category::UnitCategory;
 use std::fmt::Debug;
 use std::hash::Hash;
 

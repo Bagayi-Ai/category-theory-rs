@@ -1,5 +1,4 @@
 use std::fmt::Debug;
-use std::hash::Hash;
 
 use crate::core::identifier::Identifier;
 use crate::core::ncategory::NCategory;

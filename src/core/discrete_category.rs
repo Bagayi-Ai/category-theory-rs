@@ -1,10 +1,8 @@
 use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
 use crate::core::ncategory::{NCategory, NCategoryError};
-use crate::core::nfunctor::NFunctor;
 use crate::core::unit::unit_category::UnitCategory;
 use crate::core::unit::unit_functor::UnitFunctor;
-use crate::core::unit::unit_morphism::UnitMorphism;
 use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Display};
 use std::hash::{Hash, Hasher};
@@ -96,7 +94,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> NC
         &self,
         object_id: &Self::Identifier,
     ) -> Result<&Self::Morphism, NCategoryError> {
-        self.get_moprhism(&object_id)
+        self.get_moprhism(object_id)
     }
 
     fn get_all_object_ids(&self) -> Result<HashSet<&Self::Identifier>, NCategoryError> {
@@ -120,7 +118,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> NC
         object_id: &Self::Identifier,
     ) -> Result<Vec<&Self::Morphism>, NCategoryError> {
         // only cell in discrete category is the identity cell.
-        Ok(vec![self.get_identity_morphism(&object_id)?])
+        Ok(vec![self.get_identity_morphism(object_id)?])
     }
 
     fn get_moprhism(&self, cell_id: &Self::Identifier) -> Result<&Self::Morphism, NCategoryError> {

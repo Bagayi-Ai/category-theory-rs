@@ -2,7 +2,6 @@ use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
 use crate::core::unit::unit_category::UnitCategory;
 use crate::core::unit::unit_functor::UnitFunctor;
-use crate::core::unit::unit_identifier::UnitIdentifier;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UnitMorphism<T: Identifier> {

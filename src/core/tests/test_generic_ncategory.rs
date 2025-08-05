@@ -5,13 +5,9 @@ use crate::core::generic_ncategory::*;
 use crate::core::generic_nfunctor::GenericNFunctor;
 use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
-use crate::core::morphism_tree::MorphismMappingTree;
-use crate::core::ncategory::{NCategory, NCategoryError};
-use crate::core::nfunctor::NFunctor;
+use crate::core::ncategory::NCategory;
 use crate::core::tests::ncategory_test_helper::*;
-use crate::core::unit::unit_category::UnitCategory;
-use crate::core::unit::unit_functor::{UNIT_FUNCTOR_STRING, UnitFunctor};
-use std::collections::HashMap;
+use crate::core::unit::unit_functor::UNIT_FUNCTOR_STRING;
 
 type DiscreteCategoryString = DiscreteCategory<String>;
 
@@ -50,7 +46,7 @@ pub fn test_base_scenarios() {
 
     category.add_object(&object1).unwrap();
     // check identity morphism
-    let cell = category.get_object_morphisms(&object1.category_id());
+    let cell = category.get_object_morphisms(object1.category_id());
     assert!(cell.is_ok());
     let cell = cell.unwrap();
     assert_eq!(cell.len(), 1);
@@ -61,7 +57,7 @@ pub fn test_base_scenarios() {
     // TODO: implement comparison of the object assert_eq!(category.get_object(&object1_id).unwrap(), &object);
 
     // check identity morphism
-    let cell = category.get_object_morphisms(&object1.category_id());
+    let cell = category.get_object_morphisms(object1.category_id());
     assert!(cell.is_ok());
     let cell = cell.unwrap();
     assert_eq!(cell.len(), 1);
@@ -77,7 +73,7 @@ pub fn test_base_scenarios() {
     let object2_id = NCategory::category_id(&object2).clone();
 
     // check identity morphism
-    let cells = category.get_object_morphisms(&object2.category_id());
+    let cells = category.get_object_morphisms(object2.category_id());
     assert!(cells.is_ok());
     let cells = cells.unwrap();
     assert_eq!(cells.len(), 1);
@@ -91,7 +87,7 @@ pub fn test_base_scenarios() {
     category.add_object(&object3);
 
     // check identity morphism
-    let cells = category.get_object_morphisms(&object3.category_id());
+    let cells = category.get_object_morphisms(object3.category_id());
     assert!(cells.is_ok());
     let cells = cells.unwrap();
     assert_eq!(cells.len(), 1);
@@ -381,7 +377,7 @@ pub fn test_identity_cell_tree() {
     // setCategoryAlphabet.add_object(&discreteCategoryANumber).unwrap();
 
     let identity_cell = setCategoryAlphabet
-        .get_identity_morphism(&discreteCategoryALower.category_id())
+        .get_identity_morphism(discreteCategoryALower.category_id())
         .unwrap();
     assert_eq!(identity_cell.source_object(), &discreteCategoryALower);
     assert_eq!(identity_cell.target_object(), &discreteCategoryALower);

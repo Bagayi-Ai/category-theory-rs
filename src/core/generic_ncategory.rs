@@ -1,9 +1,7 @@
 use crate::core::generic_morphism::GenericMorphism;
-use crate::core::generic_nfunctor::GenericNFunctor;
 use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
 use crate::core::ncategory::{NCategory, NCategoryError};
-use crate::core::nfunctor::NFunctor;
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::hash::Hash;
@@ -63,7 +61,7 @@ impl<
     }
 
     fn add_morphism(&mut self, cell: Self::Morphism) -> Result<Self::Identifier, NCategoryError> {
-        if self.cells.contains_key(&cell.id()) {
+        if self.cells.contains_key(cell.id()) {
             return Err(NCategoryError::MorphismAlreadyExists);
         }
         let cell = self.cells.entry(cell.id().clone()).or_insert(cell);
@@ -82,7 +80,7 @@ impl<
         object_id: &Self::Identifier,
     ) -> Result<&Self::Morphism, NCategoryError> {
         // it's basically the cell with the same id as the object
-        self.get_moprhism(&object_id)
+        self.get_moprhism(object_id)
     }
 
     fn get_all_object_ids(&self) -> Result<HashSet<&Self::Identifier>, NCategoryError> {
@@ -93,7 +91,7 @@ impl<
         // Todo needs optimization
         // Ok(self.cells.values().collect())
 
-        let mut result: HashSet<&Self::Morphism> = HashSet::new();
+        let result: HashSet<&Self::Morphism> = HashSet::new();
         // for (_id, cell) in &self.cells {
         //     result.insert(cell);
         // }
@@ -104,13 +102,13 @@ impl<
         &self,
         object_id: &Self::Identifier,
     ) -> Result<Vec<&Self::Morphism>, NCategoryError> {
-        if let Some(cells) = self.object_mapping.get(&object_id) {
+        if let Some(cells) = self.object_mapping.get(object_id) {
             let mut result: Vec<&Self::Morphism> = Vec::new();
-            for (_to, cell_set) in cells {
+            for cell_set in cells.values() {
                 for cell_id in cell_set {
                     if let Some(cell) = self.cells.get(cell_id) {
                         if cell.source_object().category_id() == object_id {
-                            result.push(&cell);
+                            result.push(cell);
                         }
                     }
                 }

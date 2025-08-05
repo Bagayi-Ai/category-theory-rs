@@ -1,5 +1,5 @@
 use crate::core::discrete_category::DiscreteCategory;
-use crate::core::functor_mapping::FunctorMappings;
+use crate::core::functor_mapping::{FunctorMappings};
 use crate::core::generic_morphism::GenericMorphism;
 use crate::core::generic_ncategory::*;
 use crate::core::generic_nfunctor::GenericNFunctor;
@@ -10,7 +10,7 @@ use crate::core::ncategory::{NCategory, NCategoryError};
 use crate::core::nfunctor::NFunctor;
 use crate::core::tests::ncategory_test_helper::*;
 use crate::core::unit::unit_category::UnitCategory;
-use crate::core::unit::unit_functor::UnitFunctor;
+use crate::core::unit::unit_functor::{UnitFunctor, UNIT_FUNCTOR_STRING, UNIT_FUNCTOR_STRING_USize};
 use std::collections::HashMap;
 
 type DiscreteCategoryString = DiscreteCategory<String>;
@@ -187,7 +187,9 @@ pub fn test_identity_cell_tree() {
         "functor_lower_to_number".to_string(),
         &discreteCategoryALower,
         &discreteCategoryANumber,
-        vec![
+        FunctorMappings::from_vec(
+            &UNIT_FUNCTOR_STRING_USize,
+            vec![
             // a to 1
             (
                 discreteCategoryALower
@@ -215,8 +217,7 @@ pub fn test_identity_cell_tree() {
                     .get_identity_morphism(&object_3)
                     .unwrap(),
             ),
-        ]
-        .into(),
+        ]),
     );
 
     // let actual_mapping = functor_lower_to_number.mappings().unwrap();
@@ -267,7 +268,9 @@ pub fn test_identity_cell_tree() {
         "functor_1".to_string(),
         &discreteCategoryALower,
         &discreteCategoryAUpper,
-        vec![
+        FunctorMappings::from_vec(
+            &UNIT_FUNCTOR_STRING,
+            vec![
             // a to A
             (
                 discreteCategoryALower
@@ -295,8 +298,7 @@ pub fn test_identity_cell_tree() {
                     .get_identity_morphism(&object_C)
                     .unwrap(),
             ),
-        ]
-        .into(),
+        ])
     );
 
     // // expected functor mapping

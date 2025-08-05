@@ -58,6 +58,13 @@ pub const UNIT_FUNCTOR_STRING: UnitFunctor<String, UnitCategory<String>, UnitCat
         _phantom3: std::marker::PhantomData,
     };
 
+pub const UNIT_FUNCTOR_STRING_USize: UnitFunctor<String, UnitCategory<String>, UnitCategory<usize>> =
+    UnitFunctor {
+        _phantom1: std::marker::PhantomData,
+        _phantom2: std::marker::PhantomData,
+        _phantom3: std::marker::PhantomData,
+    };
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UnitFunctor<
     'a,

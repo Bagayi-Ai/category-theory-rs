@@ -36,14 +36,14 @@ pub trait NFunctor<'a>: 'a {
         let functor_mapping = self.mappings()?;
         // should map all morphisms in source category to target category
         if functor_mapping.get_morphism_mapping().len()
-            != self.source_category().get_all_morphisms()?.len()
+            != self.source_category().get_all_arrows()?.len()
         {
             return Err(NCategoryError::InvalidFunctorMappings);
         }
 
         // check each mapping in source category is mapped to a target category morphism
-        let target_morphisms = self.target_category().get_all_morphisms()?;
-        for source_morphism in self.source_category().get_all_morphisms()? {
+        let target_morphisms = self.target_category().get_all_arrows()?;
+        for source_morphism in self.source_category().get_all_arrows()? {
             let mapped_morphism = functor_mapping
                 .get_morphism_mapping()
                 .get(source_morphism)

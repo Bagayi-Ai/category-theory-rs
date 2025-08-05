@@ -42,7 +42,7 @@ impl<
 {
     type Identifier = Id;
     type Object = Category;
-    type Morphism = GenericMorphism<'a, Self>;
+    type Arrow = GenericMorphism<'a, Self>;
 
     fn category_id(&self) -> &Self::Identifier {
         todo!()
@@ -56,11 +56,11 @@ impl<
             object,
             "identity".to_string(),
         );
-        self.add_morphism(identity_cell)?;
+        self.add_arrow(identity_cell)?;
         Ok(())
     }
 
-    fn add_morphism(&mut self, cell: Self::Morphism) -> Result<Self::Identifier, NCategoryError> {
+    fn add_arrow(&mut self, cell: Self::Arrow) -> Result<Self::Identifier, NCategoryError> {
         if self.cells.contains_key(cell.id()) {
             return Err(NCategoryError::MorphismAlreadyExists);
         }
@@ -75,35 +75,35 @@ impl<
         Ok(cell_id)
     }
 
-    fn get_identity_morphism(
+    fn get_identity_arrow(
         &self,
         object_id: &Self::Identifier,
-    ) -> Result<&Self::Morphism, NCategoryError> {
+    ) -> Result<&Self::Arrow, NCategoryError> {
         // it's basically the cell with the same id as the object
-        self.get_moprhism(object_id)
+        self.get_arrow(object_id)
     }
 
     fn get_all_object_ids(&self) -> Result<HashSet<&Self::Identifier>, NCategoryError> {
         todo!()
     }
 
-    fn get_all_morphisms(&self) -> Result<HashSet<&Self::Morphism>, NCategoryError> {
+    fn get_all_arrows(&self) -> Result<HashSet<&Self::Arrow>, NCategoryError> {
         // Todo needs optimization
         // Ok(self.cells.values().collect())
 
-        let result: HashSet<&Self::Morphism> = HashSet::new();
+        let result: HashSet<&Self::Arrow> = HashSet::new();
         // for (_id, cell) in &self.cells {
         //     result.insert(cell);
         // }
         Ok(result)
     }
 
-    fn get_object_morphisms(
+    fn get_object_arrows(
         &self,
         object_id: &Self::Identifier,
-    ) -> Result<Vec<&Self::Morphism>, NCategoryError> {
+    ) -> Result<Vec<&Self::Arrow>, NCategoryError> {
         if let Some(cells) = self.object_mapping.get(object_id) {
-            let mut result: Vec<&Self::Morphism> = Vec::new();
+            let mut result: Vec<&Self::Arrow> = Vec::new();
             for cell_set in cells.values() {
                 for cell_id in cell_set {
                     if let Some(cell) = self.cells.get(cell_id) {
@@ -119,7 +119,7 @@ impl<
         }
     }
 
-    fn get_moprhism(&self, cell_id: &Self::Identifier) -> Result<&Self::Morphism, NCategoryError> {
+    fn get_arrow(&self, cell_id: &Self::Identifier) -> Result<&Self::Arrow, NCategoryError> {
         if let Some(cell) = self.cells.get(cell_id) {
             Ok(cell)
         } else {

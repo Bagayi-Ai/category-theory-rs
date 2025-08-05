@@ -9,8 +9,8 @@ pub trait MorphismMappingTreeTrait<'a>: Debug {
     type Id: Identifier;
 
     fn id(&self) -> &Self::Id;
-    fn source_cell(&self) -> &<Self::SourceCategory as NCategory<'a>>::Morphism;
-    fn target_cell(&self) -> &<Self::TargetCategory as NCategory<'a>>::Morphism;
+    fn source_cell(&self) -> &<Self::SourceCategory as NCategory<'a>>::Arrow;
+    fn target_cell(&self) -> &<Self::TargetCategory as NCategory<'a>>::Arrow;
 }
 
 #[derive(Debug)]
@@ -21,8 +21,8 @@ pub struct MorphismMappingTree<
     TargetCategory: NCategory<'a>,
 > {
     id: &'a Id,
-    source_cell: &'a SourceCategory::Morphism,
-    target_cell: &'a TargetCategory::Morphism,
+    source_cell: &'a SourceCategory::Arrow,
+    target_cell: &'a TargetCategory::Arrow,
     children: Vec<
         Box<
             dyn MorphismMappingTreeTrait<
@@ -40,8 +40,8 @@ impl<'a, Id: Identifier, SourceCategory: NCategory<'a>, TargetCategory: NCategor
 {
     pub fn new(
         id: &'a Id,
-        source_cell: &'a SourceCategory::Morphism,
-        target_cell: &'a TargetCategory::Morphism,
+        source_cell: &'a SourceCategory::Arrow,
+        target_cell: &'a TargetCategory::Arrow,
     ) -> Self {
         MorphismMappingTree {
             id,
@@ -53,8 +53,8 @@ impl<'a, Id: Identifier, SourceCategory: NCategory<'a>, TargetCategory: NCategor
 
     pub fn new_with_children(
         id: &'a Id,
-        source_cell: &'a SourceCategory::Morphism,
-        target_cell: &'a TargetCategory::Morphism,
+        source_cell: &'a SourceCategory::Arrow,
+        target_cell: &'a TargetCategory::Arrow,
         children: Vec<
             Box<
                 dyn MorphismMappingTreeTrait<
@@ -85,11 +85,11 @@ impl<'a, Id: Identifier, SourceCategory: NCategory<'a>, TargetCategory: NCategor
         self.id
     }
 
-    pub fn source_cell(&self) -> &<SourceCategory as NCategory<'a>>::Morphism {
+    pub fn source_cell(&self) -> &<SourceCategory as NCategory<'a>>::Arrow {
         self.source_cell()
     }
 
-    pub fn target_cell_id(&self) -> &<TargetCategory as NCategory<'a>>::Morphism {
+    pub fn target_cell_id(&self) -> &<TargetCategory as NCategory<'a>>::Arrow {
         self.target_cell
     }
 }
@@ -105,11 +105,11 @@ impl<'a, Id: Identifier, SourceCategory: NCategory<'a>, TargetCategory: NCategor
         self.id
     }
 
-    fn source_cell(&self) -> &<Self::SourceCategory as NCategory<'a>>::Morphism {
+    fn source_cell(&self) -> &<Self::SourceCategory as NCategory<'a>>::Arrow {
         self.source_cell
     }
 
-    fn target_cell(&self) -> &<Self::TargetCategory as NCategory<'a>>::Morphism {
+    fn target_cell(&self) -> &<Self::TargetCategory as NCategory<'a>>::Arrow {
         self.target_cell
     }
 }

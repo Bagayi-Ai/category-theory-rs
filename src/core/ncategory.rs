@@ -29,7 +29,7 @@ pub enum NCategoryError {
 pub trait NCategory<'a>: Debug {
     type Identifier: Identifier;
     type Object: 'a + Eq + Debug + Hash + NCategory<'a>;
-    type Morphism: Morphism<'a, Object = Self::Object, Identifier = Self::Identifier>;
+    type Arrow: Morphism<'a, Object = Self::Object, Identifier = Self::Identifier>;
 
     fn level(&self) -> usize
     where
@@ -42,24 +42,24 @@ pub trait NCategory<'a>: Debug {
 
     fn add_object(&mut self, object: &'a Self::Object) -> Result<(), NCategoryError>;
 
-    fn add_morphism(
+    fn add_arrow(
         &mut self,
-        morphism: Self::Morphism,
+        arrow: Self::Arrow,
     ) -> Result<Self::Identifier, NCategoryError>;
 
-    fn get_identity_morphism(
+    fn get_identity_arrow(
         &self,
         object_id: &Self::Identifier,
-    ) -> Result<&Self::Morphism, NCategoryError>;
+    ) -> Result<&Self::Arrow, NCategoryError>;
 
     fn get_all_object_ids(&self) -> Result<HashSet<&Self::Identifier>, NCategoryError>;
 
-    fn get_all_morphisms(&self) -> Result<HashSet<&Self::Morphism>, NCategoryError>;
+    fn get_all_arrows(&self) -> Result<HashSet<&Self::Arrow>, NCategoryError>;
 
-    fn get_object_morphisms(
+    fn get_object_arrows(
         &self,
         object_id: &Self::Identifier,
-    ) -> Result<Vec<&Self::Morphism>, NCategoryError>;
+    ) -> Result<Vec<&Self::Arrow>, NCategoryError>;
 
     fn get_object_targets(
         &self,
@@ -73,14 +73,14 @@ pub trait NCategory<'a>: Debug {
         todo!()
     }
 
-    fn get_moprhism(
+    fn get_arrow(
         &self,
-        morphism_id: &Self::Identifier,
-    ) -> Result<&Self::Morphism, NCategoryError>;
+        arrow_id: &Self::Identifier,
+    ) -> Result<&Self::Arrow, NCategoryError>;
 
     fn get_morphism_tree(
         &self,
-        cell_id: &Self::Morphism,
+        cell_id: &Self::Arrow,
     ) -> Result<MorphismMappingTree<'a, Self::Identifier, Self, Self>, NCategoryError>
     where
         Self: Sized,
@@ -106,20 +106,20 @@ pub trait NCategory<'a>: Debug {
         // Ok(cell_tree)
         todo!()
     }
-    fn morphism_commute(
+    fn arrow_commute(
         &self,
-        left_morphisms: Vec<&Self::Morphism>,
-        right_morphisms: Vec<&Self::Morphism>,
+        left_morphisms: Vec<&Self::Arrow>,
+        right_morphisms: Vec<&Self::Arrow>,
     ) -> Result<bool, NCategoryError> {
-        self.validate_morphisms_commutation(left_morphisms, right_morphisms)?;
+        self.validate_arrow_commutation(left_morphisms, right_morphisms)?;
 
         Ok(true)
     }
 
-    fn validate_morphisms_commutation(
+    fn validate_arrow_commutation(
         &self,
-        left_morphisms: Vec<&Self::Morphism>,
-        right_morphisms: Vec<&Self::Morphism>,
+        left_morphisms: Vec<&Self::Arrow>,
+        right_morphisms: Vec<&Self::Arrow>,
     ) -> Result<(), NCategoryError> {
         // source and target of left cells id should be same with right cells
         let left_source_object = left_morphisms
@@ -149,15 +149,15 @@ pub trait NCategory<'a>: Debug {
         }
 
         // confirm composition is correct
-        self.validate_morphisms_composition(left_morphisms)?;
-        self.validate_morphisms_composition(right_morphisms)?;
+        self.validate_arrow_composition(left_morphisms)?;
+        self.validate_arrow_composition(right_morphisms)?;
 
         Ok(())
     }
 
-    fn validate_morphisms_composition(
+    fn validate_arrow_composition(
         &self,
-        morphims: Vec<&Self::Morphism>,
+        morphims: Vec<&Self::Arrow>,
     ) -> Result<(), NCategoryError> {
         if morphims.is_empty() {
             return Err(NCategoryError::InvalidMorphismComposition);

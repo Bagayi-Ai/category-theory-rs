@@ -13,7 +13,7 @@ impl<'a> NCategory<'a> for UnitCategory {
 
     type Object = Self;
 
-    type Morphism = UnitMorphism<UnitIdentifier>;
+    type Arrow = UnitMorphism<UnitIdentifier>;
 
     fn category_id(&self) -> &Self::Identifier {
         todo!()
@@ -23,14 +23,14 @@ impl<'a> NCategory<'a> for UnitCategory {
         todo!()
     }
 
-    fn add_morphism(&mut self, cell: Self::Morphism) -> Result<Self::Identifier, NCategoryError> {
+    fn add_arrow(&mut self, cell: Self::Arrow) -> Result<Self::Identifier, NCategoryError> {
         todo!()
     }
 
-    fn get_identity_morphism(
+    fn get_identity_arrow(
         &self,
         object_id: &Self::Identifier,
-    ) -> Result<&Self::Morphism, NCategoryError> {
+    ) -> Result<&Self::Arrow, NCategoryError> {
         todo!()
     }
 
@@ -38,18 +38,18 @@ impl<'a> NCategory<'a> for UnitCategory {
         todo!()
     }
 
-    fn get_all_morphisms(&self) -> Result<HashSet<&Self::Morphism>, NCategoryError> {
+    fn get_all_arrows(&self) -> Result<HashSet<&Self::Arrow>, NCategoryError> {
         todo!()
     }
 
-    fn get_object_morphisms(
+    fn get_object_arrows(
         &self,
         object_id: &Self::Identifier,
-    ) -> Result<Vec<&Self::Morphism>, NCategoryError> {
+    ) -> Result<Vec<&Self::Arrow>, NCategoryError> {
         todo!()
     }
 
-    fn get_moprhism(&self, cell_id: &Self::Identifier) -> Result<&Self::Morphism, NCategoryError> {
+    fn get_arrow(&self, cell_id: &Self::Identifier) -> Result<&Self::Arrow, NCategoryError> {
         todo!()
     }
 

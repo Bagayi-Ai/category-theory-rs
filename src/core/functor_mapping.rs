@@ -14,8 +14,8 @@ where
     Id: Identifier,
 {
     morphism_mappings: HashMap<
-        &'a <SourceCategory as NCategory<'a>>::Morphism,
-        &'a <TargetCategory as NCategory<'a>>::Morphism,
+        &'a <SourceCategory as NCategory<'a>>::Arrow,
+        &'a <TargetCategory as NCategory<'a>>::Arrow,
     >,
     functor_mappings: HashMap<
         &'a <SourceCategory as NCategory<'a>>::Object,
@@ -65,8 +65,8 @@ where
     pub fn get_morphism_mapping(
         &self,
     ) -> &HashMap<
-        &'a <SourceCategory as NCategory<'a>>::Morphism,
-        &'a <TargetCategory as NCategory<'a>>::Morphism,
+        &'a <SourceCategory as NCategory<'a>>::Arrow,
+        &'a <TargetCategory as NCategory<'a>>::Arrow,
     > {
         &self.morphism_mappings
     }

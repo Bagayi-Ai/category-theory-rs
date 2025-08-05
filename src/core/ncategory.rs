@@ -37,7 +37,7 @@ pub trait NCategory<'a>: Debug {
         Self::nested_level()
     }
 
-    fn category_id(&self) -> Self::Identifier;
+    fn category_id(&self) -> &Self::Identifier;
 
     fn add_object(&mut self, object: &'a Self::Object) -> Result<(), NCategoryError>;
 

@@ -46,7 +46,7 @@ impl<
     type Object = Category;
     type Morphism = GenericMorphism<'a, Self>;
 
-    fn category_id(&self) -> Self::Identifier {
+    fn category_id(&self) -> &Self::Identifier {
         todo!()
     }
 
@@ -109,7 +109,7 @@ impl<
             for (_to, cell_set) in cells {
                 for cell_id in cell_set {
                     if let Some(cell) = self.cells.get(cell_id) {
-                        if &cell.source_object().category_id() == object_id {
+                        if cell.source_object().category_id() == object_id {
                             result.push(&cell);
                         }
                     }

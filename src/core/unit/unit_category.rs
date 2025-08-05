@@ -21,8 +21,8 @@ impl<'a, T: Identifier + 'a> NCategory<'a> for UnitCategory<T> {
 
     type Morphism = UnitMorphism<T>;
 
-    fn category_id(&self) -> Self::Identifier {
-        self.category_id.clone()
+    fn category_id(&self) -> &Self::Identifier {
+        &self.category_id
     }
 
     fn add_object(&mut self, object: &'a Self::Object) -> Result<(), NCategoryError> {

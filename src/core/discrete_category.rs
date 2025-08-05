@@ -56,8 +56,8 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> NC
     type Object = UnitCategory<T>;
     type Morphism = UnitCategory<T>;
 
-    fn category_id(&self) -> Self::Identifier {
-        self.category_id.clone()
+    fn category_id(&self) -> &Self::Identifier {
+        &self.category_id
     }
 
     fn add_object(&mut self, object: &Self::Object) -> Result<(), NCategoryError> {

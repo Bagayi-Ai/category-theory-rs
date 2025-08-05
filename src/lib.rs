@@ -19,6 +19,10 @@ mod core {
 
     pub mod identifier;
 
+    pub mod arrow;
+
+    pub mod generic_narrow;
+
     pub mod unit {
         pub mod unit_category;
         pub mod unit_functor;
@@ -26,6 +30,8 @@ mod core {
         pub mod unit_morphism;
 
         pub mod unit_identifier;
+
+        pub mod unit_arrow;
     }
 
     #[cfg(test)]

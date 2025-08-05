@@ -50,18 +50,8 @@ use crate::core::identifier::Identifier;
 use crate::core::ncategory::{NCategory, NCategoryError};
 use crate::core::nfunctor::NFunctor;
 use crate::core::unit::unit_category::UnitCategory;
-use crate::core::unit::unit_identifier::UnitIdentifier;
-
 
 pub const UNIT_FUNCTOR_STRING: UnitFunctor<String> = UnitFunctor {
-    _phantom1: std::marker::PhantomData,
-};
-
-pub const UNIT_FUNCTOR_UNIT_IDENTIFIER: UnitFunctor<UnitIdentifier> = UnitFunctor {
-    _phantom1: std::marker::PhantomData,
-};
-
-pub const UNIT_FUNCTOR_STRING_USize: UnitFunctor<usize> = UnitFunctor {
     _phantom1: std::marker::PhantomData,
 };
 

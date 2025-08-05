@@ -10,7 +10,7 @@ use crate::core::ncategory::{NCategory, NCategoryError};
 use crate::core::nfunctor::NFunctor;
 use crate::core::tests::ncategory_test_helper::*;
 use crate::core::unit::unit_category::UnitCategory;
-use crate::core::unit::unit_functor::{UnitFunctor, UNIT_FUNCTOR_STRING, UNIT_FUNCTOR_STRING_USize};
+use crate::core::unit::unit_functor::{UnitFunctor, UNIT_FUNCTOR_STRING};
 use std::collections::HashMap;
 
 type DiscreteCategoryString = DiscreteCategory<String>;
@@ -205,6 +205,44 @@ pub fn test_identity_cell_tree() {
                     .unwrap(),
             ),
         ]),
+    );
+
+
+    let functor_number_to_upper = GenericNFunctor::new(
+        "functor_lower_to_number".to_string(),
+        &discreteCategoryANumber,
+        &discreteCategoryAUpper,
+        FunctorMappings::from_vec(
+            &UNIT_FUNCTOR_STRING,
+            vec![
+                // a to 1
+                (
+                    discreteCategoryANumber
+                        .get_identity_morphism(object_1.category_id())
+                        .unwrap(),
+                    discreteCategoryALower
+                        .get_identity_morphism(object_a.category_id())
+                        .unwrap(),
+                ),
+                // b to 2
+                (
+                    discreteCategoryANumber
+                        .get_identity_morphism(object_2.category_id())
+                        .unwrap(),
+                    discreteCategoryALower
+                        .get_identity_morphism(object_b.category_id())
+                        .unwrap(),
+                ),
+                // c to 3
+                (
+                    discreteCategoryANumber
+                        .get_identity_morphism(object_3.category_id())
+                        .unwrap(),
+                    discreteCategoryALower
+                        .get_identity_morphism(object_c.category_id())
+                        .unwrap(),
+                ),
+            ]),
     );
 
     // let actual_mapping = functor_lower_to_number.mappings().unwrap();

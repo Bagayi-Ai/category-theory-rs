@@ -1,7 +1,7 @@
 use crate::core::identifier::Identifier;
 use crate::core::ncategory::NCategory;
 
-pub trait Arrow<'a>: 'a {
+pub trait NArrow<'a>: 'a {
     type SourceObject: NCategory<'a>;
 
     type TargetObject: NCategory<'a>;
@@ -17,14 +17,14 @@ pub trait Arrow<'a>: 'a {
     fn is_identity(&self) -> bool;
 }
 
-pub trait SubArrow<'a>: 'a {
+pub trait SubNArrow<'a>: 'a {
     type Identifier: Identifier;
     type SourceObject: NCategory<'a>;
     type TargetObject: NCategory<'a>;
 
     fn sub_arrow(
         &self,
-    ) -> &dyn Arrow<
+    ) -> &dyn NArrow<
         'a,
         Identifier = Self::Identifier,
         SourceObject = <Self::SourceObject as NCategory<'a>>::Object,

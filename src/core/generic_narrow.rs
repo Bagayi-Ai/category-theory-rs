@@ -1,5 +1,5 @@
-use crate::core::arrow::{Arrow, SubArrow};
 use crate::core::identifier::Identifier;
+use crate::core::narrow::{NArrow, SubNArrow};
 use crate::core::ncategory::NCategory;
 
 #[derive(Debug, PartialEq, Eq)]
@@ -29,7 +29,7 @@ where
     }
 }
 
-impl<'a, Id, SourceCategory, TargetCategory> Arrow<'a>
+impl<'a, Id, SourceCategory, TargetCategory> NArrow<'a>
     for GenericNArrow<'a, Id, SourceCategory, TargetCategory>
 where
     Id: Identifier + 'a,
@@ -57,7 +57,7 @@ where
     }
 }
 
-impl<'a, Id, SourceCategory, TargetCategory> SubArrow<'a>
+impl<'a, Id, SourceCategory, TargetCategory> SubNArrow<'a>
     for GenericNArrow<'a, Id, SourceCategory, TargetCategory>
 where
     Id: Identifier + 'a,
@@ -72,7 +72,7 @@ where
 
     fn sub_arrow(
         &self,
-    ) -> &dyn Arrow<
+    ) -> &dyn NArrow<
         'a,
         Identifier = Self::Identifier,
         SourceObject = <Self::SourceObject as NCategory<'a>>::Object,

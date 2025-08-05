@@ -19,7 +19,7 @@ mod core {
 
     pub mod identifier;
 
-    pub mod arrow;
+    pub mod narrow;
 
     pub mod generic_narrow;
 

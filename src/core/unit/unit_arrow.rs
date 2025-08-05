@@ -1,5 +1,5 @@
-use crate::core::arrow::{Arrow, SubArrow};
 use crate::core::identifier::Identifier;
+use crate::core::narrow::{NArrow, SubNArrow};
 use crate::core::ncategory::NCategory;
 use crate::core::unit::unit_category::UnitCategory;
 
@@ -7,7 +7,7 @@ pub struct UnitArrow<T: Identifier> {
     _phantom: std::marker::PhantomData<T>,
 }
 
-impl<'a, T: Identifier + 'a> Arrow<'a> for UnitArrow<T> {
+impl<'a, T: Identifier + 'a> NArrow<'a> for UnitArrow<T> {
     type SourceObject = UnitCategory;
     type TargetObject = UnitCategory;
     type Identifier = T;
@@ -29,14 +29,14 @@ impl<'a, T: Identifier + 'a> Arrow<'a> for UnitArrow<T> {
     }
 }
 
-impl<'a, T: Identifier + 'a> SubArrow<'a> for UnitArrow<T> {
+impl<'a, T: Identifier + 'a> SubNArrow<'a> for UnitArrow<T> {
     type Identifier = T;
     type SourceObject = UnitCategory;
     type TargetObject = UnitCategory;
 
     fn sub_arrow(
         &self,
-    ) -> &dyn Arrow<
+    ) -> &dyn NArrow<
         'a,
         Identifier = Self::Identifier,
         SourceObject = <Self::SourceObject as NCategory<'a>>::Object,

@@ -1,5 +1,5 @@
 use crate::core::discrete_category::DiscreteCategory;
-use crate::core::functor_mapping::{FunctorMappings};
+use crate::core::functor_mapping::FunctorMappings;
 use crate::core::generic_morphism::GenericMorphism;
 use crate::core::generic_ncategory::*;
 use crate::core::generic_nfunctor::GenericNFunctor;
@@ -10,7 +10,7 @@ use crate::core::ncategory::{NCategory, NCategoryError};
 use crate::core::nfunctor::NFunctor;
 use crate::core::tests::ncategory_test_helper::*;
 use crate::core::unit::unit_category::UnitCategory;
-use crate::core::unit::unit_functor::{UnitFunctor, UNIT_FUNCTOR_STRING};
+use crate::core::unit::unit_functor::{UNIT_FUNCTOR_STRING, UnitFunctor};
 use std::collections::HashMap;
 
 type DiscreteCategoryString = DiscreteCategory<String>;
@@ -148,26 +148,44 @@ pub fn test_identity_cell_tree() {
     let object_a: DiscreteCategory<String> = "a".to_string().into();
     let object_b: DiscreteCategory<String> = "b".to_string().into();
     let object_c: DiscreteCategory<String> = "c".to_string().into();
-    discreteCategoryALower.add_morphism(object_a.clone()).unwrap();
-    discreteCategoryALower.add_morphism(object_b.clone()).unwrap();
-    discreteCategoryALower.add_morphism(object_c.clone()).unwrap();
+    discreteCategoryALower
+        .add_morphism(object_a.clone())
+        .unwrap();
+    discreteCategoryALower
+        .add_morphism(object_b.clone())
+        .unwrap();
+    discreteCategoryALower
+        .add_morphism(object_c.clone())
+        .unwrap();
 
     // Discrete category A with a, b, c as objects
     let mut discreteCategoryAUpper = DiscreteCategory::new_with_id("alphabet_upper".to_string());
     let object_A: DiscreteCategory<String> = "A".to_string().into();
     let object_B: DiscreteCategory<String> = "B".to_string().into();
     let object_C: DiscreteCategory<String> = "C".to_string().into();
-    discreteCategoryAUpper.add_morphism(object_A.clone()).unwrap();
-    discreteCategoryAUpper.add_morphism(object_B.clone()).unwrap();
-    discreteCategoryAUpper.add_morphism(object_C.clone()).unwrap();
+    discreteCategoryAUpper
+        .add_morphism(object_A.clone())
+        .unwrap();
+    discreteCategoryAUpper
+        .add_morphism(object_B.clone())
+        .unwrap();
+    discreteCategoryAUpper
+        .add_morphism(object_C.clone())
+        .unwrap();
 
     let mut discreteCategoryANumber = DiscreteCategory::new();
     let object_1: DiscreteCategory<usize> = 1.into();
     let object_2: DiscreteCategory<usize> = 2.into();
     let object_3: DiscreteCategory<usize> = 3.into();
-    discreteCategoryANumber.add_morphism(object_1.clone()).unwrap();
-    discreteCategoryANumber.add_morphism(object_2.clone()).unwrap();
-    discreteCategoryANumber.add_morphism(object_3.clone()).unwrap();
+    discreteCategoryANumber
+        .add_morphism(object_1.clone())
+        .unwrap();
+    discreteCategoryANumber
+        .add_morphism(object_2.clone())
+        .unwrap();
+    discreteCategoryANumber
+        .add_morphism(object_3.clone())
+        .unwrap();
 
     // create a functor from lower to number
     let functor_lower_to_number = GenericNFunctor::new(
@@ -177,36 +195,36 @@ pub fn test_identity_cell_tree() {
         FunctorMappings::from_vec(
             &UNIT_FUNCTOR_STRING,
             vec![
-            // a to 1
-            (
-                discreteCategoryALower
-                    .get_identity_morphism(object_a.category_id())
-                    .unwrap(),
-                discreteCategoryANumber
-                    .get_identity_morphism(object_1.category_id())
-                    .unwrap(),
-            ),
-            // b to 2
-            (
-                discreteCategoryALower
-                    .get_identity_morphism(object_b.category_id())
-                    .unwrap(),
-                discreteCategoryANumber
-                    .get_identity_morphism(object_2.category_id())
-                    .unwrap(),
-            ),
-            // c to 3
-            (
-                discreteCategoryALower
-                    .get_identity_morphism(object_c.category_id())
-                    .unwrap(),
-                discreteCategoryANumber
-                    .get_identity_morphism(object_3.category_id())
-                    .unwrap(),
-            ),
-        ]),
+                // a to 1
+                (
+                    discreteCategoryALower
+                        .get_identity_morphism(object_a.category_id())
+                        .unwrap(),
+                    discreteCategoryANumber
+                        .get_identity_morphism(object_1.category_id())
+                        .unwrap(),
+                ),
+                // b to 2
+                (
+                    discreteCategoryALower
+                        .get_identity_morphism(object_b.category_id())
+                        .unwrap(),
+                    discreteCategoryANumber
+                        .get_identity_morphism(object_2.category_id())
+                        .unwrap(),
+                ),
+                // c to 3
+                (
+                    discreteCategoryALower
+                        .get_identity_morphism(object_c.category_id())
+                        .unwrap(),
+                    discreteCategoryANumber
+                        .get_identity_morphism(object_3.category_id())
+                        .unwrap(),
+                ),
+            ],
+        ),
     );
-
 
     let functor_number_to_upper = GenericNFunctor::new(
         "functor_lower_to_number".to_string(),
@@ -242,7 +260,8 @@ pub fn test_identity_cell_tree() {
                         .get_identity_morphism(object_c.category_id())
                         .unwrap(),
                 ),
-            ]),
+            ],
+        ),
     );
 
     // let actual_mapping = functor_lower_to_number.mappings().unwrap();
@@ -296,34 +315,35 @@ pub fn test_identity_cell_tree() {
         FunctorMappings::from_vec(
             &UNIT_FUNCTOR_STRING,
             vec![
-            // a to A
-            (
-                discreteCategoryALower
-                    .get_identity_morphism(object_a.category_id())
-                    .unwrap(),
-                discreteCategoryAUpper
-                    .get_identity_morphism(object_A.category_id())
-                    .unwrap(),
-            ),
-            // b to B
-            (
-                discreteCategoryALower
-                    .get_identity_morphism(object_b.category_id())
-                    .unwrap(),
-                discreteCategoryAUpper
-                    .get_identity_morphism(object_B.category_id())
-                    .unwrap(),
-            ),
-            // c to C
-            (
-                discreteCategoryALower
-                    .get_identity_morphism(object_c.category_id())
-                    .unwrap(),
-                discreteCategoryAUpper
-                    .get_identity_morphism(object_C.category_id())
-                    .unwrap(),
-            ),
-        ])
+                // a to A
+                (
+                    discreteCategoryALower
+                        .get_identity_morphism(object_a.category_id())
+                        .unwrap(),
+                    discreteCategoryAUpper
+                        .get_identity_morphism(object_A.category_id())
+                        .unwrap(),
+                ),
+                // b to B
+                (
+                    discreteCategoryALower
+                        .get_identity_morphism(object_b.category_id())
+                        .unwrap(),
+                    discreteCategoryAUpper
+                        .get_identity_morphism(object_B.category_id())
+                        .unwrap(),
+                ),
+                // c to C
+                (
+                    discreteCategoryALower
+                        .get_identity_morphism(object_c.category_id())
+                        .unwrap(),
+                    discreteCategoryAUpper
+                        .get_identity_morphism(object_C.category_id())
+                        .unwrap(),
+                ),
+            ],
+        ),
     );
 
     // // expected functor mapping

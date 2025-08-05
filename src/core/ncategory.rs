@@ -23,7 +23,7 @@ pub enum NCategoryError {
     InvalidFunctor,
     InvalidFunctorMappings,
     InvalidBaseFunctor,
-    CannotAddObjectInDiscreteCategoryOnlyIdentityMorphism
+    CannotAddObjectInDiscreteCategoryOnlyIdentityMorphism,
 }
 
 pub trait NCategory<'a>: Debug {
@@ -46,7 +46,6 @@ pub trait NCategory<'a>: Debug {
         &mut self,
         morphism: Self::Morphism,
     ) -> Result<Self::Identifier, NCategoryError>;
-
 
     fn get_identity_morphism(
         &self,

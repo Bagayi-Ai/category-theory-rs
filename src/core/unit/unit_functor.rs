@@ -56,16 +56,11 @@ pub const UNIT_FUNCTOR_STRING: UnitFunctor<String> = UnitFunctor {
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct UnitFunctor<
-    T: Identifier,
-> {
-    _phantom1: std::marker::PhantomData<T>
+pub struct UnitFunctor<T: Identifier> {
+    _phantom1: std::marker::PhantomData<T>,
 }
 
-
-impl<'a, T: Identifier + 'a> NFunctor<'a>
-    for UnitFunctor<T>
-{
+impl<'a, T: Identifier + 'a> NFunctor<'a> for UnitFunctor<T> {
     type Identifier = T;
     type SourceCategory = UnitCategory;
     type TargetCategory = UnitCategory;

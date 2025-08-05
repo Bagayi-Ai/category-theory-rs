@@ -1,5 +1,6 @@
 use crate::core::discrete_category::DiscreteCategory;
 use crate::core::identifier::Identifier;
+use crate::core::morphism::Morphism;
 use crate::core::ncategory::NCategory;
 use crate::core::nfunctor::NFunctor;
 use crate::core::unit::unit_category::UnitCategory;
@@ -8,7 +9,6 @@ use std::collections::HashMap;
 use std::fmt::{Debug, Display, Formatter};
 use std::rc::Rc;
 use std::sync::Arc;
-use crate::core::morphism::Morphism;
 
 pub struct FunctorMappings<'a, Id, SourceCategory, TargetCategory>
 where
@@ -23,11 +23,11 @@ where
     functor_mappings: HashMap<
         &'a <SourceCategory as NCategory<'a>>::Object,
         &'a dyn NFunctor<
-                    'a,
-                    Identifier = Id,
-                    SourceCategory = <SourceCategory as NCategory<'a>>::Object,
-                    TargetCategory = <TargetCategory as NCategory<'a>>::Object,
-                >,
+            'a,
+            Identifier = Id,
+            SourceCategory = <SourceCategory as NCategory<'a>>::Object,
+            TargetCategory = <TargetCategory as NCategory<'a>>::Object,
+        >,
     >,
 }
 

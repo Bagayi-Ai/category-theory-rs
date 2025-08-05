@@ -10,7 +10,7 @@ use std::fmt::{Debug, Display};
 use std::hash::Hash;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct UnitCategory{}
+pub struct UnitCategory {}
 
 impl<'a> NCategory<'a> for UnitCategory {
     type Identifier = UnitIdentifier;

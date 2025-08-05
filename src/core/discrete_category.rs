@@ -4,10 +4,10 @@ use crate::core::ncategory::{NCategory, NCategoryError};
 use crate::core::nfunctor::NFunctor;
 use crate::core::unit::unit_category::UnitCategory;
 use crate::core::unit::unit_functor::UnitFunctor;
+use crate::core::unit::unit_morphism::UnitMorphism;
 use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Display};
 use std::hash::{Hash, Hasher};
-use crate::core::unit::unit_morphism::UnitMorphism;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct DiscreteCategory<T: Identifier> {
@@ -148,11 +148,11 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> Morphism<'a>
     }
 
     fn source_object(&self) -> &Self::Object {
-        &UnitCategory{}
+        &UnitCategory {}
     }
 
     fn target_object(&self) -> &Self::Object {
-        &UnitCategory{}
+        &UnitCategory {}
     }
 
     fn is_identity(&self) -> bool {

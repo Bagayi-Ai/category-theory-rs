@@ -1,11 +1,9 @@
-use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
-use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::traits::arrow_trait::{ArrowMappingsTrait, ArrowTrait};
+use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
 use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 
-#[derive(Debug, PartialEq, Eq)]
 pub struct Arrow<'a, Id, SourceObject, TargetObject>
 where
     Id: Identifier,
@@ -15,13 +13,24 @@ where
     id: Id,
     source: &'a SourceObject,
     target: &'a TargetObject,
+    functor: ArrowMappingsTrait<'a, SourceObject::Object, TargetObject::Object>,
 }
 
 impl<'a, Id: Identifier, SourceObject: CategoryTrait<'a>, TargetObject: CategoryTrait<'a>>
     Arrow<'a, Id, SourceObject, TargetObject>
 {
-    pub fn new(id: Id, source: &'a SourceObject, target: &'a TargetObject) -> Self {
-        Arrow { id, source, target }
+    pub fn new(
+        id: Id,
+        source: &'a SourceObject,
+        target: &'a TargetObject,
+        functor: ArrowMappingsTrait<'a, SourceObject::Object, TargetObject::Object>,
+    ) -> Self {
+        Arrow {
+            id,
+            source,
+            target,
+            functor,
+        }
     }
 
     pub fn id(&self) -> &Id {
@@ -47,8 +56,6 @@ impl<'a, Id: Identifier + 'a, SourceObject: CategoryTrait<'a>, TargetObject: Cat
     type TargetObject = TargetObject;
     type Identifier = Id;
 
-    type Functor = Functor<'a, Self::Identifier, Self::SourceObject, Self::TargetObject>;
-
     fn cell_id(&self) -> &Self::Identifier {
         &self.id
     }
@@ -65,7 +72,16 @@ impl<'a, Id: Identifier + 'a, SourceObject: CategoryTrait<'a>, TargetObject: Cat
         todo!()
     }
 
-    fn functor(&self) -> &Self::Functor {
+    fn sub_arrow(
+        &self,
+    ) -> Result<
+        ArrowMappingsTrait<
+            'a,
+            <Self::SourceObject as CategoryTrait<'a>>::Object,
+            <Self::SourceObject as CategoryTrait<'a>>::Object,
+        >,
+        NCategoryError,
+    > {
         todo!()
     }
 }

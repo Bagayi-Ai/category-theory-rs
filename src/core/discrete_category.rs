@@ -1,9 +1,9 @@
+use crate::core::arrow::Arrow;
+use crate::core::arrow_mapping::ArrowMapping;
 use crate::core::identifier::Identifier;
-use crate::core::traits::arrow_trait::{ArrowTrait, DynArrowTraitType};
+use crate::core::traits::arrow_trait::{ArrowMappingsTrait, ArrowTrait};
 use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
-use crate::core::traits::functor_trait::FunctorTrait;
 use crate::core::unit::unit_category::UnitCategory;
-use crate::core::unit::unit_functor::{UNIT_FUNCTOR_STRING, UnitFunctor};
 use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Display};
 use std::hash::{Hash, Hasher};
@@ -141,7 +141,6 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> ArrowTrait<'a
     type Identifier = T;
     type SourceObject = UnitCategory;
     type TargetObject = UnitCategory;
-    type Functor = UnitFunctor<T>;
 
     fn cell_id(&self) -> &Self::Identifier {
         &self.category_id
@@ -159,7 +158,16 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> ArrowTrait<'a
         true
     }
 
-    fn functor(&self) -> &Self::Functor {
+    fn sub_arrow(
+        &self,
+    ) -> Result<
+        ArrowMappingsTrait<
+            'a,
+            <Self::SourceObject as CategoryTrait<'a>>::Object,
+            <Self::SourceObject as CategoryTrait<'a>>::Object,
+        >,
+        NCategoryError,
+    > {
         todo!()
     }
 }
@@ -178,38 +186,6 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + Display> From<Vec<T>> for Discr
             category.add_morphism(object).unwrap();
         }
         category
-    }
-}
-
-pub struct NArrowVec<'a>(pub Vec<&'a DynArrowTraitType<'a, String, UnitCategory, UnitCategory>>);
-
-impl<'a, SourceCategory: Identifier, TargetCategory: Identifier>
-    From<
-        Vec<(
-            &'a DiscreteCategory<SourceCategory>,
-            &'a DiscreteCategory<TargetCategory>,
-        )>,
-    > for NArrowVec<'a>
-{
-    fn from(
-        value: Vec<(
-            &'a DiscreteCategory<SourceCategory>,
-            &'a DiscreteCategory<TargetCategory>,
-        )>,
-    ) -> Self {
-        // let arrows = value
-        //     .into_iter()
-        //     .map(|(source, _target)| {
-        //         source as &dyn NArrow<
-        //             'a,
-        //             Identifier = String,
-        //             SourceObject = UnitCategory,
-        //             TargetObject = UnitCategory,
-        //         >
-        //     })
-        //     .collect();
-        // NArrowVec(arrows)
-        todo!()
     }
 }
 

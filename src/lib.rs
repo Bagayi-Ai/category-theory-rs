@@ -5,22 +5,17 @@ mod core {
 
     pub mod arrow;
 
-    pub mod functor;
-
-    pub mod morphism_tree;
-
     pub mod identifier;
+
+    pub mod arrow_mapping;
 
     pub mod traits {
         pub mod arrow_trait;
         pub mod category_trait;
-        pub mod functor_trait;
     }
 
     pub mod unit {
         pub mod unit_category;
-        pub mod unit_functor;
-
         pub mod unit_morphism;
 
         pub mod unit_identifier;

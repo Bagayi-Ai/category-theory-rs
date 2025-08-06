@@ -1,33 +1,15 @@
-use crate::core::traits::category_trait::CategoryTrait;
-use crate::core::traits::functor_trait::FunctorTrait;
-use std::fmt::Debug;
+use crate::core::discrete_category::DiscreteCategory;
+use crate::core::identifier::Identifier;
+use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
+use crate::core::unit::unit_category::UnitCategory;
+use std::fmt::{Debug, Display};
 
-pub type DynArrowTraitType<'a, ID, SC, TC> = dyn ArrowTrait<
-        'a,
-        SourceObject = <SC as CategoryTrait<'a>>::Object,
-        TargetObject = <TC as CategoryTrait<'a>>::Object,
-        Identifier = ID,
-        Functor = dyn FunctorTrait<
-            'a,
-            Identifier = ID,
-            SourceCategory = <SC as CategoryTrait<'a>>::Object,
-            TargetCategory = <TC as CategoryTrait<'a>>::Object,
-        >,
-    >;
-
-pub trait ArrowTrait<'a>: Debug {
+pub trait ArrowTrait<'a> {
     type SourceObject: CategoryTrait<'a>;
 
     type TargetObject: CategoryTrait<'a>;
 
     type Identifier;
-
-    type Functor: FunctorTrait<
-            'a,
-            Identifier = Self::Identifier,
-            SourceCategory = Self::SourceObject,
-            TargetCategory = Self::TargetObject,
-        >;
 
     fn cell_id(&self) -> &Self::Identifier;
 
@@ -37,5 +19,32 @@ pub trait ArrowTrait<'a>: Debug {
 
     fn is_identity(&self) -> bool;
 
-    fn functor(&self) -> &Self::Functor;
+    fn sub_arrow(
+        &self,
+    ) -> Result<
+        ArrowMappingsTrait<
+            'a,
+            <Self::SourceObject as CategoryTrait<'a>>::Object,
+            <Self::SourceObject as CategoryTrait<'a>>::Object,
+        >,
+        NCategoryError,
+    >;
 }
+
+pub trait ArrowMappingTrait<'a> {
+    type SourceArrow: ArrowTrait<'a>;
+
+    type TargetArrow: ArrowTrait<'a>;
+
+    fn source_arrow(&self) -> &Self::SourceArrow;
+
+    fn target_arrow(&self) -> &Self::TargetArrow;
+}
+
+pub type ArrowMappingsTrait<'a, SourceCategory, TargetCategory> = Vec<
+    &'a dyn ArrowMappingTrait<
+        'a,
+        SourceArrow = <SourceCategory as CategoryTrait<'a>>::Morphism,
+        TargetArrow = <TargetCategory as CategoryTrait<'a>>::Morphism,
+    >,
+>;

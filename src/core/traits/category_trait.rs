@@ -3,7 +3,6 @@ use std::fmt::Debug;
 use std::hash::Hash;
 
 use crate::core::identifier::Identifier;
-use crate::core::morphism_tree::MorphismMappingTree;
 use crate::core::traits::arrow_trait::ArrowTrait;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -26,9 +25,9 @@ pub enum NCategoryError {
     CannotAddObjectInDiscreteCategoryOnlyIdentityMorphism,
 }
 
-pub trait CategoryTrait<'a>: Debug {
+pub trait CategoryTrait<'a> {
     type Identifier: Identifier;
-    type Object: 'a + Eq + Debug + Hash + CategoryTrait<'a>;
+    type Object: 'a + CategoryTrait<'a>;
     type Morphism: ArrowTrait<
             'a,
             SourceObject = Self::Object,
@@ -83,34 +82,6 @@ pub trait CategoryTrait<'a>: Debug {
         morphism_id: &Self::Identifier,
     ) -> Result<&Self::Morphism, NCategoryError>;
 
-    fn get_morphism_tree(
-        &self,
-        cell_id: &Self::Morphism,
-    ) -> Result<MorphismMappingTree<'a, Self::Identifier, Self, Self>, NCategoryError>
-    where
-        Self: Sized,
-    {
-        /*
-        Cell tree is a recursive structure that represents the hierarchy of cells and mapping
-        of objects.
-        */
-
-        // let cell = self.get_cell(cell_id)?;
-        //
-        // let cell_tree = CellTree::new(
-        //     cell.id(),
-        //     cell.source_object_id(),
-        //     cell.target_object_id()
-        // );
-        //
-        // // Now take map all the cells in the base of source object
-        // let source_base_objects = self.base_object(cell.source_object_id())?;
-        // let all_source_base_cells = source_base_objects.get_all_cells()?;
-        //
-        //
-        // Ok(cell_tree)
-        todo!()
-    }
     fn morphism_commute(
         &self,
         left_morphisms: Vec<&Self::Morphism>,
@@ -126,65 +97,67 @@ pub trait CategoryTrait<'a>: Debug {
         left_morphisms: Vec<&Self::Morphism>,
         right_morphisms: Vec<&Self::Morphism>,
     ) -> Result<(), NCategoryError> {
-        // source and target of left cells id should be same with right cells
-        let left_source_object = left_morphisms
-            .first()
-            .ok_or(NCategoryError::InvalidMorphismCommutation)?
-            .source_object();
-        let right_source_object = right_morphisms
-            .first()
-            .ok_or(NCategoryError::InvalidMorphismCommutation)?
-            .source_object();
-
-        if left_source_object != right_source_object {
-            return Err(NCategoryError::InvalidMorphismComposition);
-        }
-
-        let left_target_object = left_morphisms
-            .first()
-            .ok_or(NCategoryError::InvalidMorphismCommutation)?
-            .target_object();
-        let right_target_object = right_morphisms
-            .first()
-            .ok_or(NCategoryError::InvalidMorphismCommutation)?
-            .target_object();
-
-        if left_target_object != right_target_object {
-            return Err(NCategoryError::InvalidMorphismComposition);
-        }
-
-        // confirm composition is correct
-        self.validate_morphisms_composition(left_morphisms)?;
-        self.validate_morphisms_composition(right_morphisms)?;
-
-        Ok(())
+        // // source and target of left cells id should be same with right cells
+        // let left_source_object = left_morphisms
+        //     .first()
+        //     .ok_or(NCategoryError::InvalidMorphismCommutation)?
+        //     .source_object();
+        // let right_source_object = right_morphisms
+        //     .first()
+        //     .ok_or(NCategoryError::InvalidMorphismCommutation)?
+        //     .source_object();
+        //
+        // if left_source_object != right_source_object {
+        //     return Err(NCategoryError::InvalidMorphismComposition);
+        // }
+        //
+        // let left_target_object = left_morphisms
+        //     .first()
+        //     .ok_or(NCategoryError::InvalidMorphismCommutation)?
+        //     .target_object();
+        // let right_target_object = right_morphisms
+        //     .first()
+        //     .ok_or(NCategoryError::InvalidMorphismCommutation)?
+        //     .target_object();
+        //
+        // if left_target_object != right_target_object {
+        //     return Err(NCategoryError::InvalidMorphismComposition);
+        // }
+        //
+        // // confirm composition is correct
+        // self.validate_morphisms_composition(left_morphisms)?;
+        // self.validate_morphisms_composition(right_morphisms)?;
+        //
+        // Ok(())
+        todo!()
     }
 
     fn validate_morphisms_composition(
         &self,
         morphims: Vec<&Self::Morphism>,
     ) -> Result<(), NCategoryError> {
-        if morphims.is_empty() {
-            return Err(NCategoryError::InvalidMorphismComposition);
-        }
-
-        // composition of only once cell is always valid
-        if morphims.len() <= 1 {
-            return Ok(());
-        }
-        // target of first cell needs to be the source of subsequent cell
-        let mut target_object = morphims
-            .first()
-            .ok_or(NCategoryError::InvalidMorphismComposition)?
-            .target_object();
-
-        for morphism in &morphims[1..] {
-            if morphism.source_object() != target_object {
-                return Err(NCategoryError::InvalidMorphismComposition);
-            }
-            target_object = morphism.target_object();
-        }
-        Ok(())
+        // if morphims.is_empty() {
+        //     return Err(NCategoryError::InvalidMorphismComposition);
+        // }
+        //
+        // // composition of only once cell is always valid
+        // if morphims.len() <= 1 {
+        //     return Ok(());
+        // }
+        // // target of first cell needs to be the source of subsequent cell
+        // let mut target_object = morphims
+        //     .first()
+        //     .ok_or(NCategoryError::InvalidMorphismComposition)?
+        //     .target_object();
+        //
+        // for morphism in &morphims[1..] {
+        //     if morphism.source_object() != target_object {
+        //         return Err(NCategoryError::InvalidMorphismComposition);
+        //     }
+        //     target_object = morphism.target_object();
+        // }
+        // Ok(())
+        todo!()
     }
 
     fn is_zero_category(&self) -> bool {

@@ -1,7 +1,7 @@
 use crate::core::identifier::Identifier;
-use crate::core::traits::arrow_trait::ArrowTrait;
+use crate::core::traits::arrow_trait::{ArrowMappingsTrait, ArrowTrait};
+use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
 use crate::core::unit::unit_category::UnitCategory;
-use crate::core::unit::unit_functor::UnitFunctor;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UnitMorphism<T: Identifier> {
@@ -12,8 +12,6 @@ impl<'a, T: Identifier + 'a> ArrowTrait<'a> for UnitMorphism<T> {
     type SourceObject = UnitCategory;
     type TargetObject = Self::SourceObject;
     type Identifier = T;
-
-    type Functor = UnitFunctor<T>;
 
     fn cell_id(&self) -> &Self::Identifier {
         todo!()
@@ -31,7 +29,16 @@ impl<'a, T: Identifier + 'a> ArrowTrait<'a> for UnitMorphism<T> {
         todo!()
     }
 
-    fn functor(&self) -> &Self::Functor {
+    fn sub_arrow(
+        &self,
+    ) -> Result<
+        ArrowMappingsTrait<
+            'a,
+            <Self::SourceObject as CategoryTrait<'a>>::Object,
+            <Self::SourceObject as CategoryTrait<'a>>::Object,
+        >,
+        NCategoryError,
+    > {
         todo!()
     }
 }

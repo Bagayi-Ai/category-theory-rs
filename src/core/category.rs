@@ -6,12 +6,7 @@ use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::hash::Hash;
 
-#[derive(Debug, PartialEq, Eq)]
-pub struct Category<
-    'a,
-    Id: Identifier<Id = Id> + 'a,
-    Object: CategoryTrait<'a, Identifier = Id> + Debug + Eq + Hash + Clone,
-> {
+pub struct Category<'a, Id: Identifier<Id = Id> + 'a, Object: CategoryTrait<'a, Identifier = Id>> {
     id: Id,
     objects: HashMap<Id, &'a Object>,
     object_mapping: HashMap<Id, HashMap<Id, HashSet<Id>>>,
@@ -34,11 +29,8 @@ impl<
     }
 }
 
-impl<
-    'a,
-    Id: Identifier<Id = Id> + 'a,
-    Object: CategoryTrait<'a, Identifier = Id> + 'a + Debug + Eq + Hash + Clone,
-> CategoryTrait<'a> for Category<'a, Id, Object>
+impl<'a, Id: Identifier<Id = Id> + 'a, Object: CategoryTrait<'a, Identifier = Id> + 'a>
+    CategoryTrait<'a> for Category<'a, Id, Object>
 {
     type Identifier = Id;
     type Object = Object;
@@ -49,10 +41,11 @@ impl<
     }
 
     fn add_object(&mut self, object: &'a Self::Object) -> Result<(), NCategoryError> {
-        self.objects.insert(object.category_id().clone(), object);
-        let identity_cell = Arrow::new(object.category_id().clone(), object, object);
-        self.add_morphism(identity_cell)?;
-        Ok(())
+        // self.objects.insert(object.category_id().clone(), object);
+        // let identity_cell = Arrow::new(object.category_id().clone(), object, object);
+        // self.add_morphism(identity_cell)?;
+        // Ok(())
+        todo!()
     }
 
     fn add_morphism(&mut self, cell: Self::Morphism) -> Result<Self::Identifier, NCategoryError> {

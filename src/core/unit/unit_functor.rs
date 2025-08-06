@@ -45,7 +45,6 @@
 // // }
 //
 
-use crate::core::functor_mapping::FunctorMappings;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::DynArrowTraitType;
 use crate::core::traits::category_trait::NCategoryError;
@@ -75,15 +74,6 @@ impl<'a, T: Identifier + 'a> FunctorTrait<'a> for UnitFunctor<T> {
     }
 
     fn target_category(&self) -> &Self::TargetCategory {
-        todo!()
-    }
-
-    fn mappings(
-        &self,
-    ) -> Result<
-        &FunctorMappings<'a, Self::Identifier, Self::SourceCategory, Self::TargetCategory>,
-        NCategoryError,
-    > {
         todo!()
     }
 

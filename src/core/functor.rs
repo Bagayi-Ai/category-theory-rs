@@ -1,5 +1,5 @@
-use crate::core::functor_mapping::FunctorMappings;
 use crate::core::identifier::Identifier;
+use crate::core::traits::arrow_trait::{ArrowTrait, DynArrowTraitType};
 use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
 use crate::core::traits::functor_trait::FunctorTrait;
 
@@ -12,7 +12,7 @@ pub struct Functor<
     id: Id,
     source_category: &'a SourceCategory,
     target_category: &'a TargetCategory,
-    mappings: FunctorMappings<'a, Id, SourceCategory, TargetCategory>,
+    arrows: Vec<&'a DynArrowTraitType<'a, Id, SourceCategory, TargetCategory>>,
 }
 
 impl<'a, Id, SourceCategory, TargetCategory> Functor<'a, Id, SourceCategory, TargetCategory>
@@ -25,13 +25,13 @@ where
         id: Id,
         source_category: &'a SourceCategory,
         target_category: &'a TargetCategory,
-        mappings: FunctorMappings<'a, Id, SourceCategory, TargetCategory>,
+        arrows: Vec<&'a DynArrowTraitType<'a, Id, SourceCategory, TargetCategory>>,
     ) -> Self {
         let functor = Functor {
             id,
             source_category,
             target_category,
-            mappings,
+            arrows,
         };
         functor
             .validate_level()
@@ -61,15 +61,6 @@ where
 
     fn target_category(&self) -> &Self::TargetCategory {
         self.target_category
-    }
-
-    fn mappings(
-        &self,
-    ) -> Result<
-        &FunctorMappings<'a, Self::Identifier, Self::SourceCategory, Self::TargetCategory>,
-        NCategoryError,
-    > {
-        Ok(&self.mappings)
     }
 
     fn morphisms(

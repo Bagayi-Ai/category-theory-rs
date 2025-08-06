@@ -1,6 +1,6 @@
 use crate::core::arrow::Arrow;
 use crate::core::category::*;
-use crate::core::discrete_category::DiscreteCategory;
+use crate::core::discrete_category::{DiscreteCategory, NArrowVec};
 use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::tests::ncategory_test_helper::*;
@@ -176,77 +176,79 @@ pub fn test_identity_cell_tree() {
         .add_morphism(object_3.clone())
         .unwrap();
 
+    let lower_to_numer_mapping: NArrowVec = vec![
+        // a to 1
+        (
+            discreteCategoryALower
+                .get_identity_morphism(object_a.category_id())
+                .unwrap(),
+            discreteCategoryANumber
+                .get_identity_morphism(object_1.category_id())
+                .unwrap(),
+        ),
+        // b to 2
+        (
+            discreteCategoryALower
+                .get_identity_morphism(object_b.category_id())
+                .unwrap(),
+            discreteCategoryANumber
+                .get_identity_morphism(object_2.category_id())
+                .unwrap(),
+        ),
+        // c to 3
+        (
+            discreteCategoryALower
+                .get_identity_morphism(object_c.category_id())
+                .unwrap(),
+            discreteCategoryANumber
+                .get_identity_morphism(object_3.category_id())
+                .unwrap(),
+        ),
+    ]
+    .into();
     // create a functor from lower to number
     let functor_lower_to_number = Functor::new(
         "functor_lower_to_number".to_string(),
         &discreteCategoryALower,
         &discreteCategoryANumber,
-        vec![
-            // a to 1
-            (
-                discreteCategoryALower
-                    .get_identity_morphism(object_a.category_id())
-                    .unwrap(),
-                discreteCategoryANumber
-                    .get_identity_morphism(object_1.category_id())
-                    .unwrap(),
-            ),
-            // b to 2
-            (
-                discreteCategoryALower
-                    .get_identity_morphism(object_b.category_id())
-                    .unwrap(),
-                discreteCategoryANumber
-                    .get_identity_morphism(object_2.category_id())
-                    .unwrap(),
-            ),
-            // c to 3
-            (
-                discreteCategoryALower
-                    .get_identity_morphism(object_c.category_id())
-                    .unwrap(),
-                discreteCategoryANumber
-                    .get_identity_morphism(object_3.category_id())
-                    .unwrap(),
-            ),
-        ]
-        .into(),
+        lower_to_numer_mapping.0,
     );
 
+    let number_to_upper_mapping: NArrowVec = vec![
+        // a to 1
+        (
+            discreteCategoryANumber
+                .get_identity_morphism(object_1.category_id())
+                .unwrap(),
+            discreteCategoryALower
+                .get_identity_morphism(object_a.category_id())
+                .unwrap(),
+        ),
+        // b to 2
+        (
+            discreteCategoryANumber
+                .get_identity_morphism(object_2.category_id())
+                .unwrap(),
+            discreteCategoryALower
+                .get_identity_morphism(object_b.category_id())
+                .unwrap(),
+        ),
+        // c to 3
+        (
+            discreteCategoryANumber
+                .get_identity_morphism(object_3.category_id())
+                .unwrap(),
+            discreteCategoryALower
+                .get_identity_morphism(object_c.category_id())
+                .unwrap(),
+        ),
+    ]
+    .into();
     let functor_number_to_upper = Functor::new(
         "functor_lower_to_number".to_string(),
         &discreteCategoryANumber,
         &discreteCategoryAUpper,
-        vec![
-            // a to 1
-            (
-                discreteCategoryANumber
-                    .get_identity_morphism(object_1.category_id())
-                    .unwrap(),
-                discreteCategoryALower
-                    .get_identity_morphism(object_a.category_id())
-                    .unwrap(),
-            ),
-            // b to 2
-            (
-                discreteCategoryANumber
-                    .get_identity_morphism(object_2.category_id())
-                    .unwrap(),
-                discreteCategoryALower
-                    .get_identity_morphism(object_b.category_id())
-                    .unwrap(),
-            ),
-            // c to 3
-            (
-                discreteCategoryANumber
-                    .get_identity_morphism(object_3.category_id())
-                    .unwrap(),
-                discreteCategoryALower
-                    .get_identity_morphism(object_c.category_id())
-                    .unwrap(),
-            ),
-        ]
-        .into(),
+        number_to_upper_mapping.0,
     );
 
     // let actual_mapping = functor_lower_to_number.mappings().unwrap();
@@ -293,40 +295,41 @@ pub fn test_identity_cell_tree() {
     // assert_eq!(actual_mapping, expected_mapping);
     //
     // create a functor1 from lower to upper
+    let lower_to_upper_mapping: NArrowVec = vec![
+        // a to A
+        (
+            discreteCategoryALower
+                .get_identity_morphism(object_a.category_id())
+                .unwrap(),
+            discreteCategoryAUpper
+                .get_identity_morphism(object_A.category_id())
+                .unwrap(),
+        ),
+        // b to B
+        (
+            discreteCategoryALower
+                .get_identity_morphism(object_b.category_id())
+                .unwrap(),
+            discreteCategoryAUpper
+                .get_identity_morphism(object_B.category_id())
+                .unwrap(),
+        ),
+        // c to C
+        (
+            discreteCategoryALower
+                .get_identity_morphism(object_c.category_id())
+                .unwrap(),
+            discreteCategoryAUpper
+                .get_identity_morphism(object_C.category_id())
+                .unwrap(),
+        ),
+    ]
+    .into();
     let functor_lower_to_upper = Functor::new(
         "functor_1".to_string(),
         &discreteCategoryALower,
         &discreteCategoryAUpper,
-        vec![
-            // a to A
-            (
-                discreteCategoryALower
-                    .get_identity_morphism(object_a.category_id())
-                    .unwrap(),
-                discreteCategoryAUpper
-                    .get_identity_morphism(object_A.category_id())
-                    .unwrap(),
-            ),
-            // b to B
-            (
-                discreteCategoryALower
-                    .get_identity_morphism(object_b.category_id())
-                    .unwrap(),
-                discreteCategoryAUpper
-                    .get_identity_morphism(object_B.category_id())
-                    .unwrap(),
-            ),
-            // c to C
-            (
-                discreteCategoryALower
-                    .get_identity_morphism(object_c.category_id())
-                    .unwrap(),
-                discreteCategoryAUpper
-                    .get_identity_morphism(object_C.category_id())
-                    .unwrap(),
-            ),
-        ]
-        .into(),
+        lower_to_upper_mapping.0,
     );
 
     // // expected functor mapping

@@ -7,8 +7,6 @@ mod core {
 
     pub mod functor;
 
-    pub mod functor_mapping;
-
     pub mod morphism_tree;
 
     pub mod identifier;

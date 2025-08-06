@@ -1,4 +1,3 @@
-use crate::core::functor_mapping::FunctorMappings;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::DynArrowTraitType;
 use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
@@ -21,16 +20,6 @@ pub trait FunctorTrait<'a>: 'a {
         Vec<
             &'a DynArrowTraitType<'a, Self::Identifier, Self::SourceCategory, Self::TargetCategory>,
         >,
-        NCategoryError,
-    >;
-
-    // for each mapping of a cell,
-    // there is a corresponding functor mapping of its base category
-    // to base category of the target category
-    fn mappings(
-        &self,
-    ) -> Result<
-        &FunctorMappings<'a, Self::Identifier, Self::SourceCategory, Self::TargetCategory>,
         NCategoryError,
     >;
 

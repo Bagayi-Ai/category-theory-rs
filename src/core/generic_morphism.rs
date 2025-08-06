@@ -6,7 +6,7 @@ use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 
 #[derive(Debug, PartialEq, Eq)]
-pub struct GenericMorphism<'a, Category>
+pub struct Arrow<'a, Category>
 where
     Category: CategoryTrait<'a>,
     <Category as CategoryTrait<'a>>::Object: Clone,
@@ -17,7 +17,7 @@ where
     name: String,
 }
 
-impl<'a, Category: CategoryTrait<'a>> GenericMorphism<'a, Category>
+impl<'a, Category: CategoryTrait<'a>> Arrow<'a, Category>
 where
     <Category as CategoryTrait<'a>>::Object: Clone,
 {
@@ -27,7 +27,7 @@ where
         target: &'a <Category as CategoryTrait<'a>>::Object,
         name: String,
     ) -> Self {
-        GenericMorphism {
+        Arrow {
             id,
             source,
             target,
@@ -44,7 +44,7 @@ where
     }
 }
 
-impl<'a, Category: CategoryTrait<'a>> Hash for GenericMorphism<'a, Category>
+impl<'a, Category: CategoryTrait<'a>> Hash for Arrow<'a, Category>
 where
     <Category as CategoryTrait<'a>>::Object: Clone,
     <Category as CategoryTrait<'a>>::Object: 'a,
@@ -57,7 +57,7 @@ where
     }
 }
 
-impl<'a, Category: CategoryTrait<'a> + Eq> ArrowTrait<'a> for GenericMorphism<'a, Category>
+impl<'a, Category: CategoryTrait<'a> + Eq> ArrowTrait<'a> for Arrow<'a, Category>
 where
     <Category as CategoryTrait<'a>>::Object: Clone + 'a + CategoryTrait<'a>,
     <Category as CategoryTrait<'a>>::Identifier: 'a,

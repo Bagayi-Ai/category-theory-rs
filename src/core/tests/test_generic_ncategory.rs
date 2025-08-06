@@ -1,6 +1,6 @@
 use crate::core::category::*;
 use crate::core::discrete_category::DiscreteCategory;
-use crate::core::generic_morphism::GenericMorphism;
+use crate::core::generic_morphism::Arrow;
 use crate::core::generic_nfunctor::GenericNFunctor;
 use crate::core::identifier::Identifier;
 use crate::core::tests::ncategory_test_helper::*;
@@ -95,7 +95,7 @@ pub fn test_base_scenarios() {
 
     // now add a cell between object1 and object2
     let cell_id = generate_identifier();
-    let cell = GenericMorphism::new(
+    let cell = Arrow::new(
         cell_id.clone(),
         &object1,
         &object2,

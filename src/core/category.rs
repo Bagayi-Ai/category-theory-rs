@@ -1,4 +1,4 @@
-use crate::core::generic_morphism::GenericMorphism;
+use crate::core::generic_morphism::Arrow;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
@@ -15,7 +15,7 @@ pub struct Category<
     id: Id,
     objects: HashMap<Id, &'a Object>,
     object_mapping: HashMap<Id, HashMap<Id, HashSet<Id>>>,
-    cells: HashMap<Id, GenericMorphism<'a, Self>>,
+    cells: HashMap<Id, Arrow<'a, Self>>,
 }
 
 impl<
@@ -42,7 +42,7 @@ impl<
 {
     type Identifier = Id;
     type Object = Object;
-    type Morphism = GenericMorphism<'a, Self>;
+    type Morphism = Arrow<'a, Self>;
 
     fn category_id(&self) -> &Self::Identifier {
         todo!()
@@ -50,7 +50,7 @@ impl<
 
     fn add_object(&mut self, object: &'a Self::Object) -> Result<(), NCategoryError> {
         self.objects.insert(object.category_id().clone(), object);
-        let identity_cell = GenericMorphism::new(
+        let identity_cell = Arrow::new(
             object.category_id().clone(),
             object,
             object,

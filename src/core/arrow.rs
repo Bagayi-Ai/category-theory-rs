@@ -13,7 +13,8 @@ where
     id: Id,
     source: &'a SourceObject,
     target: &'a TargetObject,
-    functor: Functor<'a, Id, SourceObject::Object, TargetObject::Object>,
+    functor: &'a Functor<'a, Id, SourceObject::Object, TargetObject::Object>,
+    identity: bool,
 }
 
 impl<'a, Id: Identifier, SourceObject: CategoryTrait<'a>, TargetObject: CategoryTrait<'a>>
@@ -23,18 +24,48 @@ impl<'a, Id: Identifier, SourceObject: CategoryTrait<'a>, TargetObject: Category
         id: Id,
         source: &'a SourceObject,
         target: &'a TargetObject,
-        functor: Functor<'a, Id, SourceObject::Object, TargetObject::Object>,
+        functor: &'a Functor<'a, Id, SourceObject::Object, TargetObject::Object>,
     ) -> Self {
         Arrow {
             id,
             source,
             target,
             functor,
+            identity: false,
         }
     }
 
+    // pub fn new_identity(
+    //     id: Id,
+    //     object: &'a SourceObject,
+    // ) -> Self {
+    //     Arrow {
+    //         id,
+    //         source: object,
+    //         target: object,
+    //         functor: Functor::identity(id, object),
+    //         identity: true,
+    //     }
+    // }
+
     pub fn id(&self) -> &Id {
         &self.id
+    }
+}
+
+impl<'a, Id: Identifier, Object: CategoryTrait<'a, Identifier = Id>>
+Arrow<'a, Id, Object, Object>
+{
+    pub fn new_identity_arrow(
+        object: &'a Object,
+    ) -> Self {
+        Arrow {
+            id: object.category_id().clone(),
+            source: object,
+            target: object,
+            functor: object.identity_endofunctor(),
+            identity: true,
+        }
     }
 }
 

@@ -4,6 +4,7 @@ use crate::core::unit::unit_morphism::UnitMorphism;
 use std::collections::HashSet;
 use std::fmt::Debug;
 use std::hash::Hash;
+use crate::core::traits::arrow_trait::Functor;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UnitCategory {}
@@ -16,6 +17,10 @@ impl<'a> CategoryTrait<'a> for UnitCategory {
     type Morphism = UnitMorphism<UnitIdentifier>;
 
     fn category_id(&self) -> &Self::Identifier {
+        todo!()
+    }
+
+    fn identity_endofunctor(&self) -> &Functor<'a, Self::Identifier, Self::Object, Self::Object> {
         todo!()
     }
 

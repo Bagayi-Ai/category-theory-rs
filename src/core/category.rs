@@ -1,6 +1,6 @@
 use crate::core::arrow::Arrow;
 use crate::core::identifier::Identifier;
-use crate::core::traits::arrow_trait::ArrowTrait;
+use crate::core::traits::arrow_trait::{ArrowTrait, Functor};
 use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
@@ -40,12 +40,15 @@ impl<'a, Id: Identifier<Id = Id> + 'a, Object: CategoryTrait<'a, Identifier = Id
         todo!()
     }
 
-    fn add_object(&mut self, object: &'a Self::Object) -> Result<(), NCategoryError> {
-        // self.objects.insert(object.category_id().clone(), object);
-        // let identity_cell = Arrow::new(object.category_id().clone(), object, object);
-        // self.add_morphism(identity_cell)?;
-        // Ok(())
+    fn identity_endofunctor(&self) -> &Functor<'a, Self::Identifier, Self::Object, Self::Object> {
         todo!()
+    }
+
+    fn add_object(&mut self, object: &'a Self::Object) -> Result<(), NCategoryError> {
+        self.objects.insert(object.category_id().clone(), object);
+        let identity_cell = Arrow::new_identity_arrow(object);
+        self.add_morphism(identity_cell)?;
+        Ok(())
     }
 
     fn add_morphism(&mut self, cell: Self::Morphism) -> Result<Self::Identifier, NCategoryError> {

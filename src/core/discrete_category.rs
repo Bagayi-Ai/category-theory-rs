@@ -60,6 +60,10 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> Ca
         &self.category_id
     }
 
+    fn identity_endofunctor(&self) -> &Functor<'a, Self::Identifier, Self::Object, Self::Object> {
+        todo!()
+    }
+
     fn add_object(&mut self, object: &Self::Object) -> Result<(), NCategoryError> {
         Err(NCategoryError::CannotAddObjectInDiscreteCategoryOnlyIdentityMorphism)
     }

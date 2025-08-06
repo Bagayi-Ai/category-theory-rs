@@ -1,10 +1,10 @@
 use crate::core::identifier::Identifier;
-use crate::core::ncategory::NCategory;
+use crate::core::traits::category_trait::CategoryTrait;
 
 pub trait Arrow<'a>: 'a {
-    type SourceObject: NCategory<'a>;
+    type SourceObject: CategoryTrait<'a>;
 
-    type TargetObject: NCategory<'a>;
+    type TargetObject: CategoryTrait<'a>;
 
     type Identifier: Identifier;
 
@@ -19,15 +19,15 @@ pub trait Arrow<'a>: 'a {
 
 pub trait SubArrow<'a>: 'a {
     type Identifier: Identifier;
-    type SourceObject: NCategory<'a>;
-    type TargetObject: NCategory<'a>;
+    type SourceObject: CategoryTrait<'a>;
+    type TargetObject: CategoryTrait<'a>;
 
     fn sub_arrow(
         &self,
     ) -> &dyn Arrow<
         'a,
         Identifier = Self::Identifier,
-        SourceObject = <Self::SourceObject as NCategory<'a>>::Object,
-        TargetObject = <Self::TargetObject as NCategory<'a>>::Object,
+        SourceObject = <Self::SourceObject as CategoryTrait<'a>>::Object,
+        TargetObject = <Self::TargetObject as CategoryTrait<'a>>::Object,
     >;
 }

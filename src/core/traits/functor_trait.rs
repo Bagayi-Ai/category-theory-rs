@@ -1,11 +1,11 @@
 use crate::core::functor_mapping::FunctorMappings;
 use crate::core::identifier::Identifier;
 use crate::core::traits::morphism_trait::MorphismTrait;
-use crate::core::ncategory::{NCategory, NCategoryError};
+use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
 
-pub trait NFunctor<'a>: 'a {
-    type SourceCategory: NCategory<'a>;
-    type TargetCategory: NCategory<'a>;
+pub trait FunctorTrait<'a>: 'a {
+    type SourceCategory: CategoryTrait<'a>;
+    type TargetCategory: CategoryTrait<'a>;
 
     type Identifier: Identifier;
 

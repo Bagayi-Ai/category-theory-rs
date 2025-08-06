@@ -1,13 +1,13 @@
 use crate::core::functor_mapping::FunctorMappings;
 use crate::core::identifier::Identifier;
-use crate::core::ncategory::{NCategory, NCategoryError};
-use crate::core::nfunctor::NFunctor;
+use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
+use crate::core::traits::functor_trait::FunctorTrait;
 
 pub struct GenericNFunctor<
     'a,
     Id: Identifier,
-    SourceCategory: NCategory<'a>,
-    TargetCategory: NCategory<'a>,
+    SourceCategory: CategoryTrait<'a>,
+    TargetCategory: CategoryTrait<'a>,
 > {
     id: Id,
     source_category: &'a SourceCategory,
@@ -17,8 +17,8 @@ pub struct GenericNFunctor<
 
 impl<'a, Id, SourceCategory, TargetCategory> GenericNFunctor<'a, Id, SourceCategory, TargetCategory>
 where
-    SourceCategory: NCategory<'a>,
-    TargetCategory: NCategory<'a>,
+    SourceCategory: CategoryTrait<'a>,
+    TargetCategory: CategoryTrait<'a>,
     Id: Identifier + 'a,
 {
     pub fn new(
@@ -40,11 +40,11 @@ where
     }
 }
 
-impl<'a, Id, SourceCategory, TargetCategory> NFunctor<'a>
+impl<'a, Id, SourceCategory, TargetCategory> FunctorTrait<'a>
     for GenericNFunctor<'a, Id, SourceCategory, TargetCategory>
 where
-    SourceCategory: NCategory<'a>,
-    TargetCategory: NCategory<'a>,
+    SourceCategory: CategoryTrait<'a>,
+    TargetCategory: CategoryTrait<'a>,
     Id: Identifier + 'a,
 {
     type SourceCategory = SourceCategory;

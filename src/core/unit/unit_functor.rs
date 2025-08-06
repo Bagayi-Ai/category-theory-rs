@@ -47,8 +47,8 @@
 
 use crate::core::functor_mapping::FunctorMappings;
 use crate::core::identifier::Identifier;
-use crate::core::ncategory::NCategoryError;
-use crate::core::nfunctor::NFunctor;
+use crate::core::traits::category_trait::NCategoryError;
+use crate::core::traits::functor_trait::FunctorTrait;
 use crate::core::unit::unit_category::UnitCategory;
 
 pub const UNIT_FUNCTOR_STRING: UnitFunctor<String> = UnitFunctor {
@@ -60,7 +60,7 @@ pub struct UnitFunctor<T: Identifier> {
     _phantom1: std::marker::PhantomData<T>,
 }
 
-impl<'a, T: Identifier + 'a> NFunctor<'a> for UnitFunctor<T> {
+impl<'a, T: Identifier + 'a> FunctorTrait<'a> for UnitFunctor<T> {
     type Identifier = T;
     type SourceCategory = UnitCategory;
     type TargetCategory = UnitCategory;

@@ -1,6 +1,4 @@
 mod core {
-    pub mod ncategory;
-
     pub mod generic_ncategory;
 
     pub mod discrete_category;
@@ -10,8 +8,6 @@ mod core {
     pub mod generic_nfunctor;
 
     pub mod functor_mapping;
-
-    pub mod nfunctor;
 
     pub mod morphism_tree;
 
@@ -23,6 +19,8 @@ mod core {
 
     pub mod traits {
         pub mod morphism_trait;
+        pub mod functor_trait;
+        pub mod category_trait;
     }
 
     pub mod unit {

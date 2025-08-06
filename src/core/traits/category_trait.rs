@@ -26,9 +26,9 @@ pub enum NCategoryError {
     CannotAddObjectInDiscreteCategoryOnlyIdentityMorphism,
 }
 
-pub trait NCategory<'a>: Debug {
+pub trait CategoryTrait<'a>: Debug {
     type Identifier: Identifier;
-    type Object: 'a + Eq + Debug + Hash + NCategory<'a>;
+    type Object: 'a + Eq + Debug + Hash + CategoryTrait<'a>;
     type Morphism: MorphismTrait<'a, Object = Self::Object, Identifier = Self::Identifier>;
 
     fn level(&self) -> usize
@@ -190,6 +190,6 @@ pub trait NCategory<'a>: Debug {
     where
         Self: Sized,
     {
-        1 + <Self::Object as NCategory>::nested_level()
+        1 + <Self::Object as CategoryTrait>::nested_level()
     }
 }

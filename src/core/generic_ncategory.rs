@@ -1,7 +1,7 @@
 use crate::core::generic_morphism::GenericMorphism;
 use crate::core::identifier::Identifier;
 use crate::core::traits::morphism_trait::MorphismTrait;
-use crate::core::ncategory::{NCategory, NCategoryError};
+use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::hash::Hash;
@@ -10,7 +10,7 @@ use std::hash::Hash;
 pub struct GenericNCategory<
     'a,
     Id: Identifier<Id = Id> + 'a,
-    Category: NCategory<'a, Identifier = Id> + Debug + Eq + Hash + Clone,
+    Category: CategoryTrait<'a, Identifier = Id> + Debug + Eq + Hash + Clone,
 > {
     id: Id,
     objects: HashMap<Id, &'a Category>,
@@ -21,7 +21,7 @@ pub struct GenericNCategory<
 impl<
     'a,
     Id: Identifier<Id = Id>,
-    Category: NCategory<'a, Identifier = Id> + Debug + Eq + Hash + Clone,
+    Category: CategoryTrait<'a, Identifier = Id> + Debug + Eq + Hash + Clone,
 > GenericNCategory<'a, Id, Category>
 {
     pub fn new() -> Self {
@@ -37,8 +37,8 @@ impl<
 impl<
     'a,
     Id: Identifier<Id = Id> + 'a,
-    Category: NCategory<'a, Identifier = Id> + 'a + Debug + Eq + Hash + Clone,
-> NCategory<'a> for GenericNCategory<'a, Id, Category>
+    Category: CategoryTrait<'a, Identifier = Id> + 'a + Debug + Eq + Hash + Clone,
+> CategoryTrait<'a> for GenericNCategory<'a, Id, Category>
 {
     type Identifier = Id;
     type Object = Category;

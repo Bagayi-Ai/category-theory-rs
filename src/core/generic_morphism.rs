@@ -1,30 +1,30 @@
 use crate::core::generic_nfunctor::GenericNFunctor;
 use crate::core::identifier::Identifier;
 use crate::core::traits::morphism_trait::MorphismTrait;
-use crate::core::ncategory::NCategory;
+use crate::core::traits::category_trait::CategoryTrait;
 use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct GenericMorphism<'a, Category>
 where
-    Category: NCategory<'a>,
-    <Category as NCategory<'a>>::Object: Clone,
+    Category: CategoryTrait<'a>,
+    <Category as CategoryTrait<'a>>::Object: Clone,
 {
-    id: <Category as NCategory<'a>>::Identifier,
-    source: &'a <Category as NCategory<'a>>::Object,
-    target: &'a <Category as NCategory<'a>>::Object,
+    id: <Category as CategoryTrait<'a>>::Identifier,
+    source: &'a <Category as CategoryTrait<'a>>::Object,
+    target: &'a <Category as CategoryTrait<'a>>::Object,
     name: String,
 }
 
-impl<'a, Category: NCategory<'a>> GenericMorphism<'a, Category>
+impl<'a, Category: CategoryTrait<'a>> GenericMorphism<'a, Category>
 where
-    <Category as NCategory<'a>>::Object: Clone,
+    <Category as CategoryTrait<'a>>::Object: Clone,
 {
     pub fn new(
-        id: <Category as NCategory<'a>>::Identifier,
-        source: &'a <Category as NCategory<'a>>::Object,
-        target: &'a <Category as NCategory<'a>>::Object,
+        id: <Category as CategoryTrait<'a>>::Identifier,
+        source: &'a <Category as CategoryTrait<'a>>::Object,
+        target: &'a <Category as CategoryTrait<'a>>::Object,
         name: String,
     ) -> Self {
         GenericMorphism {
@@ -35,7 +35,7 @@ where
         }
     }
 
-    pub fn id(&self) -> &<Category as NCategory<'a>>::Identifier {
+    pub fn id(&self) -> &<Category as CategoryTrait<'a>>::Identifier {
         &self.id
     }
 
@@ -44,10 +44,10 @@ where
     }
 }
 
-impl<'a, Category: NCategory<'a>> Hash for GenericMorphism<'a, Category>
+impl<'a, Category: CategoryTrait<'a>> Hash for GenericMorphism<'a, Category>
 where
-    <Category as NCategory<'a>>::Object: Clone,
-    <Category as NCategory<'a>>::Object: 'a,
+    <Category as CategoryTrait<'a>>::Object: Clone,
+    <Category as CategoryTrait<'a>>::Object: 'a,
 {
     fn hash<H>(&self, _: &mut H)
     where
@@ -57,19 +57,19 @@ where
     }
 }
 
-impl<'a, Category: NCategory<'a> + Eq> MorphismTrait<'a> for GenericMorphism<'a, Category>
+impl<'a, Category: CategoryTrait<'a> + Eq> MorphismTrait<'a> for GenericMorphism<'a, Category>
 where
-    <Category as NCategory<'a>>::Object: Clone + 'a + NCategory<'a>,
-    <Category as NCategory<'a>>::Identifier: 'a,
+    <Category as CategoryTrait<'a>>::Object: Clone + 'a + CategoryTrait<'a>,
+    <Category as CategoryTrait<'a>>::Identifier: 'a,
 {
-    type Object = <Category as NCategory<'a>>::Object;
-    type Identifier = <Category as NCategory<'a>>::Identifier;
+    type Object = <Category as CategoryTrait<'a>>::Object;
+    type Identifier = <Category as CategoryTrait<'a>>::Identifier;
 
     type Functor = GenericNFunctor<
         'a,
         Self::Identifier,
-        <Self::Object as NCategory<'a>>::Object,
-        <Self::Object as NCategory<'a>>::Object,
+        <Self::Object as CategoryTrait<'a>>::Object,
+        <Self::Object as CategoryTrait<'a>>::Object,
     >;
 
     fn cell_id(&self) -> &Self::Identifier {

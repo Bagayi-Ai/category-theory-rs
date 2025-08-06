@@ -1,24 +1,24 @@
 use std::fmt::Debug;
 
 use crate::core::identifier::Identifier;
-use crate::core::ncategory::NCategory;
+use crate::core::traits::category_trait::CategoryTrait;
 
 pub trait MorphismMappingTreeTrait<'a>: Debug {
-    type SourceCategory: NCategory<'a>;
-    type TargetCategory: NCategory<'a>;
+    type SourceCategory: CategoryTrait<'a>;
+    type TargetCategory: CategoryTrait<'a>;
     type Id: Identifier;
 
     fn id(&self) -> &Self::Id;
-    fn source_cell(&self) -> &<Self::SourceCategory as NCategory<'a>>::Morphism;
-    fn target_cell(&self) -> &<Self::TargetCategory as NCategory<'a>>::Morphism;
+    fn source_cell(&self) -> &<Self::SourceCategory as CategoryTrait<'a>>::Morphism;
+    fn target_cell(&self) -> &<Self::TargetCategory as CategoryTrait<'a>>::Morphism;
 }
 
 #[derive(Debug)]
 pub struct MorphismMappingTree<
     'a,
     Id: Identifier,
-    SourceCategory: NCategory<'a>,
-    TargetCategory: NCategory<'a>,
+    SourceCategory: CategoryTrait<'a>,
+    TargetCategory: CategoryTrait<'a>,
 > {
     id: &'a Id,
     source_cell: &'a SourceCategory::Morphism,
@@ -27,15 +27,15 @@ pub struct MorphismMappingTree<
         Box<
             dyn MorphismMappingTreeTrait<
                     'a,
-                    SourceCategory = <SourceCategory as NCategory<'a>>::Object,
-                    TargetCategory = <TargetCategory as NCategory<'a>>::Object,
+                    SourceCategory = <SourceCategory as CategoryTrait<'a>>::Object,
+                    TargetCategory = <TargetCategory as CategoryTrait<'a>>::Object,
                     Id = Id,
                 >,
         >,
     >,
 }
 
-impl<'a, Id: Identifier, SourceCategory: NCategory<'a>, TargetCategory: NCategory<'a>>
+impl<'a, Id: Identifier, SourceCategory: CategoryTrait<'a>, TargetCategory: CategoryTrait<'a>>
     MorphismMappingTree<'a, Id, SourceCategory, TargetCategory>
 {
     pub fn new(
@@ -59,8 +59,8 @@ impl<'a, Id: Identifier, SourceCategory: NCategory<'a>, TargetCategory: NCategor
             Box<
                 dyn MorphismMappingTreeTrait<
                         'a,
-                        SourceCategory = <SourceCategory as NCategory<'a>>::Object,
-                        TargetCategory = <TargetCategory as NCategory<'a>>::Object,
+                        SourceCategory = <SourceCategory as CategoryTrait<'a>>::Object,
+                        TargetCategory = <TargetCategory as CategoryTrait<'a>>::Object,
                         Id = Id,
                     >,
             >,
@@ -85,16 +85,16 @@ impl<'a, Id: Identifier, SourceCategory: NCategory<'a>, TargetCategory: NCategor
         self.id
     }
 
-    pub fn source_cell(&self) -> &<SourceCategory as NCategory<'a>>::Morphism {
+    pub fn source_cell(&self) -> &<SourceCategory as CategoryTrait<'a>>::Morphism {
         self.source_cell()
     }
 
-    pub fn target_cell_id(&self) -> &<TargetCategory as NCategory<'a>>::Morphism {
+    pub fn target_cell_id(&self) -> &<TargetCategory as CategoryTrait<'a>>::Morphism {
         self.target_cell
     }
 }
 
-impl<'a, Id: Identifier, SourceCategory: NCategory<'a>, TargetCategory: NCategory<'a>>
+impl<'a, Id: Identifier, SourceCategory: CategoryTrait<'a>, TargetCategory: CategoryTrait<'a>>
     MorphismMappingTreeTrait<'a> for MorphismMappingTree<'a, Id, SourceCategory, TargetCategory>
 {
     type SourceCategory = SourceCategory;
@@ -105,11 +105,11 @@ impl<'a, Id: Identifier, SourceCategory: NCategory<'a>, TargetCategory: NCategor
         self.id
     }
 
-    fn source_cell(&self) -> &<Self::SourceCategory as NCategory<'a>>::Morphism {
+    fn source_cell(&self) -> &<Self::SourceCategory as CategoryTrait<'a>>::Morphism {
         self.source_cell
     }
 
-    fn target_cell(&self) -> &<Self::TargetCategory as NCategory<'a>>::Morphism {
+    fn target_cell(&self) -> &<Self::TargetCategory as CategoryTrait<'a>>::Morphism {
         self.target_cell
     }
 }

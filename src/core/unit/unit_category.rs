@@ -1,4 +1,4 @@
-use crate::core::ncategory::{NCategory, NCategoryError};
+use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
 use crate::core::unit::unit_identifier::UnitIdentifier;
 use crate::core::unit::unit_morphism::UnitMorphism;
 use std::collections::HashSet;
@@ -8,7 +8,7 @@ use std::hash::Hash;
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UnitCategory {}
 
-impl<'a> NCategory<'a> for UnitCategory {
+impl<'a> CategoryTrait<'a> for UnitCategory {
     type Identifier = UnitIdentifier;
 
     type Object = Self;

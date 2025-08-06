@@ -1,29 +1,29 @@
 use crate::core::discrete_category::DiscreteCategory;
 use crate::core::identifier::Identifier;
 use crate::core::traits::morphism_trait::MorphismTrait;
-use crate::core::ncategory::NCategory;
-use crate::core::nfunctor::NFunctor;
+use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::traits::functor_trait::FunctorTrait;
 use crate::core::unit::unit_functor::UNIT_FUNCTOR_STRING;
 use std::collections::HashMap;
 use std::fmt::{Debug, Display, Formatter};
 
 pub struct FunctorMappings<'a, Id, SourceCategory, TargetCategory>
 where
-    SourceCategory: NCategory<'a>,
-    TargetCategory: NCategory<'a>,
+    SourceCategory: CategoryTrait<'a>,
+    TargetCategory: CategoryTrait<'a>,
     Id: Identifier,
 {
     morphism_mappings: HashMap<
-        &'a <SourceCategory as NCategory<'a>>::Morphism,
-        &'a <TargetCategory as NCategory<'a>>::Morphism,
+        &'a <SourceCategory as CategoryTrait<'a>>::Morphism,
+        &'a <TargetCategory as CategoryTrait<'a>>::Morphism,
     >,
     functor_mappings: HashMap<
-        &'a <SourceCategory as NCategory<'a>>::Object,
-        &'a dyn NFunctor<
+        &'a <SourceCategory as CategoryTrait<'a>>::Object,
+        &'a dyn FunctorTrait<
             'a,
             Identifier = Id,
-            SourceCategory = <SourceCategory as NCategory<'a>>::Object,
-            TargetCategory = <TargetCategory as NCategory<'a>>::Object,
+            SourceCategory = <SourceCategory as CategoryTrait<'a>>::Object,
+            TargetCategory = <TargetCategory as CategoryTrait<'a>>::Object,
         >,
     >,
 }
@@ -31,8 +31,8 @@ where
 impl<'a, SourceCategory, TargetCategory, Id> Debug
     for FunctorMappings<'a, Id, SourceCategory, TargetCategory>
 where
-    SourceCategory: NCategory<'a>,
-    TargetCategory: NCategory<'a>,
+    SourceCategory: CategoryTrait<'a>,
+    TargetCategory: CategoryTrait<'a>,
     Id: Identifier,
 {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
@@ -43,8 +43,8 @@ where
 impl<'a, SourceCategory, TargetCategory, Id> PartialEq
     for FunctorMappings<'a, Id, SourceCategory, TargetCategory>
 where
-    SourceCategory: NCategory<'a>,
-    TargetCategory: NCategory<'a>,
+    SourceCategory: CategoryTrait<'a>,
+    TargetCategory: CategoryTrait<'a>,
     Id: Identifier,
 {
     fn eq(&self, other: &Self) -> bool {
@@ -54,8 +54,8 @@ where
 
 impl<'a, SourceCategory, TargetCategory, Id> FunctorMappings<'a, Id, SourceCategory, TargetCategory>
 where
-    SourceCategory: NCategory<'a>,
-    TargetCategory: NCategory<'a>,
+    SourceCategory: CategoryTrait<'a>,
+    TargetCategory: CategoryTrait<'a>,
     Id: Identifier,
 {
     pub fn new() -> Self {
@@ -65,8 +65,8 @@ where
     pub fn get_morphism_mapping(
         &self,
     ) -> &HashMap<
-        &'a <SourceCategory as NCategory<'a>>::Morphism,
-        &'a <TargetCategory as NCategory<'a>>::Morphism,
+        &'a <SourceCategory as CategoryTrait<'a>>::Morphism,
+        &'a <TargetCategory as CategoryTrait<'a>>::Morphism,
     > {
         &self.morphism_mappings
     }
@@ -74,12 +74,12 @@ where
     pub fn get_functor_mappings(
         &self,
     ) -> &HashMap<
-        &'a <SourceCategory as NCategory<'a>>::Object,
-        &'a dyn NFunctor<
+        &'a <SourceCategory as CategoryTrait<'a>>::Object,
+        &'a dyn FunctorTrait<
             'a,
             Identifier = Id,
-            SourceCategory = <SourceCategory as NCategory<'a>>::Object,
-            TargetCategory = <TargetCategory as NCategory<'a>>::Object,
+            SourceCategory = <SourceCategory as CategoryTrait<'a>>::Object,
+            TargetCategory = <TargetCategory as CategoryTrait<'a>>::Object,
         >,
     > {
         &self.functor_mappings
@@ -107,12 +107,12 @@ impl<
     ) -> Self {
         let mut morphism_mappings = HashMap::new();
         let mut functor_mappings: HashMap<
-            &'a <DiscreteCategory<SourceObject> as NCategory<'a>>::Object,
-            &'a dyn NFunctor<
+            &'a <DiscreteCategory<SourceObject> as CategoryTrait<'a>>::Object,
+            &'a dyn FunctorTrait<
                 'a,
                 Identifier = String,
-                SourceCategory = <DiscreteCategory<SourceObject> as NCategory<'a>>::Object,
-                TargetCategory = <DiscreteCategory<TargetObject> as NCategory<'a>>::Object,
+                SourceCategory = <DiscreteCategory<SourceObject> as CategoryTrait<'a>>::Object,
+                TargetCategory = <DiscreteCategory<TargetObject> as CategoryTrait<'a>>::Object,
             >,
         > = HashMap::new();
 

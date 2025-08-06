@@ -4,7 +4,7 @@ use crate::core::generic_ncategory::*;
 use crate::core::generic_nfunctor::GenericNFunctor;
 use crate::core::identifier::Identifier;
 use crate::core::traits::morphism_trait::MorphismTrait;
-use crate::core::ncategory::NCategory;
+use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::tests::ncategory_test_helper::*;
 
 type DiscreteCategoryString = DiscreteCategory<String>;
@@ -39,7 +39,7 @@ pub fn test_base_scenarios() {
     let mut category = GenericNCategory::new();
     // add object 1
     let object1 = generate_object();
-    let object1_id = NCategory::category_id(&object1).clone();
+    let object1_id = CategoryTrait::category_id(&object1).clone();
     let object2_id = generate_identifier();
 
     category.add_object(&object1).unwrap();
@@ -68,7 +68,7 @@ pub fn test_base_scenarios() {
     // add object 2
     let object2 = generate_object();
     category.add_object(&object2).unwrap();
-    let object2_id = NCategory::category_id(&object2).clone();
+    let object2_id = CategoryTrait::category_id(&object2).clone();
 
     // check identity morphism
     let cells = category.get_object_morphisms(object2.category_id());
@@ -81,7 +81,7 @@ pub fn test_base_scenarios() {
 
     // add object 3
     let object3 = generate_object();
-    let object3_id = NCategory::category_id(&object3);
+    let object3_id = CategoryTrait::category_id(&object3);
     category.add_object(&object3);
 
     // check identity morphism

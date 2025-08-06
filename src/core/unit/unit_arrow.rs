@@ -1,6 +1,6 @@
 use crate::core::arrow::{Arrow, SubArrow};
 use crate::core::identifier::Identifier;
-use crate::core::ncategory::NCategory;
+use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::unit::unit_category::UnitCategory;
 
 pub struct UnitArrow<T: Identifier> {
@@ -39,8 +39,8 @@ impl<'a, T: Identifier + 'a> SubArrow<'a> for UnitArrow<T> {
     ) -> &dyn Arrow<
         'a,
         Identifier = Self::Identifier,
-        SourceObject = <Self::SourceObject as NCategory<'a>>::Object,
-        TargetObject = <Self::TargetObject as NCategory<'a>>::Object,
+        SourceObject = <Self::SourceObject as CategoryTrait<'a>>::Object,
+        TargetObject = <Self::TargetObject as CategoryTrait<'a>>::Object,
     > {
         todo!()
     }

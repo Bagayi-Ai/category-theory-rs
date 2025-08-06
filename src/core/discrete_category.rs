@@ -1,6 +1,6 @@
 use crate::core::identifier::Identifier;
 use crate::core::traits::morphism_trait::MorphismTrait;
-use crate::core::ncategory::{NCategory, NCategoryError};
+use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
 use crate::core::unit::unit_category::UnitCategory;
 use crate::core::unit::unit_functor::UnitFunctor;
 use std::collections::{HashMap, HashSet};
@@ -48,7 +48,7 @@ impl<T: Eq + Clone + Debug + Hash + Identifier> DiscreteCategory<T> {
     }
 }
 
-impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> NCategory<'a>
+impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> CategoryTrait<'a>
     for DiscreteCategory<T>
 {
     type Identifier = T;

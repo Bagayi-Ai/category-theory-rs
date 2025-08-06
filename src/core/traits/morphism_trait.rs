@@ -1,20 +1,20 @@
-use crate::core::ncategory::NCategory;
-use crate::core::nfunctor::NFunctor;
+use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::traits::functor_trait::FunctorTrait;
 use std::fmt::Debug;
 use std::hash::Hash;
 
 pub trait MorphismTrait<'a>: Debug + Eq + Hash
 where
-    <Self as MorphismTrait<'a>>::Object: NCategory<'a>,
+    <Self as MorphismTrait<'a>>::Object: CategoryTrait<'a>,
 {
     type Object;
     type Identifier;
 
-    type Functor: NFunctor<
+    type Functor: FunctorTrait<
             'a,
             Identifier = Self::Identifier,
-            SourceCategory = <Self::Object as NCategory<'a>>::Object,
-            TargetCategory = <Self::Object as NCategory<'a>>::Object,
+            SourceCategory = <Self::Object as CategoryTrait<'a>>::Object,
+            TargetCategory = <Self::Object as CategoryTrait<'a>>::Object,
         >;
 
     fn cell_id(&self) -> &Self::Identifier;

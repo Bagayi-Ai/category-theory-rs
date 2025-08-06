@@ -62,7 +62,7 @@ impl<'a, Id: Identifier<Id = Id> + 'a, Object: CategoryTrait<'a, Identifier = Id
             .or_default()
             .entry(cell.target_object().category_id().clone())
             .or_default()
-            .insert(cell.cell_id().clone());
+            .insert(cell.arrow_id().clone());
         let cell_id = cell.id().clone();
         Ok(cell_id)
     }

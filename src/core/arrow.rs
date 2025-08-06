@@ -72,7 +72,7 @@ impl<'a, Id: Identifier + 'a, SourceObject: CategoryTrait<'a>, TargetObject: Cat
     type TargetObject = TargetObject;
     type Identifier = Id;
 
-    fn cell_id(&self) -> &Self::Identifier {
+    fn arrow_id(&self) -> &Self::Identifier {
         &self.id
     }
 

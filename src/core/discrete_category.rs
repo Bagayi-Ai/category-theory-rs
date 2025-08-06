@@ -75,7 +75,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> Ca
             return Err(Errors::OnlyIdentityMorphismDiscreteCategory);
         }
 
-        let cell_id = morphism.cell_id().clone();
+        let cell_id = morphism.arrow_id().clone();
 
         if let Some(cells) = &mut self.cells {
             if cells.contains_key(&cell_id) {
@@ -144,7 +144,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> ArrowTrait<'a
     type SourceObject = UnitCategory;
     type TargetObject = UnitCategory;
 
-    fn cell_id(&self) -> &Self::Identifier {
+    fn arrow_id(&self) -> &Self::Identifier {
         &self.category_id
     }
 

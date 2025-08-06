@@ -15,7 +15,7 @@ impl<'a, T: Identifier + 'a> ArrowTrait<'a> for UnitMorphism<T> {
     type TargetObject = Self::SourceObject;
     type Identifier = T;
 
-    fn cell_id(&self) -> &Self::Identifier {
+    fn arrow_id(&self) -> &Self::Identifier {
         todo!()
     }
 

@@ -10,7 +10,7 @@ pub trait ArrowTrait<'a> {
 
     type Identifier: Identifier;
 
-    fn cell_id(&self) -> &Self::Identifier;
+    fn arrow_id(&self) -> &Self::Identifier;
 
     fn source_object(&self) -> &Self::SourceObject;
 

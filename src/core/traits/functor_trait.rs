@@ -19,7 +19,7 @@ pub trait FunctorTrait<'a>: 'a {
         &self,
     ) -> Result<
         Vec<
-            &'a DynArrowTraitType<'a, Self::SourceCategory, Self::TargetCategory, Self::Identifier>,
+            &'a DynArrowTraitType<'a, Self::Identifier, Self::SourceCategory, Self::TargetCategory>,
         >,
         NCategoryError,
     >;

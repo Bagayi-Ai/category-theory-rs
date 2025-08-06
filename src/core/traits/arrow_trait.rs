@@ -3,7 +3,7 @@ use crate::core::traits::functor_trait::FunctorTrait;
 use std::fmt::Debug;
 use std::hash::Hash;
 
-pub type DynArrowTraitType<'a, SC, TC, ID> = dyn ArrowTrait<
+pub type DynArrowTraitType<'a, ID, SC, TC> = dyn ArrowTrait<
         'a,
         SourceObject = <SC as CategoryTrait<'a>>::Object,
         TargetObject = <TC as CategoryTrait<'a>>::Object,

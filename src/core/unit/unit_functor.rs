@@ -91,7 +91,7 @@ impl<'a, T: Identifier + 'a> FunctorTrait<'a> for UnitFunctor<T> {
         &self,
     ) -> Result<
         Vec<
-            &'a DynArrowTraitType<'a, Self::SourceCategory, Self::TargetCategory, Self::Identifier>,
+            &'a DynArrowTraitType<'a, Self::Identifier, Self::SourceCategory, Self::TargetCategory>,
         >,
         NCategoryError,
     > {

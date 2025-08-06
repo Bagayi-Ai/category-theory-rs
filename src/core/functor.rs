@@ -79,9 +79,9 @@ where
         Vec<
             &'a super::traits::arrow_trait::DynArrowTraitType<
                 'a,
+                Self::Identifier,
                 Self::SourceCategory,
                 Self::TargetCategory,
-                Self::Identifier,
             >,
         >,
         NCategoryError,

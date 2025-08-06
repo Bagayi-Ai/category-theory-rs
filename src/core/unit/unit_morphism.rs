@@ -1,6 +1,8 @@
+use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
-use crate::core::traits::arrow_trait::{Functor, ArrowTrait};
+use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
+use crate::core::traits::functor_trait::FunctorTrait;
 use crate::core::unit::unit_category::UnitCategory;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -32,7 +34,7 @@ impl<'a, T: Identifier + 'a> ArrowTrait<'a> for UnitMorphism<T> {
     fn sub_arrow(
         &self,
     ) -> Result<
-        Functor<
+        &Functor<
             'a,
             Self::Identifier,
             <Self::SourceObject as CategoryTrait<'a>>::Object,

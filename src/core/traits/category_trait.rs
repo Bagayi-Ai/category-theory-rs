@@ -3,7 +3,8 @@ use std::fmt::Debug;
 use std::hash::Hash;
 
 use crate::core::identifier::Identifier;
-use crate::core::traits::arrow_trait::{ArrowTrait, Functor};
+use crate::core::traits::arrow_trait::ArrowTrait;
+use crate::core::traits::functor_trait::FunctorTrait;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum NCategoryError {
@@ -44,7 +45,7 @@ pub trait CategoryTrait<'a> {
 
     fn category_id(&self) -> &Self::Identifier;
 
-    fn identity_endofunctor(&self) -> &Functor<'a, Self::Identifier, Self::Object, Self::Object>;
+    fn identity_endofunctor(&self) -> &impl  FunctorTrait<'a, Self::Identifier, Self::Object, Self::Object>;
 
     fn add_object(&mut self, object: &'a Self::Object) -> Result<(), NCategoryError>;
 

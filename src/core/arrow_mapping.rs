@@ -1,8 +1,7 @@
-use crate::core::arrow::Arrow;
 use crate::core::identifier::Identifier;
-use crate::core::traits::arrow_trait::{ArrowMappingTrait, Functor, ArrowTrait};
+use crate::core::traits::arrow_trait::{ArrowMappingTrait, ArrowTrait};
 use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
-use std::marker::PhantomData;
+use crate::core::traits::functor_trait::FunctorTrait;
 
 pub(crate) struct ArrowMapping<'a, Id, SourceArrow, TargetArrow>
 where
@@ -10,7 +9,7 @@ where
     SourceArrow: ArrowTrait<'a>,
     TargetArrow: ArrowTrait<'a>,
 {
-    id: &'a Id,
+    id: Id,
     source_arrow: &'a SourceArrow,
     target_arrow: &'a TargetArrow,
 }
@@ -21,7 +20,7 @@ where
     SourceArrow: ArrowTrait<'a>,
     TargetArrow: ArrowTrait<'a>,
 {
-    pub fn new(id: &'a Id, source_arrow: &'a SourceArrow, target_arrow: &'a TargetArrow) -> Self {
+    pub fn new(id: Id, source_arrow: &'a SourceArrow, target_arrow: &'a TargetArrow) -> Self {
         ArrowMapping {
             id,
             source_arrow,
@@ -52,7 +51,7 @@ where
     fn source_sub_arrow_mapping(
         &self,
     ) -> Result<
-        &Functor<
+        &dyn FunctorTrait<
             'a,
             Self::Identifier,
             <Self::SourceArrow as ArrowTrait<'a>>::SourceObject,
@@ -66,7 +65,7 @@ where
     fn target_sub_arrow_mapping(
         &self,
     ) -> Result<
-        &Functor<
+        &dyn FunctorTrait<
             'a,
             Self::Identifier,
             <Self::TargetArrow as ArrowTrait<'a>>::SourceObject,

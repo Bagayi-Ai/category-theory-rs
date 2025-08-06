@@ -9,9 +9,15 @@ mod core {
 
     pub mod arrow_mapping;
 
+    pub mod functor;
+
+    pub mod type_alias;
+
     pub mod traits {
         pub mod arrow_trait;
         pub mod category_trait;
+        pub mod functor_trait;
+
     }
 
     pub mod unit {
@@ -19,6 +25,8 @@ mod core {
         pub mod unit_morphism;
 
         pub mod unit_identifier;
+
+        pub mod unit_functor;
     }
 
     #[cfg(test)]

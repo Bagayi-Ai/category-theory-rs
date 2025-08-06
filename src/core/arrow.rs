@@ -1,8 +1,10 @@
 use crate::core::identifier::Identifier;
-use crate::core::traits::arrow_trait::{Functor, ArrowTrait};
+use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
 use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
+use crate::core::functor::Functor;
+use crate::core::traits::functor_trait::FunctorTrait;
 
 pub struct Arrow<'a, Id, SourceObject, TargetObject>
 where
@@ -13,7 +15,7 @@ where
     id: Id,
     source: &'a SourceObject,
     target: &'a TargetObject,
-    functor: &'a Functor<'a, Id, SourceObject::Object, TargetObject::Object>,
+    functor: &'a dyn FunctorTrait<'a, Id, SourceObject::Object, TargetObject::Object>,
     identity: bool,
 }
 
@@ -24,7 +26,7 @@ impl<'a, Id: Identifier, SourceObject: CategoryTrait<'a>, TargetObject: Category
         id: Id,
         source: &'a SourceObject,
         target: &'a TargetObject,
-        functor: &'a Functor<'a, Id, SourceObject::Object, TargetObject::Object>,
+        functor: &'a dyn FunctorTrait<'a, Id, SourceObject::Object, TargetObject::Object>,
     ) -> Self {
         Arrow {
             id,
@@ -106,7 +108,7 @@ impl<'a, Id: Identifier + 'a, SourceObject: CategoryTrait<'a>, TargetObject: Cat
     fn sub_arrow(
         &self,
     ) -> Result<
-        Functor<
+        &Functor<
             'a,
             Id,
             <Self::SourceObject as CategoryTrait<'a>>::Object,

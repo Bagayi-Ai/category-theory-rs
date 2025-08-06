@@ -1,12 +1,13 @@
-use crate::core::arrow::Arrow;
-use crate::core::arrow_mapping::ArrowMapping;
 use crate::core::identifier::Identifier;
-use crate::core::traits::arrow_trait::{Functor, ArrowTrait};
+use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
 use crate::core::unit::unit_category::UnitCategory;
 use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Display};
 use std::hash::{Hash, Hasher};
+use crate::core::traits::functor_trait::FunctorTrait;
+use crate::core::functor::Functor;
+use crate::core::unit::unit_functor::UnitFunctor;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct DiscreteCategory<T: Identifier> {
@@ -60,8 +61,8 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> Ca
         &self.category_id
     }
 
-    fn identity_endofunctor(&self) -> &Functor<'a, Self::Identifier, Self::Object, Self::Object> {
-        todo!()
+    fn identity_endofunctor(&self) -> &UnitFunctor {
+        &UnitFunctor{}
     }
 
     fn add_object(&mut self, object: &Self::Object) -> Result<(), NCategoryError> {
@@ -165,7 +166,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> ArrowTrait<'a
     fn sub_arrow(
         &self,
     ) -> Result<
-        Functor<
+        &Functor<
             'a,
             Self::Identifier,
             <Self::SourceObject as CategoryTrait<'a>>::Object,

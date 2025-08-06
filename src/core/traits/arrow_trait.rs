@@ -1,15 +1,14 @@
-use crate::core::discrete_category::DiscreteCategory;
 use crate::core::identifier::Identifier;
 use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
-use crate::core::unit::unit_category::UnitCategory;
 use std::fmt::{Debug, Display};
+use crate::core::traits::functor_trait::FunctorTrait;
 
 pub trait ArrowTrait<'a> {
     type SourceObject: CategoryTrait<'a>;
 
     type TargetObject: CategoryTrait<'a>;
 
-    type Identifier;
+    type Identifier: Identifier;
 
     fn cell_id(&self) -> &Self::Identifier;
 
@@ -22,7 +21,7 @@ pub trait ArrowTrait<'a> {
     fn sub_arrow(
         &self,
     ) -> Result<
-        Functor<
+        &impl FunctorTrait<
             'a,
             Self::Identifier,
             <Self::SourceObject as CategoryTrait<'a>>::Object,
@@ -46,7 +45,7 @@ pub trait ArrowMappingTrait<'a> {
     fn source_sub_arrow_mapping(
         &self,
     ) -> Result<
-        &Functor<
+        &dyn FunctorTrait<
             'a,
             Self::Identifier,
             <Self::SourceArrow as ArrowTrait<'a>>::SourceObject,
@@ -58,7 +57,7 @@ pub trait ArrowMappingTrait<'a> {
     fn target_sub_arrow_mapping(
         &self,
     ) -> Result<
-        &Functor<
+        &dyn FunctorTrait<
             'a,
             Self::Identifier,
             <Self::TargetArrow as ArrowTrait<'a>>::SourceObject,
@@ -67,12 +66,3 @@ pub trait ArrowMappingTrait<'a> {
         NCategoryError,
     >;
 }
-
-pub type Functor<'a, Id, SourceCategory, TargetCategory> = Vec<
-    &'a dyn ArrowMappingTrait<
-        'a,
-        Identifier = Id,
-        SourceArrow = <SourceCategory as CategoryTrait<'a>>::Morphism,
-        TargetArrow = <TargetCategory as CategoryTrait<'a>>::Morphism,
-    >,
->;

@@ -1,11 +1,13 @@
-use crate::core::arrow::Arrow;
 use crate::core::arrow_mapping::ArrowMapping;
 use crate::core::category::*;
 use crate::core::discrete_category::DiscreteCategory;
 use crate::core::identifier::Identifier;
 use crate::core::tests::ncategory_test_helper::*;
-use crate::core::traits::arrow_trait::{Functor, ArrowTrait};
+use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::traits::functor_trait::FunctorTrait;
+use crate::core::type_alias::ArrowMappingAlias;
+use crate::core::functor::Functor;
 
 type DiscreteCategoryString = DiscreteCategory<String>;
 
@@ -176,14 +178,10 @@ pub fn test_identity_cell_tree() {
         .add_morphism(object_3.clone())
         .unwrap();
 
-    let lower_to_numer_mappings: Functor<
-        String,
-        DiscreteCategory<String>,
-        DiscreteCategory<usize>,
-    > = vec![
+    let lower_to_numer_mappings: Vec<ArrowMappingAlias<String, DiscreteCategory<String>, DiscreteCategory<usize>>> = vec![
         // a to 1
-        &ArrowMapping::new(
-            &"a->1".to_string(),
+        ArrowMapping::new(
+            "a->1".to_string(),
             discreteCategoryALower
                 .get_identity_morphism(object_a.category_id())
                 .unwrap(),
@@ -192,8 +190,8 @@ pub fn test_identity_cell_tree() {
                 .unwrap(),
         ),
         // b to 2
-        &ArrowMapping::new(
-            &"b->2".to_string(),
+        ArrowMapping::new(
+            "b->2".to_string(),
             discreteCategoryALower
                 .get_identity_morphism(object_b.category_id())
                 .unwrap(),
@@ -202,8 +200,8 @@ pub fn test_identity_cell_tree() {
                 .unwrap(),
         ),
         // c to 3
-        &ArrowMapping::new(
-            &"c->3".to_string(),
+        ArrowMapping::new(
+            "c->3".to_string(),
             discreteCategoryALower
                 .get_identity_morphism(object_c.category_id())
                 .unwrap(),
@@ -213,12 +211,12 @@ pub fn test_identity_cell_tree() {
         ),
     ];
     // create a functor from lower to number
-    // let functor_lower_to_number = Functor::new(
-    //     "functor_lower_to_number".to_string(),
-    //     &discreteCategoryALower,
-    //     &discreteCategoryANumber,
-    //     lower_to_numer_mapping.0,
-    // );
+    let functor_lower_to_number = Functor::new(
+        "functor_lower_to_number".to_string(),
+        &discreteCategoryALower,
+        &discreteCategoryANumber,
+        lower_to_numer_mappings,
+    );
 
     // let number_to_upper_mappings: ArrowMappingsVec<usize, String> = vec![
     //     // a to 1

@@ -4,7 +4,6 @@ use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::functor_trait::FunctorTrait;
-use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 
 pub struct Arrow<'a, Id, SourceObject, TargetObject>

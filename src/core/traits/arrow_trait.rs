@@ -2,7 +2,6 @@ use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::functor_trait::FunctorTrait;
-use std::fmt::{Debug, Display};
 
 pub trait ArrowTrait<'a> {
     type SourceObject: CategoryTrait<'a>;

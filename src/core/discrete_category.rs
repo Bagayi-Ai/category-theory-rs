@@ -3,7 +3,6 @@ use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
-use crate::core::traits::functor_trait::FunctorTrait;
 use crate::core::unit::unit_category::UnitCategory;
 use crate::core::unit::unit_functor::UnitFunctor;
 use std::collections::{HashMap, HashSet};

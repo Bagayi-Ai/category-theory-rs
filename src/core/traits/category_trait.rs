@@ -3,8 +3,6 @@ use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::functor_trait::FunctorTrait;
 use std::collections::HashSet;
-use std::fmt::Debug;
-use std::hash::Hash;
 
 pub trait CategoryTrait<'a> {
     type Identifier: Identifier;

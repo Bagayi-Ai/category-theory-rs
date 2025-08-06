@@ -14,7 +14,7 @@ pub trait FunctorTrait<'a>: 'a {
 
     fn target_category(&self) -> &Self::TargetCategory;
 
-    fn morphisms(
+    fn arrows(
         &self,
     ) -> Result<
         Vec<

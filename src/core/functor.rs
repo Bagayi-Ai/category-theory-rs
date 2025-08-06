@@ -63,7 +63,7 @@ where
         self.target_category
     }
 
-    fn morphisms(
+    fn arrows(
         &self,
     ) -> Result<
         Vec<

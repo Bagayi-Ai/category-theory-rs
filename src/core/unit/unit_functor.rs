@@ -77,7 +77,7 @@ impl<'a, T: Identifier + 'a> FunctorTrait<'a> for UnitFunctor<T> {
         todo!()
     }
 
-    fn morphisms(
+    fn arrows(
         &self,
     ) -> Result<
         Vec<

@@ -13,7 +13,7 @@ where
     id: Id,
     source: &'a SourceObject,
     target: &'a TargetObject,
-    functor: ArrowMappingsTrait<'a, SourceObject::Object, TargetObject::Object>,
+    functor: ArrowMappingsTrait<'a, Id, SourceObject::Object, TargetObject::Object>,
 }
 
 impl<'a, Id: Identifier, SourceObject: CategoryTrait<'a>, TargetObject: CategoryTrait<'a>>
@@ -23,7 +23,7 @@ impl<'a, Id: Identifier, SourceObject: CategoryTrait<'a>, TargetObject: Category
         id: Id,
         source: &'a SourceObject,
         target: &'a TargetObject,
-        functor: ArrowMappingsTrait<'a, SourceObject::Object, TargetObject::Object>,
+        functor: ArrowMappingsTrait<'a, Id, SourceObject::Object, TargetObject::Object>,
     ) -> Self {
         Arrow {
             id,
@@ -77,8 +77,9 @@ impl<'a, Id: Identifier + 'a, SourceObject: CategoryTrait<'a>, TargetObject: Cat
     ) -> Result<
         ArrowMappingsTrait<
             'a,
+            Id,
             <Self::SourceObject as CategoryTrait<'a>>::Object,
-            <Self::SourceObject as CategoryTrait<'a>>::Object,
+            <Self::TargetObject as CategoryTrait<'a>>::Object,
         >,
         NCategoryError,
     > {

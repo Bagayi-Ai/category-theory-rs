@@ -163,6 +163,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> ArrowTrait<'a
     ) -> Result<
         ArrowMappingsTrait<
             'a,
+            Self::Identifier,
             <Self::SourceObject as CategoryTrait<'a>>::Object,
             <Self::SourceObject as CategoryTrait<'a>>::Object,
         >,

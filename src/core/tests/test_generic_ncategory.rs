@@ -177,11 +177,13 @@ pub fn test_identity_cell_tree() {
         .unwrap();
 
     let lower_to_numer_mappings: ArrowMappingsTrait<
+        String,
         DiscreteCategory<String>,
         DiscreteCategory<usize>,
     > = vec![
         // a to 1
         &ArrowMapping::new(
+            &"a->1".to_string(),
             discreteCategoryALower
                 .get_identity_morphism(object_a.category_id())
                 .unwrap(),
@@ -191,6 +193,7 @@ pub fn test_identity_cell_tree() {
         ),
         // b to 2
         &ArrowMapping::new(
+            &"b->2".to_string(),
             discreteCategoryALower
                 .get_identity_morphism(object_b.category_id())
                 .unwrap(),
@@ -200,6 +203,7 @@ pub fn test_identity_cell_tree() {
         ),
         // c to 3
         &ArrowMapping::new(
+            &"c->3".to_string(),
             discreteCategoryALower
                 .get_identity_morphism(object_c.category_id())
                 .unwrap(),

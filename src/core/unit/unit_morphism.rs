@@ -34,6 +34,7 @@ impl<'a, T: Identifier + 'a> ArrowTrait<'a> for UnitMorphism<T> {
     ) -> Result<
         ArrowMappingsTrait<
             'a,
+            Self::Identifier,
             <Self::SourceObject as CategoryTrait<'a>>::Object,
             <Self::SourceObject as CategoryTrait<'a>>::Object,
         >,

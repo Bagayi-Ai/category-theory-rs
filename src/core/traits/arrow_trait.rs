@@ -24,14 +24,17 @@ pub trait ArrowTrait<'a> {
     ) -> Result<
         ArrowMappingsTrait<
             'a,
+            Self::Identifier,
             <Self::SourceObject as CategoryTrait<'a>>::Object,
-            <Self::SourceObject as CategoryTrait<'a>>::Object,
+            <Self::TargetObject as CategoryTrait<'a>>::Object,
         >,
         NCategoryError,
     >;
 }
 
 pub trait ArrowMappingTrait<'a> {
+    type Identifier: Identifier;
+
     type SourceArrow: ArrowTrait<'a>;
 
     type TargetArrow: ArrowTrait<'a>;
@@ -39,11 +42,36 @@ pub trait ArrowMappingTrait<'a> {
     fn source_arrow(&self) -> &Self::SourceArrow;
 
     fn target_arrow(&self) -> &Self::TargetArrow;
+
+    fn source_sub_arrow_mapping(
+        &self,
+    ) -> Result<
+        &ArrowMappingsTrait<
+            'a,
+            Self::Identifier,
+            <Self::SourceArrow as ArrowTrait<'a>>::SourceObject,
+            <Self::SourceArrow as ArrowTrait<'a>>::TargetObject,
+        >,
+        NCategoryError,
+    >;
+
+    fn target_sub_arrow_mapping(
+        &self,
+    ) -> Result<
+        &ArrowMappingsTrait<
+            'a,
+            Self::Identifier,
+            <Self::TargetArrow as ArrowTrait<'a>>::SourceObject,
+            <Self::TargetArrow as ArrowTrait<'a>>::TargetObject,
+        >,
+        NCategoryError,
+    >;
 }
 
-pub type ArrowMappingsTrait<'a, SourceCategory, TargetCategory> = Vec<
+pub type ArrowMappingsTrait<'a, Id, SourceCategory, TargetCategory> = Vec<
     &'a dyn ArrowMappingTrait<
         'a,
+        Identifier = Id,
         SourceArrow = <SourceCategory as CategoryTrait<'a>>::Morphism,
         TargetArrow = <TargetCategory as CategoryTrait<'a>>::Morphism,
     >,

@@ -15,7 +15,7 @@ pub struct Category<
     id: Id,
     objects: HashMap<Id, &'a Object>,
     object_mapping: HashMap<Id, HashMap<Id, HashSet<Id>>>,
-    cells: HashMap<Id, Arrow<'a, Id, Object, Object>>,
+    morphism: HashMap<Id, Arrow<'a, Id, Object, Object>>,
 }
 
 impl<
@@ -29,7 +29,7 @@ impl<
             id: Id::generate(),
             objects: HashMap::new(),
             object_mapping: HashMap::new(),
-            cells: HashMap::new(),
+            morphism: HashMap::new(),
         }
     }
 }
@@ -56,10 +56,10 @@ impl<
     }
 
     fn add_morphism(&mut self, cell: Self::Morphism) -> Result<Self::Identifier, NCategoryError> {
-        if self.cells.contains_key(cell.id()) {
+        if self.morphism.contains_key(cell.id()) {
             return Err(NCategoryError::MorphismAlreadyExists);
         }
-        let cell = self.cells.entry(cell.id().clone()).or_insert(cell);
+        let cell = self.morphism.entry(cell.id().clone()).or_insert(cell);
         self.object_mapping
             .entry(cell.source_object().category_id().clone())
             .or_default()
@@ -101,7 +101,7 @@ impl<
             let mut result: Vec<&Self::Morphism> = Vec::new();
             for cell_set in cells.values() {
                 for cell_id in cell_set {
-                    if let Some(cell) = self.cells.get(cell_id) {
+                    if let Some(cell) = self.morphism.get(cell_id) {
                         if cell.source_object().category_id() == object_id {
                             result.push(cell);
                         }
@@ -115,7 +115,7 @@ impl<
     }
 
     fn get_moprhism(&self, cell_id: &Self::Identifier) -> Result<&Self::Morphism, NCategoryError> {
-        if let Some(cell) = self.cells.get(cell_id) {
+        if let Some(cell) = self.morphism.get(cell_id) {
             Ok(cell)
         } else {
             Err(NCategoryError::MorphismNotFound)

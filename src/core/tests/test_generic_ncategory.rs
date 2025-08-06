@@ -1,6 +1,6 @@
+use crate::core::category::*;
 use crate::core::discrete_category::DiscreteCategory;
 use crate::core::generic_morphism::GenericMorphism;
-use crate::core::generic_ncategory::*;
 use crate::core::generic_nfunctor::GenericNFunctor;
 use crate::core::identifier::Identifier;
 use crate::core::tests::ncategory_test_helper::*;

@@ -1,5 +1,5 @@
 mod core {
-    pub mod generic_ncategory;
+    pub mod category;
 
     pub mod discrete_category;
 

@@ -1,4 +1,4 @@
-use crate::core::generic_morphism::Arrow;
+use crate::core::arrow::Arrow;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};

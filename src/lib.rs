@@ -3,7 +3,7 @@ mod core {
 
     pub mod discrete_category;
 
-    pub mod generic_morphism;
+    pub mod arrow;
 
     pub mod generic_nfunctor;
 
@@ -12,10 +12,6 @@ mod core {
     pub mod morphism_tree;
 
     pub mod identifier;
-
-    pub mod arrow;
-
-    pub mod generic_narrow;
 
     pub mod traits {
         pub mod arrow_trait;
@@ -30,8 +26,6 @@ mod core {
         pub mod unit_morphism;
 
         pub mod unit_identifier;
-
-        pub mod unit_arrow;
     }
 
     #[cfg(test)]

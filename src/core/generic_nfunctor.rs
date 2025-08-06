@@ -2,7 +2,7 @@ use crate::core::functor_mapping::FunctorMappings;
 use crate::core::identifier::Identifier;
 use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
 use crate::core::traits::functor_trait::FunctorTrait;
-use crate::core::traits::morphism_trait::MorphismTrait;
+use crate::core::traits::arrow_trait::ArrowTrait;
 
 pub struct GenericNFunctor<
     'a,
@@ -77,7 +77,7 @@ where
         &self,
     ) -> Result<
         Vec<
-            &'a super::traits::morphism_trait::DynMorphismTraitType<
+            &'a super::traits::arrow_trait::DynArrowTraitType<
                 'a,
                 Self::SourceCategory,
                 Self::TargetCategory,

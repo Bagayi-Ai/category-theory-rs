@@ -4,7 +4,7 @@ use std::hash::Hash;
 
 use crate::core::identifier::Identifier;
 use crate::core::morphism_tree::MorphismMappingTree;
-use crate::core::traits::morphism_trait::MorphismTrait;
+use crate::core::traits::arrow_trait::ArrowTrait;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum NCategoryError {
@@ -29,7 +29,7 @@ pub enum NCategoryError {
 pub trait CategoryTrait<'a>: Debug {
     type Identifier: Identifier;
     type Object: 'a + Eq + Debug + Hash + CategoryTrait<'a>;
-    type Morphism: MorphismTrait<
+    type Morphism: ArrowTrait<
             'a,
             SourceObject = Self::Object,
             TargetObject = Self::Object,

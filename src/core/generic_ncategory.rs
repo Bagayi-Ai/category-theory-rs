@@ -1,7 +1,7 @@
 use crate::core::generic_morphism::GenericMorphism;
 use crate::core::identifier::Identifier;
 use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
-use crate::core::traits::morphism_trait::MorphismTrait;
+use crate::core::traits::arrow_trait::ArrowTrait;
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::hash::Hash;

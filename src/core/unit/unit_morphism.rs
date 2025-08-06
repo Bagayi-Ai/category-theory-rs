@@ -1,5 +1,5 @@
 use crate::core::identifier::Identifier;
-use crate::core::traits::morphism_trait::MorphismTrait;
+use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::unit::unit_category::UnitCategory;
 use crate::core::unit::unit_functor::UnitFunctor;
 
@@ -8,7 +8,7 @@ pub struct UnitMorphism<T: Identifier> {
     _phantom: std::marker::PhantomData<T>,
 }
 
-impl<'a, T: Identifier + 'a> MorphismTrait<'a> for UnitMorphism<T> {
+impl<'a, T: Identifier + 'a> ArrowTrait<'a> for UnitMorphism<T> {
     type SourceObject = UnitCategory;
     type TargetObject = Self::SourceObject;
     type Identifier = T;

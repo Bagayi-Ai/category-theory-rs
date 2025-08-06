@@ -5,7 +5,7 @@ use crate::core::generic_nfunctor::GenericNFunctor;
 use crate::core::identifier::Identifier;
 use crate::core::tests::ncategory_test_helper::*;
 use crate::core::traits::category_trait::CategoryTrait;
-use crate::core::traits::morphism_trait::MorphismTrait;
+use crate::core::traits::arrow_trait::ArrowTrait;
 
 type DiscreteCategoryString = DiscreteCategory<String>;
 

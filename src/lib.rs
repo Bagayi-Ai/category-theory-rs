@@ -20,7 +20,7 @@ mod core {
     pub mod traits {
         pub mod category_trait;
         pub mod functor_trait;
-        pub mod morphism_trait;
+        pub mod arrow_trait;
     }
 
     pub mod unit {

@@ -1,7 +1,7 @@
 use crate::core::generic_nfunctor::GenericNFunctor;
 use crate::core::identifier::Identifier;
 use crate::core::traits::category_trait::CategoryTrait;
-use crate::core::traits::morphism_trait::MorphismTrait;
+use crate::core::traits::arrow_trait::ArrowTrait;
 use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 
@@ -57,7 +57,7 @@ where
     }
 }
 
-impl<'a, Category: CategoryTrait<'a> + Eq> MorphismTrait<'a> for GenericMorphism<'a, Category>
+impl<'a, Category: CategoryTrait<'a> + Eq> ArrowTrait<'a> for GenericMorphism<'a, Category>
 where
     <Category as CategoryTrait<'a>>::Object: Clone + 'a + CategoryTrait<'a>,
     <Category as CategoryTrait<'a>>::Identifier: 'a,

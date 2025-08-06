@@ -29,7 +29,12 @@ pub enum NCategoryError {
 pub trait CategoryTrait<'a>: Debug {
     type Identifier: Identifier;
     type Object: 'a + Eq + Debug + Hash + CategoryTrait<'a>;
-    type Morphism: MorphismTrait<'a, Object = Self::Object, Identifier = Self::Identifier>;
+    type Morphism: MorphismTrait<
+            'a,
+            SourceObject = Self::Object,
+            TargetObject = Self::Object,
+            Identifier = Self::Identifier,
+        >;
 
     fn level(&self) -> usize
     where

@@ -49,6 +49,7 @@ use crate::core::functor_mapping::FunctorMappings;
 use crate::core::identifier::Identifier;
 use crate::core::traits::category_trait::NCategoryError;
 use crate::core::traits::functor_trait::FunctorTrait;
+use crate::core::traits::morphism_trait::DynMorphismTraitType;
 use crate::core::unit::unit_category::UnitCategory;
 
 pub const UNIT_FUNCTOR_STRING: UnitFunctor<String> = UnitFunctor {
@@ -81,6 +82,22 @@ impl<'a, T: Identifier + 'a> FunctorTrait<'a> for UnitFunctor<T> {
         &self,
     ) -> Result<
         &FunctorMappings<'a, Self::Identifier, Self::SourceCategory, Self::TargetCategory>,
+        NCategoryError,
+    > {
+        todo!()
+    }
+
+    fn morphisms(
+        &self,
+    ) -> Result<
+        Vec<
+            &'a DynMorphismTraitType<
+                'a,
+                Self::SourceCategory,
+                Self::TargetCategory,
+                Self::Identifier,
+            >,
+        >,
         NCategoryError,
     > {
         todo!()

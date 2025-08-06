@@ -3,25 +3,38 @@ use crate::core::traits::functor_trait::FunctorTrait;
 use std::fmt::Debug;
 use std::hash::Hash;
 
-pub trait MorphismTrait<'a>: Debug + Eq + Hash
-where
-    <Self as MorphismTrait<'a>>::Object: CategoryTrait<'a>,
-{
-    type Object;
+pub type DynMorphismTraitType<'a, SC, TC, ID> = dyn MorphismTrait<
+        'a,
+        SourceObject = <SC as CategoryTrait<'a>>::Object,
+        TargetObject = <TC as CategoryTrait<'a>>::Object,
+        Identifier = ID,
+        Functor = dyn FunctorTrait<
+            'a,
+            Identifier = ID,
+            SourceCategory = <SC as CategoryTrait<'a>>::Object,
+            TargetCategory = <TC as CategoryTrait<'a>>::Object,
+        >,
+    >;
+
+pub trait MorphismTrait<'a>: Debug {
+    type SourceObject: CategoryTrait<'a>;
+
+    type TargetObject: CategoryTrait<'a>;
+
     type Identifier;
 
     type Functor: FunctorTrait<
             'a,
             Identifier = Self::Identifier,
-            SourceCategory = <Self::Object as CategoryTrait<'a>>::Object,
-            TargetCategory = <Self::Object as CategoryTrait<'a>>::Object,
+            SourceCategory = Self::SourceObject,
+            TargetCategory = Self::TargetObject,
         >;
 
     fn cell_id(&self) -> &Self::Identifier;
 
-    fn source_object(&self) -> &Self::Object;
+    fn source_object(&self) -> &Self::SourceObject;
 
-    fn target_object(&self) -> &Self::Object;
+    fn target_object(&self) -> &Self::TargetObject;
 
     fn is_identity(&self) -> bool;
 

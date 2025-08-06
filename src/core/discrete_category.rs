@@ -138,18 +138,19 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> MorphismTrait
     for DiscreteCategory<T>
 {
     type Identifier = T;
-    type Object = UnitCategory;
+    type SourceObject = UnitCategory;
+    type TargetObject = UnitCategory;
     type Functor = UnitFunctor<T>;
 
     fn cell_id(&self) -> &Self::Identifier {
         &self.category_id
     }
 
-    fn source_object(&self) -> &Self::Object {
+    fn source_object(&self) -> &Self::SourceObject {
         &UnitCategory {}
     }
 
-    fn target_object(&self) -> &Self::Object {
+    fn target_object(&self) -> &Self::TargetObject {
         &UnitCategory {}
     }
 

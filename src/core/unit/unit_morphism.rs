@@ -9,7 +9,8 @@ pub struct UnitMorphism<T: Identifier> {
 }
 
 impl<'a, T: Identifier + 'a> MorphismTrait<'a> for UnitMorphism<T> {
-    type Object = UnitCategory;
+    type SourceObject = UnitCategory;
+    type TargetObject = Self::SourceObject;
     type Identifier = T;
 
     type Functor = UnitFunctor<T>;
@@ -18,11 +19,11 @@ impl<'a, T: Identifier + 'a> MorphismTrait<'a> for UnitMorphism<T> {
         todo!()
     }
 
-    fn source_object(&self) -> &Self::Object {
+    fn source_object(&self) -> &Self::SourceObject {
         todo!()
     }
 
-    fn target_object(&self) -> &Self::Object {
+    fn target_object(&self) -> &Self::TargetObject {
         todo!()
     }
 

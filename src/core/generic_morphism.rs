@@ -62,25 +62,21 @@ where
     <Category as CategoryTrait<'a>>::Object: Clone + 'a + CategoryTrait<'a>,
     <Category as CategoryTrait<'a>>::Identifier: 'a,
 {
-    type Object = <Category as CategoryTrait<'a>>::Object;
+    type SourceObject = <Category as CategoryTrait<'a>>::Object;
+    type TargetObject = <Category as CategoryTrait<'a>>::Object;
     type Identifier = <Category as CategoryTrait<'a>>::Identifier;
 
-    type Functor = GenericNFunctor<
-        'a,
-        Self::Identifier,
-        <Self::Object as CategoryTrait<'a>>::Object,
-        <Self::Object as CategoryTrait<'a>>::Object,
-    >;
+    type Functor = GenericNFunctor<'a, Self::Identifier, Self::SourceObject, Self::TargetObject>;
 
     fn cell_id(&self) -> &Self::Identifier {
         &self.id
     }
 
-    fn source_object(&self) -> &Self::Object {
+    fn source_object(&self) -> &Self::SourceObject {
         self.source
     }
 
-    fn target_object(&self) -> &Self::Object {
+    fn target_object(&self) -> &Self::TargetObject {
         self.target
     }
 

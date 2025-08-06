@@ -37,19 +37,6 @@ impl<'a, Id: Identifier, SourceObject: CategoryTrait<'a>, TargetObject: Category
         }
     }
 
-    // pub fn new_identity(
-    //     id: Id,
-    //     object: &'a SourceObject,
-    // ) -> Self {
-    //     Arrow {
-    //         id,
-    //         source: object,
-    //         target: object,
-    //         functor: Functor::identity(id, object),
-    //         identity: true,
-    //     }
-    // }
-
     pub fn id(&self) -> &Id {
         &self.id
     }

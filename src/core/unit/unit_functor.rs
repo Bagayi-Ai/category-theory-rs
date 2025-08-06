@@ -1,5 +1,5 @@
 use crate::core::identifier::Identifier;
-use crate::core::traits::arrow_trait::ArrowMappingTrait;
+use crate::core::traits::arrow_mapping_trait::ArrowMappingTrait;
 use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::functor_trait::FunctorTrait;
 use crate::core::unit::unit_category::UnitCategory;

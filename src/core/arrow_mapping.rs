@@ -1,6 +1,7 @@
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
-use crate::core::traits::arrow_trait::{ArrowMappingTrait, ArrowTrait};
+use crate::core::traits::arrow_mapping_trait::ArrowMappingTrait;
+use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::functor_trait::FunctorTrait;
 
 pub(crate) struct ArrowMapping<'a, Id, SourceArrow, TargetArrow>

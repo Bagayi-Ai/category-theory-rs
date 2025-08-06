@@ -2,6 +2,7 @@ use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::functor_trait::FunctorTrait;
+use crate::core::type_alias::ChildObjectAlias;
 
 pub trait ArrowTrait<'a> {
     type SourceObject: CategoryTrait<'a>;
@@ -24,8 +25,8 @@ pub trait ArrowTrait<'a> {
         &impl FunctorTrait<
             'a,
             Self::Identifier,
-            <Self::SourceObject as CategoryTrait<'a>>::Object,
-            <Self::TargetObject as CategoryTrait<'a>>::Object,
+            ChildObjectAlias<'a, Self::SourceObject>,
+            ChildObjectAlias<'a, Self::TargetObject>,
         >,
         Errors,
     >;

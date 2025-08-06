@@ -1,6 +1,7 @@
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_mapping_trait::ArrowMappingTrait;
 use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::type_alias::MorphismAlias;
 
 pub trait FunctorTrait<'a, Id, SourceCategory, TargetCategory>
 where
@@ -20,8 +21,8 @@ where
         &dyn ArrowMappingTrait<
             'a,
             Identifier = Id,
-            SourceArrow = <SourceCategory as CategoryTrait<'a>>::Morphism,
-            TargetArrow = <TargetCategory as CategoryTrait<'a>>::Morphism,
+            SourceArrow = MorphismAlias<'a, SourceCategory>,
+            TargetArrow = MorphismAlias<'a, TargetCategory>,
         >,
     >;
 }

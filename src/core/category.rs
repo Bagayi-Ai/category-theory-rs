@@ -15,7 +15,7 @@ pub struct Category<
     id: Id,
     objects: HashMap<Id, &'a Object>,
     object_mapping: HashMap<Id, HashMap<Id, HashSet<Id>>>,
-    cells: HashMap<Id, Arrow<'a, Self>>,
+    cells: HashMap<Id, Arrow<'a, Id, Object, Object>>,
 }
 
 impl<
@@ -42,7 +42,7 @@ impl<
 {
     type Identifier = Id;
     type Object = Object;
-    type Morphism = Arrow<'a, Self>;
+    type Morphism = Arrow<'a, Self::Identifier, Self::Object, Self::Object>;
 
     fn category_id(&self) -> &Self::Identifier {
         todo!()
@@ -50,12 +50,7 @@ impl<
 
     fn add_object(&mut self, object: &'a Self::Object) -> Result<(), NCategoryError> {
         self.objects.insert(object.category_id().clone(), object);
-        let identity_cell = Arrow::new(
-            object.category_id().clone(),
-            object,
-            object,
-            "identity".to_string(),
-        );
+        let identity_cell = Arrow::new(object.category_id().clone(), object, object);
         self.add_morphism(identity_cell)?;
         Ok(())
     }

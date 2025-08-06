@@ -6,48 +6,31 @@ use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 
 #[derive(Debug, PartialEq, Eq)]
-pub struct Arrow<'a, Category>
+pub struct Arrow<'a, Id, SourceObject, TargetObject>
 where
-    Category: CategoryTrait<'a>,
-    <Category as CategoryTrait<'a>>::Object: Clone,
+    Id: Identifier,
+    SourceObject: CategoryTrait<'a>,
+    TargetObject: CategoryTrait<'a>,
 {
-    id: <Category as CategoryTrait<'a>>::Identifier,
-    source: &'a <Category as CategoryTrait<'a>>::Object,
-    target: &'a <Category as CategoryTrait<'a>>::Object,
-    name: String,
+    id: Id,
+    source: &'a SourceObject,
+    target: &'a TargetObject,
 }
 
-impl<'a, Category: CategoryTrait<'a>> Arrow<'a, Category>
-where
-    <Category as CategoryTrait<'a>>::Object: Clone,
+impl<'a, Id: Identifier, SourceObject: CategoryTrait<'a>, TargetObject: CategoryTrait<'a>>
+    Arrow<'a, Id, SourceObject, TargetObject>
 {
-    pub fn new(
-        id: <Category as CategoryTrait<'a>>::Identifier,
-        source: &'a <Category as CategoryTrait<'a>>::Object,
-        target: &'a <Category as CategoryTrait<'a>>::Object,
-        name: String,
-    ) -> Self {
-        Arrow {
-            id,
-            source,
-            target,
-            name,
-        }
+    pub fn new(id: Id, source: &'a SourceObject, target: &'a TargetObject) -> Self {
+        Arrow { id, source, target }
     }
 
-    pub fn id(&self) -> &<Category as CategoryTrait<'a>>::Identifier {
+    pub fn id(&self) -> &Id {
         &self.id
     }
-
-    pub fn name(&self) -> &str {
-        &self.name
-    }
 }
 
-impl<'a, Category: CategoryTrait<'a>> Hash for Arrow<'a, Category>
-where
-    <Category as CategoryTrait<'a>>::Object: Clone,
-    <Category as CategoryTrait<'a>>::Object: 'a,
+impl<'a, Id: Identifier, SourceObject: CategoryTrait<'a>, TargetObject: CategoryTrait<'a>> Hash
+    for Arrow<'a, Id, SourceObject, TargetObject>
 {
     fn hash<H>(&self, _: &mut H)
     where
@@ -57,14 +40,12 @@ where
     }
 }
 
-impl<'a, Category: CategoryTrait<'a> + Eq> ArrowTrait<'a> for Arrow<'a, Category>
-where
-    <Category as CategoryTrait<'a>>::Object: Clone + 'a + CategoryTrait<'a>,
-    <Category as CategoryTrait<'a>>::Identifier: 'a,
+impl<'a, Id: Identifier + 'a, SourceObject: CategoryTrait<'a>, TargetObject: CategoryTrait<'a>>
+    ArrowTrait<'a> for Arrow<'a, Id, SourceObject, TargetObject>
 {
-    type SourceObject = <Category as CategoryTrait<'a>>::Object;
-    type TargetObject = <Category as CategoryTrait<'a>>::Object;
-    type Identifier = <Category as CategoryTrait<'a>>::Identifier;
+    type SourceObject = SourceObject;
+    type TargetObject = TargetObject;
+    type Identifier = Id;
 
     type Functor = GenericNFunctor<'a, Self::Identifier, Self::SourceObject, Self::TargetObject>;
 

@@ -95,12 +95,7 @@ pub fn test_base_scenarios() {
 
     // now add a cell between object1 and object2
     let cell_id = generate_identifier();
-    let cell = Arrow::new(
-        cell_id.clone(),
-        &object1,
-        &object2,
-        "obj1 to obj2".to_string(),
-    );
+    let cell = Arrow::new(cell_id.clone(), &object1, &object2);
     category.add_morphism(cell).unwrap();
 
     let cell = category.get_moprhism(&cell_id).unwrap();

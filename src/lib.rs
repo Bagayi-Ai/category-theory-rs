@@ -5,8 +5,6 @@ mod core {
 
     pub mod discrete_category;
 
-    pub mod morphism;
-
     pub mod generic_morphism;
 
     pub mod generic_nfunctor;
@@ -22,6 +20,10 @@ mod core {
     pub mod arrow;
 
     pub mod generic_narrow;
+
+    pub mod traits {
+        pub mod morphism_trait;
+    }
 
     pub mod unit {
         pub mod unit_category;

@@ -1,5 +1,5 @@
 use crate::core::identifier::Identifier;
-use crate::core::morphism::Morphism;
+use crate::core::traits::morphism_trait::MorphismTrait;
 use crate::core::ncategory::{NCategory, NCategoryError};
 use crate::core::unit::unit_category::UnitCategory;
 use crate::core::unit::unit_functor::UnitFunctor;
@@ -134,7 +134,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> NC
     }
 }
 
-impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> Morphism<'a>
+impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> MorphismTrait<'a>
     for DiscreteCategory<T>
 {
     type Identifier = T;

@@ -3,7 +3,7 @@ use crate::core::generic_morphism::GenericMorphism;
 use crate::core::generic_ncategory::*;
 use crate::core::generic_nfunctor::GenericNFunctor;
 use crate::core::identifier::Identifier;
-use crate::core::morphism::Morphism;
+use crate::core::traits::morphism_trait::MorphismTrait;
 use crate::core::ncategory::NCategory;
 use crate::core::tests::ncategory_test_helper::*;
 

@@ -1,6 +1,6 @@
 use crate::core::discrete_category::DiscreteCategory;
 use crate::core::identifier::Identifier;
-use crate::core::morphism::Morphism;
+use crate::core::traits::morphism_trait::MorphismTrait;
 use crate::core::ncategory::NCategory;
 use crate::core::nfunctor::NFunctor;
 use crate::core::unit::unit_functor::UNIT_FUNCTOR_STRING;

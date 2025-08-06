@@ -1,6 +1,6 @@
 use crate::core::functor_mapping::FunctorMappings;
 use crate::core::identifier::Identifier;
-use crate::core::morphism::Morphism;
+use crate::core::traits::morphism_trait::MorphismTrait;
 use crate::core::ncategory::{NCategory, NCategoryError};
 
 pub trait NFunctor<'a>: 'a {

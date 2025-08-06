@@ -3,9 +3,9 @@ use crate::core::nfunctor::NFunctor;
 use std::fmt::Debug;
 use std::hash::Hash;
 
-pub trait Morphism<'a>: Debug + Eq + Hash
+pub trait MorphismTrait<'a>: Debug + Eq + Hash
 where
-    <Self as Morphism<'a>>::Object: NCategory<'a>,
+    <Self as MorphismTrait<'a>>::Object: NCategory<'a>,
 {
     type Object;
     type Identifier;

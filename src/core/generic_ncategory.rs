@@ -1,6 +1,6 @@
 use crate::core::generic_morphism::GenericMorphism;
 use crate::core::identifier::Identifier;
-use crate::core::morphism::Morphism;
+use crate::core::traits::morphism_trait::MorphismTrait;
 use crate::core::ncategory::{NCategory, NCategoryError};
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;

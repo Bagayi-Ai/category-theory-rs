@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use std::hash::Hash;
 
 use crate::core::identifier::Identifier;
-use crate::core::morphism::Morphism;
+use crate::core::traits::morphism_trait::MorphismTrait;
 use crate::core::morphism_tree::MorphismMappingTree;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -29,7 +29,7 @@ pub enum NCategoryError {
 pub trait NCategory<'a>: Debug {
     type Identifier: Identifier;
     type Object: 'a + Eq + Debug + Hash + NCategory<'a>;
-    type Morphism: Morphism<'a, Object = Self::Object, Identifier = Self::Identifier>;
+    type Morphism: MorphismTrait<'a, Object = Self::Object, Identifier = Self::Identifier>;
 
     fn level(&self) -> usize
     where

@@ -1,11 +1,11 @@
+use crate::core::errors::Errors;
 use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::unit::unit_functor::UnitFunctor;
 use crate::core::unit::unit_identifier::UnitIdentifier;
 use crate::core::unit::unit_morphism::UnitMorphism;
 use std::collections::HashSet;
 use std::fmt::Debug;
 use std::hash::Hash;
-use crate::core::errors::Errors;
-use crate::core::unit::unit_functor::UnitFunctor;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UnitCategory {}

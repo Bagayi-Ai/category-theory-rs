@@ -1,13 +1,13 @@
 use crate::core::arrow_mapping::ArrowMapping;
 use crate::core::category::*;
 use crate::core::discrete_category::DiscreteCategory;
+use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::tests::ncategory_test_helper::*;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::functor_trait::FunctorTrait;
 use crate::core::type_alias::ArrowMappingAlias;
-use crate::core::functor::Functor;
 
 type DiscreteCategoryString = DiscreteCategory<String>;
 
@@ -178,7 +178,9 @@ pub fn test_identity_cell_tree() {
         .add_morphism(object_3.clone())
         .unwrap();
 
-    let lower_to_numer_mappings: Vec<ArrowMappingAlias<String, DiscreteCategory<String>, DiscreteCategory<usize>>> = vec![
+    let lower_to_numer_mappings: Vec<
+        ArrowMappingAlias<String, DiscreteCategory<String>, DiscreteCategory<usize>>,
+    > = vec![
         // a to 1
         ArrowMapping::new(
             "a->1".to_string(),

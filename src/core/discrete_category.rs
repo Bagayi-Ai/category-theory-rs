@@ -1,14 +1,14 @@
+use crate::core::errors::Errors;
+use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::traits::functor_trait::FunctorTrait;
 use crate::core::unit::unit_category::UnitCategory;
+use crate::core::unit::unit_functor::UnitFunctor;
 use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Display};
 use std::hash::{Hash, Hasher};
-use crate::core::errors::Errors;
-use crate::core::traits::functor_trait::FunctorTrait;
-use crate::core::functor::Functor;
-use crate::core::unit::unit_functor::UnitFunctor;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct DiscreteCategory<T: Identifier> {
@@ -63,17 +63,14 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> Ca
     }
 
     fn identity_endofunctor(&self) -> &UnitFunctor {
-        &UnitFunctor{}
+        &UnitFunctor {}
     }
 
     fn add_object(&mut self, object: &Self::Object) -> Result<(), Errors> {
         Err(Errors::CannotAddObjectInDiscreteCategoryOnlyIdentityMorphism)
     }
 
-    fn add_morphism(
-        &mut self,
-        morphism: Self::Morphism,
-    ) -> Result<Self::Identifier, Errors> {
+    fn add_morphism(&mut self, morphism: Self::Morphism) -> Result<Self::Identifier, Errors> {
         // morphsims in discrete category are only identity morphisms,
         if morphism.source_object() != morphism.target_object() {
             return Err(Errors::OnlyIdentityMorphismDiscreteCategory);

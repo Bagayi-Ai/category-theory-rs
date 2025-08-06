@@ -1,11 +1,11 @@
+use crate::core::errors::Errors;
+use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::traits::functor_trait::FunctorTrait;
 use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
-use crate::core::errors::Errors;
-use crate::core::functor::Functor;
-use crate::core::traits::functor_trait::FunctorTrait;
 
 pub struct Arrow<'a, Id, SourceObject, TargetObject>
 where
@@ -56,12 +56,8 @@ impl<'a, Id: Identifier, SourceObject: CategoryTrait<'a>, TargetObject: Category
     }
 }
 
-impl<'a, Id: Identifier, Object: CategoryTrait<'a, Identifier = Id>>
-Arrow<'a, Id, Object, Object>
-{
-    pub fn new_identity_arrow(
-        object: &'a Object,
-    ) -> Self {
+impl<'a, Id: Identifier, Object: CategoryTrait<'a, Identifier = Id>> Arrow<'a, Id, Object, Object> {
+    pub fn new_identity_arrow(object: &'a Object) -> Self {
         Arrow {
             id: object.category_id().clone(),
             source: object,

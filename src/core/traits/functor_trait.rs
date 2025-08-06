@@ -8,14 +8,15 @@ where
     SourceCategory: CategoryTrait<'a>,
     TargetCategory: CategoryTrait<'a>,
 {
-
     fn functor_id(&self) -> &Id;
 
     fn source_category(&self) -> &'a SourceCategory;
 
     fn target_category(&self) -> &'a TargetCategory;
 
-    fn arrow_mappings(&self) -> Vec<
+    fn arrow_mappings(
+        &self,
+    ) -> Vec<
         &dyn ArrowMappingTrait<
             'a,
             Identifier = Id,

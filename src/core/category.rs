@@ -1,12 +1,12 @@
 use crate::core::arrow::Arrow;
+use crate::core::errors::Errors;
+use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::hash::Hash;
-use crate::core::errors::Errors;
-use crate::core::functor::Functor;
 pub struct Category<'a, Id: Identifier<Id = Id> + 'a, Object: CategoryTrait<'a, Identifier = Id>> {
     id: Id,
     objects: HashMap<Id, &'a Object>,

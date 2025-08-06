@@ -1,10 +1,10 @@
-use std::collections::HashSet;
-use std::fmt::Debug;
-use std::hash::Hash;
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::functor_trait::FunctorTrait;
+use std::collections::HashSet;
+use std::fmt::Debug;
+use std::hash::Hash;
 
 pub trait CategoryTrait<'a> {
     type Identifier: Identifier;
@@ -25,14 +25,13 @@ pub trait CategoryTrait<'a> {
 
     fn category_id(&self) -> &Self::Identifier;
 
-    fn identity_endofunctor(&self) -> &impl  FunctorTrait<'a, Self::Identifier, Self::Object, Self::Object>;
+    fn identity_endofunctor(
+        &self,
+    ) -> &impl FunctorTrait<'a, Self::Identifier, Self::Object, Self::Object>;
 
     fn add_object(&mut self, object: &'a Self::Object) -> Result<(), Errors>;
 
-    fn add_morphism(
-        &mut self,
-        morphism: Self::Morphism,
-    ) -> Result<Self::Identifier, Errors>;
+    fn add_morphism(&mut self, morphism: Self::Morphism) -> Result<Self::Identifier, Errors>;
 
     fn get_identity_morphism(
         &self,
@@ -60,10 +59,7 @@ pub trait CategoryTrait<'a> {
         todo!()
     }
 
-    fn get_moprhism(
-        &self,
-        morphism_id: &Self::Identifier,
-    ) -> Result<&Self::Morphism, Errors>;
+    fn get_moprhism(&self, morphism_id: &Self::Identifier) -> Result<&Self::Morphism, Errors>;
 
     fn morphism_commute(
         &self,
@@ -115,10 +111,7 @@ pub trait CategoryTrait<'a> {
         todo!()
     }
 
-    fn validate_morphisms_composition(
-        &self,
-        morphims: Vec<&Self::Morphism>,
-    ) -> Result<(), Errors> {
+    fn validate_morphisms_composition(&self, morphims: Vec<&Self::Morphism>) -> Result<(), Errors> {
         // if morphims.is_empty() {
         //     return Err(NCategoryError::InvalidMorphismComposition);
         // }

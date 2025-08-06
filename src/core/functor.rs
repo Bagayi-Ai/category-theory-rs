@@ -1,9 +1,8 @@
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowMappingTrait;
 use crate::core::traits::category_trait::CategoryTrait;
-use crate::core::type_alias::{ArrowMappingAlias};
 use crate::core::traits::functor_trait::FunctorTrait;
-
+use crate::core::type_alias::ArrowMappingAlias;
 
 pub struct Functor<'a, Id, SourceCategory, TargetCategory>
 where
@@ -14,12 +13,7 @@ where
     id: Id,
     source_category: &'a SourceCategory,
     target_category: &'a TargetCategory,
-    mappings: Vec<
-        ArrowMappingAlias<
-            'a,
-            Id,
-            SourceCategory,
-            TargetCategory>>
+    mappings: Vec<ArrowMappingAlias<'a, Id, SourceCategory, TargetCategory>>,
 }
 
 impl<'a, Id, SourceCategory, TargetCategory> Functor<'a, Id, SourceCategory, TargetCategory>
@@ -32,11 +26,7 @@ where
         id: Id,
         source_category: &'a SourceCategory,
         target_category: &'a TargetCategory,
-        mappings: Vec<ArrowMappingAlias<
-            'a,
-            Id,
-            SourceCategory,
-            TargetCategory>>
+        mappings: Vec<ArrowMappingAlias<'a, Id, SourceCategory, TargetCategory>>,
     ) -> Self {
         Functor {
             id,
@@ -45,12 +35,10 @@ where
             mappings,
         }
     }
-
 }
 
-
-impl<'a, Id, SourceCategory, TargetCategory>  FunctorTrait<'a, Id, SourceCategory, TargetCategory>
-for Functor<'a, Id, SourceCategory, TargetCategory>
+impl<'a, Id, SourceCategory, TargetCategory> FunctorTrait<'a, Id, SourceCategory, TargetCategory>
+    for Functor<'a, Id, SourceCategory, TargetCategory>
 where
     Id: Identifier,
     SourceCategory: CategoryTrait<'a>,
@@ -68,13 +56,26 @@ where
         self.target_category
     }
 
-    fn arrow_mappings(&self) -> Vec<&dyn ArrowMappingTrait<'a, Identifier=Id, SourceArrow=<SourceCategory as CategoryTrait<'a>>::Morphism, TargetArrow=<TargetCategory as CategoryTrait<'a>>::Morphism>> {
-        self.mappings.iter().map(
-            |m|
+    fn arrow_mappings(
+        &self,
+    ) -> Vec<
+        &dyn ArrowMappingTrait<
+            'a,
+            Identifier = Id,
+            SourceArrow = <SourceCategory as CategoryTrait<'a>>::Morphism,
+            TargetArrow = <TargetCategory as CategoryTrait<'a>>::Morphism,
+        >,
+    > {
+        self.mappings
+            .iter()
+            .map(|m| {
                 m as &dyn ArrowMappingTrait<
-                    'a, Identifier=Id,
-                    SourceArrow=<SourceCategory as CategoryTrait<'a>>::Morphism,
-                    TargetArrow=<TargetCategory as CategoryTrait<'a>>::Morphism>)
+                    'a,
+                    Identifier = Id,
+                    SourceArrow = <SourceCategory as CategoryTrait<'a>>::Morphism,
+                    TargetArrow = <TargetCategory as CategoryTrait<'a>>::Morphism,
+                >
+            })
             .collect()
     }
 }

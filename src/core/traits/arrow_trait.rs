@@ -18,7 +18,7 @@ pub trait ArrowTrait<'a> {
 
     fn is_identity(&self) -> bool;
 
-    fn sub_arrow(
+    fn functor(
         &self,
     ) -> Result<
         &impl FunctorTrait<

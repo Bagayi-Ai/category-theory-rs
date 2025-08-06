@@ -160,7 +160,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> ArrowTrait<'a
         true
     }
 
-    fn sub_arrow(
+    fn functor(
         &self,
     ) -> Result<
         &Functor<

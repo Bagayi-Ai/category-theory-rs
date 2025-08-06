@@ -31,7 +31,7 @@ impl<'a, T: Identifier + 'a> ArrowTrait<'a> for UnitMorphism<T> {
         todo!()
     }
 
-    fn sub_arrow(
+    fn functor(
         &self,
     ) -> Result<
         &Functor<

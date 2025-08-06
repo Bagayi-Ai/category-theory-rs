@@ -88,7 +88,7 @@ impl<'a, Id: Identifier + 'a, SourceObject: CategoryTrait<'a>, TargetObject: Cat
         todo!()
     }
 
-    fn sub_arrow(
+    fn functor(
         &self,
     ) -> Result<
         &Functor<

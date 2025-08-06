@@ -1,6 +1,7 @@
 use crate::core::identifier::Identifier;
-use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
+use crate::core::traits::category_trait::CategoryTrait;
 use std::fmt::{Debug, Display};
+use crate::core::errors::Errors;
 use crate::core::traits::functor_trait::FunctorTrait;
 
 pub trait ArrowTrait<'a> {
@@ -27,7 +28,7 @@ pub trait ArrowTrait<'a> {
             <Self::SourceObject as CategoryTrait<'a>>::Object,
             <Self::TargetObject as CategoryTrait<'a>>::Object,
         >,
-        NCategoryError,
+        Errors,
     >;
 }
 
@@ -51,7 +52,7 @@ pub trait ArrowMappingTrait<'a> {
             <Self::SourceArrow as ArrowTrait<'a>>::SourceObject,
             <Self::SourceArrow as ArrowTrait<'a>>::TargetObject,
         >,
-        NCategoryError,
+        Errors,
     >;
 
     fn target_sub_arrow_mapping(
@@ -63,6 +64,6 @@ pub trait ArrowMappingTrait<'a> {
             <Self::TargetArrow as ArrowTrait<'a>>::SourceObject,
             <Self::TargetArrow as ArrowTrait<'a>>::TargetObject,
         >,
-        NCategoryError,
+        Errors,
     >;
 }

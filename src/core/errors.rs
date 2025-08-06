@@ -1,0 +1,19 @@
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum Errors {
+    MorphismAlreadyExists,
+    MorphismNotFound,
+    OnlyIdentityMorphismDiscreteCategory,
+    InvalidMorphismComposition,
+    InvalidMorphismCommutation,
+    ObjectNotFound,
+    InvalidObjectId,
+    InvalidObjectMapping,
+    InvalidCellMapping,
+    NoObjectsInCategory,
+    InvalidCategory,
+    InvalidFunctorLevelMissmatch,
+    InvalidFunctor,
+    InvalidFunctorMappings,
+    InvalidBaseFunctor,
+    CannotAddObjectInDiscreteCategoryOnlyIdentityMorphism,
+}

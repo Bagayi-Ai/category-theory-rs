@@ -1,13 +1,12 @@
 use crate::core::arrow::Arrow;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
+use crate::core::traits::category_trait::CategoryTrait;
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::hash::Hash;
+use crate::core::errors::Errors;
 use crate::core::functor::Functor;
-use crate::core::traits::functor_trait::FunctorTrait;
-
 pub struct Category<'a, Id: Identifier<Id = Id> + 'a, Object: CategoryTrait<'a, Identifier = Id>> {
     id: Id,
     objects: HashMap<Id, &'a Object>,
@@ -46,16 +45,16 @@ impl<'a, Id: Identifier<Id = Id> + 'a, Object: CategoryTrait<'a, Identifier = Id
         todo!()
     }
 
-    fn add_object(&mut self, object: &'a Self::Object) -> Result<(), NCategoryError> {
+    fn add_object(&mut self, object: &'a Self::Object) -> Result<(), Errors> {
         self.objects.insert(object.category_id().clone(), object);
         let identity_cell = Arrow::new_identity_arrow(object);
         self.add_morphism(identity_cell)?;
         Ok(())
     }
 
-    fn add_morphism(&mut self, cell: Self::Morphism) -> Result<Self::Identifier, NCategoryError> {
+    fn add_morphism(&mut self, cell: Self::Morphism) -> Result<Self::Identifier, Errors> {
         if self.morphism.contains_key(cell.id()) {
-            return Err(NCategoryError::MorphismAlreadyExists);
+            return Err(Errors::MorphismAlreadyExists);
         }
         let cell = self.morphism.entry(cell.id().clone()).or_insert(cell);
         self.object_mapping
@@ -71,16 +70,16 @@ impl<'a, Id: Identifier<Id = Id> + 'a, Object: CategoryTrait<'a, Identifier = Id
     fn get_identity_morphism(
         &self,
         object_id: &Self::Identifier,
-    ) -> Result<&Self::Morphism, NCategoryError> {
+    ) -> Result<&Self::Morphism, Errors> {
         // it's basically the cell with the same id as the object
         self.get_moprhism(object_id)
     }
 
-    fn get_all_object_ids(&self) -> Result<HashSet<&Self::Identifier>, NCategoryError> {
+    fn get_all_object_ids(&self) -> Result<HashSet<&Self::Identifier>, Errors> {
         todo!()
     }
 
-    fn get_all_morphisms(&self) -> Result<HashSet<&Self::Morphism>, NCategoryError> {
+    fn get_all_morphisms(&self) -> Result<HashSet<&Self::Morphism>, Errors> {
         // Todo needs optimization
         // Ok(self.cells.values().collect())
 
@@ -94,7 +93,7 @@ impl<'a, Id: Identifier<Id = Id> + 'a, Object: CategoryTrait<'a, Identifier = Id
     fn get_object_morphisms(
         &self,
         object_id: &Self::Identifier,
-    ) -> Result<Vec<&Self::Morphism>, NCategoryError> {
+    ) -> Result<Vec<&Self::Morphism>, Errors> {
         if let Some(cells) = self.object_mapping.get(object_id) {
             let mut result: Vec<&Self::Morphism> = Vec::new();
             for cell_set in cells.values() {
@@ -108,15 +107,15 @@ impl<'a, Id: Identifier<Id = Id> + 'a, Object: CategoryTrait<'a, Identifier = Id
             }
             Ok(result)
         } else {
-            Err(NCategoryError::ObjectNotFound)
+            Err(Errors::ObjectNotFound)
         }
     }
 
-    fn get_moprhism(&self, cell_id: &Self::Identifier) -> Result<&Self::Morphism, NCategoryError> {
+    fn get_moprhism(&self, cell_id: &Self::Identifier) -> Result<&Self::Morphism, Errors> {
         if let Some(cell) = self.morphism.get(cell_id) {
             Ok(cell)
         } else {
-            Err(NCategoryError::MorphismNotFound)
+            Err(Errors::MorphismNotFound)
         }
     }
 }

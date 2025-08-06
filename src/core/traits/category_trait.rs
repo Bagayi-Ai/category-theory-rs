@@ -1,30 +1,10 @@
 use std::collections::HashSet;
 use std::fmt::Debug;
 use std::hash::Hash;
-
+use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::functor_trait::FunctorTrait;
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum NCategoryError {
-    MorphismAlreadyExists,
-    MorphismNotFound,
-    OnlyIdentityMorphismDiscreteCategory,
-    InvalidMorphismComposition,
-    InvalidMorphismCommutation,
-    ObjectNotFound,
-    InvalidObjectId,
-    InvalidObjectMapping,
-    InvalidCellMapping,
-    NoObjectsInCategory,
-    InvalidCategory,
-    InvalidFunctorLevelMissmatch,
-    InvalidFunctor,
-    InvalidFunctorMappings,
-    InvalidBaseFunctor,
-    CannotAddObjectInDiscreteCategoryOnlyIdentityMorphism,
-}
 
 pub trait CategoryTrait<'a> {
     type Identifier: Identifier;
@@ -47,31 +27,31 @@ pub trait CategoryTrait<'a> {
 
     fn identity_endofunctor(&self) -> &impl  FunctorTrait<'a, Self::Identifier, Self::Object, Self::Object>;
 
-    fn add_object(&mut self, object: &'a Self::Object) -> Result<(), NCategoryError>;
+    fn add_object(&mut self, object: &'a Self::Object) -> Result<(), Errors>;
 
     fn add_morphism(
         &mut self,
         morphism: Self::Morphism,
-    ) -> Result<Self::Identifier, NCategoryError>;
+    ) -> Result<Self::Identifier, Errors>;
 
     fn get_identity_morphism(
         &self,
         object_id: &Self::Identifier,
-    ) -> Result<&Self::Morphism, NCategoryError>;
+    ) -> Result<&Self::Morphism, Errors>;
 
-    fn get_all_object_ids(&self) -> Result<HashSet<&Self::Identifier>, NCategoryError>;
+    fn get_all_object_ids(&self) -> Result<HashSet<&Self::Identifier>, Errors>;
 
-    fn get_all_morphisms(&self) -> Result<HashSet<&Self::Morphism>, NCategoryError>;
+    fn get_all_morphisms(&self) -> Result<HashSet<&Self::Morphism>, Errors>;
 
     fn get_object_morphisms(
         &self,
         object_id: &Self::Identifier,
-    ) -> Result<Vec<&Self::Morphism>, NCategoryError>;
+    ) -> Result<Vec<&Self::Morphism>, Errors>;
 
     fn get_object_targets(
         &self,
         object_id: &Self::Identifier,
-    ) -> Result<Vec<&Self::Identifier>, NCategoryError> {
+    ) -> Result<Vec<&Self::Identifier>, Errors> {
         // self.get_object_cells(object_id)
         //     .unwrap()
         //     .iter()
@@ -83,13 +63,13 @@ pub trait CategoryTrait<'a> {
     fn get_moprhism(
         &self,
         morphism_id: &Self::Identifier,
-    ) -> Result<&Self::Morphism, NCategoryError>;
+    ) -> Result<&Self::Morphism, Errors>;
 
     fn morphism_commute(
         &self,
         left_morphisms: Vec<&Self::Morphism>,
         right_morphisms: Vec<&Self::Morphism>,
-    ) -> Result<bool, NCategoryError> {
+    ) -> Result<bool, Errors> {
         self.validate_morphisms_commutation(left_morphisms, right_morphisms)?;
 
         Ok(true)
@@ -99,7 +79,7 @@ pub trait CategoryTrait<'a> {
         &self,
         left_morphisms: Vec<&Self::Morphism>,
         right_morphisms: Vec<&Self::Morphism>,
-    ) -> Result<(), NCategoryError> {
+    ) -> Result<(), Errors> {
         // // source and target of left cells id should be same with right cells
         // let left_source_object = left_morphisms
         //     .first()
@@ -138,7 +118,7 @@ pub trait CategoryTrait<'a> {
     fn validate_morphisms_composition(
         &self,
         morphims: Vec<&Self::Morphism>,
-    ) -> Result<(), NCategoryError> {
+    ) -> Result<(), Errors> {
         // if morphims.is_empty() {
         //     return Err(NCategoryError::InvalidMorphismComposition);
         // }

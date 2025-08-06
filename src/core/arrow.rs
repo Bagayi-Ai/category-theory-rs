@@ -1,8 +1,9 @@
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
+use crate::core::traits::category_trait::CategoryTrait;
 use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
+use crate::core::errors::Errors;
 use crate::core::functor::Functor;
 use crate::core::traits::functor_trait::FunctorTrait;
 
@@ -114,7 +115,7 @@ impl<'a, Id: Identifier + 'a, SourceObject: CategoryTrait<'a>, TargetObject: Cat
             <Self::SourceObject as CategoryTrait<'a>>::Object,
             <Self::TargetObject as CategoryTrait<'a>>::Object,
         >,
-        NCategoryError,
+        Errors,
     > {
         todo!()
     }

@@ -12,6 +12,8 @@ mod core {
     pub mod functor;
 
     pub mod type_alias;
+    
+    pub mod errors;
 
     pub mod traits {
         pub mod arrow_trait;

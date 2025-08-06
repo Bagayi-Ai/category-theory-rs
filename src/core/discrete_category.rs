@@ -1,10 +1,11 @@
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
+use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::unit::unit_category::UnitCategory;
 use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Display};
 use std::hash::{Hash, Hasher};
+use crate::core::errors::Errors;
 use crate::core::traits::functor_trait::FunctorTrait;
 use crate::core::functor::Functor;
 use crate::core::unit::unit_functor::UnitFunctor;
@@ -65,24 +66,24 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> Ca
         &UnitFunctor{}
     }
 
-    fn add_object(&mut self, object: &Self::Object) -> Result<(), NCategoryError> {
-        Err(NCategoryError::CannotAddObjectInDiscreteCategoryOnlyIdentityMorphism)
+    fn add_object(&mut self, object: &Self::Object) -> Result<(), Errors> {
+        Err(Errors::CannotAddObjectInDiscreteCategoryOnlyIdentityMorphism)
     }
 
     fn add_morphism(
         &mut self,
         morphism: Self::Morphism,
-    ) -> Result<Self::Identifier, NCategoryError> {
+    ) -> Result<Self::Identifier, Errors> {
         // morphsims in discrete category are only identity morphisms,
         if morphism.source_object() != morphism.target_object() {
-            return Err(NCategoryError::OnlyIdentityMorphismDiscreteCategory);
+            return Err(Errors::OnlyIdentityMorphismDiscreteCategory);
         }
 
         let cell_id = morphism.cell_id().clone();
 
         if let Some(cells) = &mut self.cells {
             if cells.contains_key(&cell_id) {
-                return Err(NCategoryError::MorphismAlreadyExists);
+                return Err(Errors::MorphismAlreadyExists);
             }
             cells.insert(cell_id.clone(), morphism);
         } else {
@@ -99,11 +100,11 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> Ca
     fn get_identity_morphism(
         &self,
         object_id: &Self::Identifier,
-    ) -> Result<&Self::Morphism, NCategoryError> {
+    ) -> Result<&Self::Morphism, Errors> {
         self.get_moprhism(object_id)
     }
 
-    fn get_all_object_ids(&self) -> Result<HashSet<&Self::Identifier>, NCategoryError> {
+    fn get_all_object_ids(&self) -> Result<HashSet<&Self::Identifier>, Errors> {
         // if let Some(cells) = &self.cells {
         //     Ok(cells.values().collect())
         // } else {
@@ -112,7 +113,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> Ca
         todo!()
     }
 
-    fn get_all_morphisms(&self) -> Result<HashSet<&Self::Morphism>, NCategoryError> {
+    fn get_all_morphisms(&self) -> Result<HashSet<&Self::Morphism>, Errors> {
         self.get_all_object_ids()?
             .into_iter()
             .map(|object_id| self.get_identity_morphism(object_id))
@@ -122,18 +123,18 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> Ca
     fn get_object_morphisms(
         &self,
         object_id: &Self::Identifier,
-    ) -> Result<Vec<&Self::Morphism>, NCategoryError> {
+    ) -> Result<Vec<&Self::Morphism>, Errors> {
         // only cell in discrete category is the identity cell.
         Ok(vec![self.get_identity_morphism(object_id)?])
     }
 
-    fn get_moprhism(&self, cell_id: &Self::Identifier) -> Result<&Self::Morphism, NCategoryError> {
+    fn get_moprhism(&self, cell_id: &Self::Identifier) -> Result<&Self::Morphism, Errors> {
         if let Some(cells) = &self.cells {
             if let Some(cell) = cells.get(cell_id) {
                 return Ok(cell);
             }
         }
-        Err(NCategoryError::MorphismNotFound)
+        Err(Errors::MorphismNotFound)
     }
     fn nested_level() -> usize {
         1
@@ -172,7 +173,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> ArrowTrait<'a
             <Self::SourceObject as CategoryTrait<'a>>::Object,
             <Self::SourceObject as CategoryTrait<'a>>::Object,
         >,
-        NCategoryError,
+        Errors,
     > {
         todo!()
     }

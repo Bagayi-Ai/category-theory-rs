@@ -1,6 +1,7 @@
+use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::{ArrowMappingTrait, ArrowTrait};
-use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
+use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::functor_trait::FunctorTrait;
 
 pub(crate) struct ArrowMapping<'a, Id, SourceArrow, TargetArrow>
@@ -57,7 +58,7 @@ where
             <Self::SourceArrow as ArrowTrait<'a>>::SourceObject,
             <Self::SourceArrow as ArrowTrait<'a>>::TargetObject,
         >,
-        NCategoryError,
+        Errors,
     > {
         todo!()
     }
@@ -71,7 +72,7 @@ where
             <Self::TargetArrow as ArrowTrait<'a>>::SourceObject,
             <Self::TargetArrow as ArrowTrait<'a>>::TargetObject,
         >,
-        NCategoryError,
+        Errors,
     > {
         todo!()
     }

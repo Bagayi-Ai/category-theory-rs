@@ -1,6 +1,6 @@
 use crate::core::functor_mapping::FunctorMappings;
 use crate::core::identifier::Identifier;
-use crate::core::traits::arrow_trait::{ArrowTrait, DynArrowTraitType};
+use crate::core::traits::arrow_trait::DynArrowTraitType;
 use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
 
 pub trait FunctorTrait<'a>: 'a {

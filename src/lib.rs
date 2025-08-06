@@ -5,7 +5,7 @@ mod core {
 
     pub mod arrow;
 
-    pub mod generic_nfunctor;
+    pub mod functor;
 
     pub mod functor_mapping;
 

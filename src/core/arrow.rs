@@ -1,4 +1,4 @@
-use crate::core::generic_nfunctor::GenericNFunctor;
+use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
@@ -47,7 +47,7 @@ impl<'a, Id: Identifier + 'a, SourceObject: CategoryTrait<'a>, TargetObject: Cat
     type TargetObject = TargetObject;
     type Identifier = Id;
 
-    type Functor = GenericNFunctor<'a, Self::Identifier, Self::SourceObject, Self::TargetObject>;
+    type Functor = Functor<'a, Self::Identifier, Self::SourceObject, Self::TargetObject>;
 
     fn cell_id(&self) -> &Self::Identifier {
         &self.id
@@ -68,8 +68,4 @@ impl<'a, Id: Identifier + 'a, SourceObject: CategoryTrait<'a>, TargetObject: Cat
     fn functor(&self) -> &Self::Functor {
         todo!()
     }
-
-    // fn functor(&self) -> &<Self::Functor as NFunctor>::Identifier {
-    //     todo!()
-    // }
 }

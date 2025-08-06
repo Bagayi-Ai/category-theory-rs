@@ -1,7 +1,7 @@
 use crate::core::arrow::Arrow;
 use crate::core::category::*;
 use crate::core::discrete_category::DiscreteCategory;
-use crate::core::generic_nfunctor::GenericNFunctor;
+use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::tests::ncategory_test_helper::*;
 use crate::core::traits::arrow_trait::ArrowTrait;
@@ -177,7 +177,7 @@ pub fn test_identity_cell_tree() {
         .unwrap();
 
     // create a functor from lower to number
-    let functor_lower_to_number = GenericNFunctor::new(
+    let functor_lower_to_number = Functor::new(
         "functor_lower_to_number".to_string(),
         &discreteCategoryALower,
         &discreteCategoryANumber,
@@ -213,7 +213,7 @@ pub fn test_identity_cell_tree() {
         .into(),
     );
 
-    let functor_number_to_upper = GenericNFunctor::new(
+    let functor_number_to_upper = Functor::new(
         "functor_lower_to_number".to_string(),
         &discreteCategoryANumber,
         &discreteCategoryAUpper,
@@ -293,7 +293,7 @@ pub fn test_identity_cell_tree() {
     // assert_eq!(actual_mapping, expected_mapping);
     //
     // create a functor1 from lower to upper
-    let functor_lower_to_upper = GenericNFunctor::new(
+    let functor_lower_to_upper = Functor::new(
         "functor_1".to_string(),
         &discreteCategoryALower,
         &discreteCategoryAUpper,

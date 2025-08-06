@@ -4,7 +4,7 @@ use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
 use crate::core::traits::functor_trait::FunctorTrait;
 
-pub struct GenericNFunctor<
+pub struct Functor<
     'a,
     Id: Identifier,
     SourceCategory: CategoryTrait<'a>,
@@ -16,7 +16,7 @@ pub struct GenericNFunctor<
     mappings: FunctorMappings<'a, Id, SourceCategory, TargetCategory>,
 }
 
-impl<'a, Id, SourceCategory, TargetCategory> GenericNFunctor<'a, Id, SourceCategory, TargetCategory>
+impl<'a, Id, SourceCategory, TargetCategory> Functor<'a, Id, SourceCategory, TargetCategory>
 where
     SourceCategory: CategoryTrait<'a>,
     TargetCategory: CategoryTrait<'a>,
@@ -28,7 +28,7 @@ where
         target_category: &'a TargetCategory,
         mappings: FunctorMappings<'a, Id, SourceCategory, TargetCategory>,
     ) -> Self {
-        let functor = GenericNFunctor {
+        let functor = Functor {
             id,
             source_category,
             target_category,
@@ -42,7 +42,7 @@ where
 }
 
 impl<'a, Id, SourceCategory, TargetCategory> FunctorTrait<'a>
-    for GenericNFunctor<'a, Id, SourceCategory, TargetCategory>
+    for Functor<'a, Id, SourceCategory, TargetCategory>
 where
     SourceCategory: CategoryTrait<'a>,
     TargetCategory: CategoryTrait<'a>,

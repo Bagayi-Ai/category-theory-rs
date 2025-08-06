@@ -3,8 +3,8 @@ use std::fmt::Debug;
 use std::hash::Hash;
 
 use crate::core::identifier::Identifier;
-use crate::core::traits::morphism_trait::MorphismTrait;
 use crate::core::morphism_tree::MorphismMappingTree;
+use crate::core::traits::morphism_trait::MorphismTrait;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum NCategoryError {

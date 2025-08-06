@@ -3,9 +3,9 @@ use crate::core::generic_morphism::GenericMorphism;
 use crate::core::generic_ncategory::*;
 use crate::core::generic_nfunctor::GenericNFunctor;
 use crate::core::identifier::Identifier;
-use crate::core::traits::morphism_trait::MorphismTrait;
-use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::tests::ncategory_test_helper::*;
+use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::traits::morphism_trait::MorphismTrait;
 
 type DiscreteCategoryString = DiscreteCategory<String>;
 

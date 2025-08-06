@@ -18,9 +18,9 @@ mod core {
     pub mod generic_narrow;
 
     pub mod traits {
-        pub mod morphism_trait;
-        pub mod functor_trait;
         pub mod category_trait;
+        pub mod functor_trait;
+        pub mod morphism_trait;
     }
 
     pub mod unit {

@@ -1,7 +1,7 @@
 use crate::core::functor_mapping::FunctorMappings;
 use crate::core::identifier::Identifier;
-use crate::core::traits::morphism_trait::MorphismTrait;
 use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
+use crate::core::traits::morphism_trait::MorphismTrait;
 
 pub trait FunctorTrait<'a>: 'a {
     type SourceCategory: CategoryTrait<'a>;

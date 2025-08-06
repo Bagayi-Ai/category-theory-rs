@@ -1,8 +1,8 @@
 use crate::core::discrete_category::DiscreteCategory;
 use crate::core::identifier::Identifier;
+use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::functor_trait::FunctorTrait;
-use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::unit::unit_functor::UNIT_FUNCTOR_STRING;
 use std::collections::HashMap;
 use std::fmt::{Debug, Display, Formatter};

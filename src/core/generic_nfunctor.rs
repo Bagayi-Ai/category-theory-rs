@@ -1,8 +1,8 @@
 use crate::core::functor_mapping::FunctorMappings;
 use crate::core::identifier::Identifier;
+use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
 use crate::core::traits::functor_trait::FunctorTrait;
-use crate::core::traits::arrow_trait::ArrowTrait;
 
 pub struct GenericNFunctor<
     'a,

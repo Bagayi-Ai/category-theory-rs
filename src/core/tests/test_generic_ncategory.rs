@@ -4,19 +4,19 @@ use crate::core::generic_ncategory::*;
 use crate::core::generic_nfunctor::GenericNFunctor;
 use crate::core::identifier::Identifier;
 use crate::core::tests::ncategory_test_helper::*;
-use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::arrow_trait::ArrowTrait;
+use crate::core::traits::category_trait::CategoryTrait;
 
 type DiscreteCategoryString = DiscreteCategory<String>;
 
 pub struct GenericCategory1TestHelper<'a> {
-    category: GenericNCategory<'a, String, DiscreteCategoryString>,
+    category: Category<'a, String, DiscreteCategoryString>,
 }
 
 impl<'a> GenericCategory1TestHelper<'a> {
     pub fn new() -> Self {
         GenericCategory1TestHelper {
-            category: GenericNCategory::new(),
+            category: Category::new(),
         }
     }
 }
@@ -36,7 +36,7 @@ fn generate_object() -> DiscreteCategoryString {
 
 #[test]
 pub fn test_base_scenarios() {
-    let mut category = GenericNCategory::new();
+    let mut category = Category::new();
     // add object 1
     let object1 = generate_object();
     let object1_id = CategoryTrait::category_id(&object1).clone();
@@ -135,7 +135,7 @@ pub fn test_base_scenarios() {
 
 #[test]
 pub fn test_identity_cell_tree() {
-    let mut setCategoryAlphabet = GenericNCategory::new();
+    let mut setCategoryAlphabet = Category::new();
 
     // Discrete category A with a, b, c as objects
     let mut discreteCategoryALower = DiscreteCategory::new_with_id("alphabet_lower".to_string());

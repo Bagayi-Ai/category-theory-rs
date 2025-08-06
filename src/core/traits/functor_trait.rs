@@ -1,7 +1,7 @@
 use crate::core::functor_mapping::FunctorMappings;
 use crate::core::identifier::Identifier;
+use crate::core::traits::arrow_trait::{ArrowTrait, DynArrowTraitType};
 use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
-use crate::core::traits::arrow_trait::{DynArrowTraitType, ArrowTrait};
 
 pub trait FunctorTrait<'a>: 'a {
     type SourceCategory: CategoryTrait<'a>;
@@ -19,12 +19,7 @@ pub trait FunctorTrait<'a>: 'a {
         &self,
     ) -> Result<
         Vec<
-            &'a DynArrowTraitType<
-                'a,
-                Self::SourceCategory,
-                Self::TargetCategory,
-                Self::Identifier,
-            >,
+            &'a DynArrowTraitType<'a, Self::SourceCategory, Self::TargetCategory, Self::Identifier>,
         >,
         NCategoryError,
     >;

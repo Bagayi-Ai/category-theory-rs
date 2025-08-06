@@ -1,19 +1,19 @@
 use crate::core::generic_morphism::GenericMorphism;
 use crate::core::identifier::Identifier;
-use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
 use crate::core::traits::arrow_trait::ArrowTrait;
+use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::hash::Hash;
 
 #[derive(Debug, PartialEq, Eq)]
-pub struct GenericNCategory<
+pub struct Category<
     'a,
     Id: Identifier<Id = Id> + 'a,
-    Category: CategoryTrait<'a, Identifier = Id> + Debug + Eq + Hash + Clone,
+    Object: CategoryTrait<'a, Identifier = Id> + Debug + Eq + Hash + Clone,
 > {
     id: Id,
-    objects: HashMap<Id, &'a Category>,
+    objects: HashMap<Id, &'a Object>,
     object_mapping: HashMap<Id, HashMap<Id, HashSet<Id>>>,
     cells: HashMap<Id, GenericMorphism<'a, Self>>,
 }
@@ -21,11 +21,11 @@ pub struct GenericNCategory<
 impl<
     'a,
     Id: Identifier<Id = Id>,
-    Category: CategoryTrait<'a, Identifier = Id> + Debug + Eq + Hash + Clone,
-> GenericNCategory<'a, Id, Category>
+    Object: CategoryTrait<'a, Identifier = Id> + Debug + Eq + Hash + Clone,
+> Category<'a, Id, Object>
 {
     pub fn new() -> Self {
-        GenericNCategory {
+        Category {
             id: Id::generate(),
             objects: HashMap::new(),
             object_mapping: HashMap::new(),
@@ -37,11 +37,11 @@ impl<
 impl<
     'a,
     Id: Identifier<Id = Id> + 'a,
-    Category: CategoryTrait<'a, Identifier = Id> + 'a + Debug + Eq + Hash + Clone,
-> CategoryTrait<'a> for GenericNCategory<'a, Id, Category>
+    Object: CategoryTrait<'a, Identifier = Id> + 'a + Debug + Eq + Hash + Clone,
+> CategoryTrait<'a> for Category<'a, Id, Object>
 {
     type Identifier = Id;
-    type Object = Category;
+    type Object = Object;
     type Morphism = GenericMorphism<'a, Self>;
 
     fn category_id(&self) -> &Self::Identifier {

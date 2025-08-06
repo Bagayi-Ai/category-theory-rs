@@ -4,7 +4,7 @@ use crate::core::category::*;
 use crate::core::discrete_category::DiscreteCategory;
 use crate::core::identifier::Identifier;
 use crate::core::tests::ncategory_test_helper::*;
-use crate::core::traits::arrow_trait::{ArrowMappingsTrait, ArrowTrait};
+use crate::core::traits::arrow_trait::{Functor, ArrowTrait};
 use crate::core::traits::category_trait::CategoryTrait;
 
 type DiscreteCategoryString = DiscreteCategory<String>;
@@ -176,7 +176,7 @@ pub fn test_identity_cell_tree() {
         .add_morphism(object_3.clone())
         .unwrap();
 
-    let lower_to_numer_mappings: ArrowMappingsTrait<
+    let lower_to_numer_mappings: Functor<
         String,
         DiscreteCategory<String>,
         DiscreteCategory<usize>,

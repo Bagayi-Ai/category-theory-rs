@@ -22,7 +22,7 @@ pub trait ArrowTrait<'a> {
     fn sub_arrow(
         &self,
     ) -> Result<
-        ArrowMappingsTrait<
+        Functor<
             'a,
             Self::Identifier,
             <Self::SourceObject as CategoryTrait<'a>>::Object,
@@ -46,7 +46,7 @@ pub trait ArrowMappingTrait<'a> {
     fn source_sub_arrow_mapping(
         &self,
     ) -> Result<
-        &ArrowMappingsTrait<
+        &Functor<
             'a,
             Self::Identifier,
             <Self::SourceArrow as ArrowTrait<'a>>::SourceObject,
@@ -58,7 +58,7 @@ pub trait ArrowMappingTrait<'a> {
     fn target_sub_arrow_mapping(
         &self,
     ) -> Result<
-        &ArrowMappingsTrait<
+        &Functor<
             'a,
             Self::Identifier,
             <Self::TargetArrow as ArrowTrait<'a>>::SourceObject,
@@ -68,7 +68,7 @@ pub trait ArrowMappingTrait<'a> {
     >;
 }
 
-pub type ArrowMappingsTrait<'a, Id, SourceCategory, TargetCategory> = Vec<
+pub type Functor<'a, Id, SourceCategory, TargetCategory> = Vec<
     &'a dyn ArrowMappingTrait<
         'a,
         Identifier = Id,

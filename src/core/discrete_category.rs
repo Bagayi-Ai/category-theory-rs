@@ -1,7 +1,7 @@
 use crate::core::arrow::Arrow;
 use crate::core::arrow_mapping::ArrowMapping;
 use crate::core::identifier::Identifier;
-use crate::core::traits::arrow_trait::{ArrowMappingsTrait, ArrowTrait};
+use crate::core::traits::arrow_trait::{Functor, ArrowTrait};
 use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
 use crate::core::unit::unit_category::UnitCategory;
 use std::collections::{HashMap, HashSet};
@@ -161,7 +161,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> ArrowTrait<'a
     fn sub_arrow(
         &self,
     ) -> Result<
-        ArrowMappingsTrait<
+        Functor<
             'a,
             Self::Identifier,
             <Self::SourceObject as CategoryTrait<'a>>::Object,

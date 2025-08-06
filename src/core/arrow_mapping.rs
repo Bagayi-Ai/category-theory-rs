@@ -1,6 +1,6 @@
 use crate::core::arrow::Arrow;
 use crate::core::identifier::Identifier;
-use crate::core::traits::arrow_trait::{ArrowMappingTrait, ArrowMappingsTrait, ArrowTrait};
+use crate::core::traits::arrow_trait::{ArrowMappingTrait, Functor, ArrowTrait};
 use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
 use std::marker::PhantomData;
 
@@ -52,7 +52,7 @@ where
     fn source_sub_arrow_mapping(
         &self,
     ) -> Result<
-        &ArrowMappingsTrait<
+        &Functor<
             'a,
             Self::Identifier,
             <Self::SourceArrow as ArrowTrait<'a>>::SourceObject,
@@ -66,7 +66,7 @@ where
     fn target_sub_arrow_mapping(
         &self,
     ) -> Result<
-        &ArrowMappingsTrait<
+        &Functor<
             'a,
             Self::Identifier,
             <Self::TargetArrow as ArrowTrait<'a>>::SourceObject,

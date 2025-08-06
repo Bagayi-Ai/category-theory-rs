@@ -1,5 +1,5 @@
 use crate::core::identifier::Identifier;
-use crate::core::traits::arrow_trait::{ArrowMappingsTrait, ArrowTrait};
+use crate::core::traits::arrow_trait::{Functor, ArrowTrait};
 use crate::core::traits::category_trait::{CategoryTrait, NCategoryError};
 use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
@@ -13,7 +13,7 @@ where
     id: Id,
     source: &'a SourceObject,
     target: &'a TargetObject,
-    functor: ArrowMappingsTrait<'a, Id, SourceObject::Object, TargetObject::Object>,
+    functor: Functor<'a, Id, SourceObject::Object, TargetObject::Object>,
 }
 
 impl<'a, Id: Identifier, SourceObject: CategoryTrait<'a>, TargetObject: CategoryTrait<'a>>
@@ -23,7 +23,7 @@ impl<'a, Id: Identifier, SourceObject: CategoryTrait<'a>, TargetObject: Category
         id: Id,
         source: &'a SourceObject,
         target: &'a TargetObject,
-        functor: ArrowMappingsTrait<'a, Id, SourceObject::Object, TargetObject::Object>,
+        functor: Functor<'a, Id, SourceObject::Object, TargetObject::Object>,
     ) -> Self {
         Arrow {
             id,
@@ -75,7 +75,7 @@ impl<'a, Id: Identifier + 'a, SourceObject: CategoryTrait<'a>, TargetObject: Cat
     fn sub_arrow(
         &self,
     ) -> Result<
-        ArrowMappingsTrait<
+        Functor<
             'a,
             Id,
             <Self::SourceObject as CategoryTrait<'a>>::Object,

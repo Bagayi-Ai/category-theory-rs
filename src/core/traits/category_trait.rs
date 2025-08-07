@@ -23,10 +23,6 @@ pub trait CategoryTrait<'a> {
 
     fn category_id(&self) -> &Self::Identifier;
 
-    fn identity_endofunctor(
-        &self,
-    ) -> &impl FunctorTrait<'a, Self::Identifier, Self::Object, Self::Object>;
-
     fn add_object(&mut self, object: &'a Self::Object) -> Result<(), Errors>;
 
     fn add_morphism(&mut self, morphism: Self::Morphism) -> Result<Self::Identifier, Errors>;

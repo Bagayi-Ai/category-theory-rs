@@ -6,8 +6,8 @@ use crate::core::traits::category_trait::MorphismAlias;
 pub trait FunctorTrait<'a, Id, SourceCategory, TargetCategory>
 where
     Id: Identifier,
-    SourceCategory: CategoryTrait<'a>,
-    TargetCategory: CategoryTrait<'a>,
+    SourceCategory: CategoryTrait<'a> + ?Sized,
+    TargetCategory: CategoryTrait<'a> + ?Sized,
 {
     fn functor_id(&self) -> &Id;
 

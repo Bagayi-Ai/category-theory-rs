@@ -21,10 +21,6 @@ impl<'a> CategoryTrait<'a> for UnitCategory {
         todo!()
     }
 
-    fn identity_endofunctor(&self) -> &UnitFunctor {
-        todo!()
-    }
-
     fn add_object(&mut self, object: &'a Self::Object) -> Result<(), Errors> {
         todo!()
     }

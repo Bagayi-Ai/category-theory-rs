@@ -9,6 +9,9 @@ use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Display};
 use std::hash::{Hash, Hasher};
 
+pub type DiscreteCategoryString = DiscreteCategory<String>;
+pub type DiscreteCategoryUsize = DiscreteCategory<usize>;
+
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct DiscreteCategory<T: Identifier> {
     category_id: T,
@@ -59,10 +62,6 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> Ca
 
     fn category_id(&self) -> &Self::Identifier {
         &self.category_id
-    }
-
-    fn identity_endofunctor(&self) -> &UnitFunctor {
-        &UnitFunctor {}
     }
 
     fn add_object(&mut self, object: &Self::Object) -> Result<(), Errors> {

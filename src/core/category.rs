@@ -41,10 +41,6 @@ impl<'a, Id: Identifier<Id = Id> + 'a, Object: CategoryTrait<'a, Identifier = Id
         todo!()
     }
 
-    fn identity_endofunctor(&self) -> &Functor<'a, Self::Identifier, Self::Object, Self::Object> {
-        todo!()
-    }
-
     fn add_object(&mut self, object: &'a Self::Object) -> Result<(), Errors> {
         self.objects.insert(object.category_id().clone(), object);
         let identity_cell = Arrow::new_identity_arrow(object);

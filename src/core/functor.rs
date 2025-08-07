@@ -1,9 +1,10 @@
 use crate::core::identifier::Identifier;
+use crate::core::traits::arrow_mapping_trait::ArrowMappingAlias;
 use crate::core::traits::arrow_mapping_trait::ArrowMappingTrait;
 use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::functor_trait::FunctorTrait;
-use crate::core::traits::arrow_mapping_trait::ArrowMappingAlias;
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Functor<'a, Id, SourceCategory, TargetCategory>
 where
     Id: Identifier,

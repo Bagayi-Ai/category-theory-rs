@@ -1,8 +1,9 @@
 use crate::core::errors::Errors;
+use crate::core::errors::Errors::{InvalidArrowNoFunctorFound, NoFunctorForIdentityArrow};
 use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::traits::category_trait::{CategoryTrait, ChildObjectAlias};
 use crate::core::traits::functor_trait::FunctorTrait;
 use std::hash::{Hash, Hasher};
 
@@ -91,14 +92,12 @@ impl<'a, Id: Identifier + 'a, SourceObject: CategoryTrait<'a>, TargetObject: Cat
     fn functor(
         &self,
     ) -> Result<
-        &Functor<
-            'a,
-            Id,
-            <Self::SourceObject as CategoryTrait<'a>>::Object,
-            <Self::TargetObject as CategoryTrait<'a>>::Object,
-        >,
+        &dyn FunctorTrait<'a, Self::Identifier, Self::SourceObject, Self::TargetObject>,
         Errors,
     > {
-        todo!()
+        if self.identity {
+            return Err(Errors::NoFunctorForIdentityArrow);
+        }
+        self.functor.ok_or(InvalidArrowNoFunctorFound)
     }
 }

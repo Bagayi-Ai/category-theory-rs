@@ -16,4 +16,6 @@ pub enum Errors {
     InvalidFunctorMappings,
     InvalidBaseFunctor,
     CannotAddObjectInDiscreteCategoryOnlyIdentityMorphism,
+    NoFunctorForIdentityArrow,
+    InvalidArrowNoFunctorFound,
 }

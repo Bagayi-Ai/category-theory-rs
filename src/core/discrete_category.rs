@@ -2,7 +2,8 @@ use crate::core::errors::Errors;
 use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::traits::category_trait::{CategoryTrait, ChildObjectAlias};
+use crate::core::traits::functor_trait::FunctorTrait;
 use crate::core::unit::unit_category::UnitCategory;
 use crate::core::unit::unit_functor::UnitFunctor;
 use std::collections::{HashMap, HashSet};
@@ -162,11 +163,11 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> ArrowTrait<'a
     fn functor(
         &self,
     ) -> Result<
-        &Functor<
+        &dyn FunctorTrait<
             'a,
             Self::Identifier,
-            <Self::SourceObject as CategoryTrait<'a>>::Object,
-            <Self::SourceObject as CategoryTrait<'a>>::Object,
+            ChildObjectAlias<'a, Self::SourceObject>,
+            ChildObjectAlias<'a, Self::TargetObject>,
         >,
         Errors,
     > {

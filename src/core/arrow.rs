@@ -15,7 +15,7 @@ where
     id: Id,
     source: &'a SourceObject,
     target: &'a TargetObject,
-    functor: &'a dyn FunctorTrait<'a, Id, SourceObject, TargetObject>,
+    functor: Option<&'a dyn FunctorTrait<'a, Id, SourceObject, TargetObject>>,
     identity: bool,
 }
 
@@ -32,7 +32,7 @@ impl<'a, Id: Identifier, SourceObject: CategoryTrait<'a>, TargetObject: Category
             id,
             source,
             target,
-            functor,
+            functor: functor.into(),
             identity: false,
         }
     }
@@ -44,14 +44,13 @@ impl<'a, Id: Identifier, SourceObject: CategoryTrait<'a>, TargetObject: Category
 
 impl<'a, Id: Identifier, Object: CategoryTrait<'a, Identifier = Id>> Arrow<'a, Id, Object, Object> {
     pub fn new_identity_arrow(object: &'a Object) -> Self {
-        // Arrow {
-        //     id: object.category_id().clone(),
-        //     source: object,
-        //     target: object,
-        //     functor: object.identity_endofunctor(),
-        //     identity: true,
-        // }
-        todo!()
+        Arrow {
+            id: object.category_id().clone(),
+            source: object,
+            target: object,
+            functor: None,
+            identity: true,
+        }
     }
 }
 

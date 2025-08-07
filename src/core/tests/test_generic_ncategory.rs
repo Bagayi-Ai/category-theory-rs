@@ -6,7 +6,7 @@ use crate::core::identifier::Identifier;
 use crate::core::tests::ncategory_test_helper::*;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
-use crate::core::type_alias::ArrowMappingAlias;
+use crate::core::traits::arrow_mapping_trait::ArrowMappingAlias;
 
 type DiscreteCategoryString = DiscreteCategory<String>;
 

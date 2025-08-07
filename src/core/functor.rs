@@ -2,7 +2,7 @@ use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_mapping_trait::ArrowMappingTrait;
 use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::functor_trait::FunctorTrait;
-use crate::core::type_alias::ArrowMappingAlias;
+use crate::core::traits::arrow_mapping_trait::ArrowMappingAlias;
 
 pub struct Functor<'a, Id, SourceCategory, TargetCategory>
 where

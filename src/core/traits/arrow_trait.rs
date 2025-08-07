@@ -2,7 +2,7 @@ use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::functor_trait::FunctorTrait;
-use crate::core::type_alias::ChildObjectAlias;
+use crate::core::traits::category_trait::ChildObjectAlias;
 
 pub trait ArrowTrait<'a> {
     type SourceObject: CategoryTrait<'a>;

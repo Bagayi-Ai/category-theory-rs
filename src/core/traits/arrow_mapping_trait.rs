@@ -1,6 +1,8 @@
+use crate::core::arrow_mapping::ArrowMapping;
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
+use crate::core::traits::category_trait::MorphismAlias;
 use crate::core::traits::functor_trait::FunctorTrait;
 
 pub trait ArrowMappingTrait<'a> {
@@ -38,3 +40,6 @@ pub trait ArrowMappingTrait<'a> {
         Errors,
     >;
 }
+
+pub type ArrowMappingAlias<'a, Id, SourceCategory, TargetCategory> =
+    ArrowMapping<'a, Id, MorphismAlias<'a, SourceCategory>, MorphismAlias<'a, TargetCategory>>;

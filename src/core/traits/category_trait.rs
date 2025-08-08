@@ -1,8 +1,10 @@
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::functor_trait::FunctorTrait;
 use std::collections::HashSet;
+
+pub type ChildObjectAlias<'a, Object> = <Object as CategoryTrait<'a>>::Object;
+pub type MorphismAlias<'a, Category> = <Category as CategoryTrait<'a>>::Morphism;
 
 pub trait CategoryTrait<'a> {
     type Identifier: Identifier;
@@ -141,6 +143,3 @@ pub trait CategoryTrait<'a> {
         1 + <Self::Object as CategoryTrait>::nested_level()
     }
 }
-
-pub type ChildObjectAlias<'a, Object> = <Object as CategoryTrait<'a>>::Object;
-pub type MorphismAlias<'a, Category> = <Category as CategoryTrait<'a>>::Morphism;

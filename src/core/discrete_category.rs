@@ -166,8 +166,8 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> ArrowTrait<'a
         &dyn FunctorTrait<
             'a,
             Self::Identifier,
-            ChildObjectAlias<'a, Self::SourceObject>,
-            ChildObjectAlias<'a, Self::TargetObject>,
+            Self::SourceObject,
+            Self::TargetObject,
         >,
         Errors,
     > {

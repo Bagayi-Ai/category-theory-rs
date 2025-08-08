@@ -50,34 +50,6 @@ where
     fn target_arrow(&self) -> &Self::TargetArrow {
         todo!()
     }
-
-    fn source_sub_arrow_mapping(
-        &self,
-    ) -> Result<
-        &dyn FunctorTrait<
-            'a,
-            Self::Identifier,
-            <Self::SourceArrow as ArrowTrait<'a>>::SourceObject,
-            <Self::SourceArrow as ArrowTrait<'a>>::TargetObject,
-        >,
-        Errors,
-    > {
-        todo!()
-    }
-
-    fn target_sub_arrow_mapping(
-        &self,
-    ) -> Result<
-        &dyn FunctorTrait<
-            'a,
-            Self::Identifier,
-            <Self::TargetArrow as ArrowTrait<'a>>::SourceObject,
-            <Self::TargetArrow as ArrowTrait<'a>>::TargetObject,
-        >,
-        Errors,
-    > {
-        todo!()
-    }
 }
 
 impl<'a, Id, SourceArrow, TargetArrow> Debug for ArrowMapping<'a, Id, SourceArrow, TargetArrow>

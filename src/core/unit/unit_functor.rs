@@ -3,25 +3,14 @@ use crate::core::traits::category_trait::{CategoryTrait, MorphismAlias};
 use crate::core::traits::functor_trait::FunctorTrait;
 use crate::core::unit::unit_category::UnitCategory;
 use std::collections::HashMap;
+use crate::core::unit::unit_morphism::UnitMorphism;
 
-pub struct UnitFunctor {}
-
-impl<'a, Id: Identifier> FunctorTrait<'a, Id, UnitCategory, UnitCategory> for UnitFunctor {
-    fn functor_id(&self) -> &Id {
+impl<'a, T: Identifier + 'a> FunctorTrait<'a> for UnitMorphism<T>{
+    fn functor_id(&self) -> &Self::Identifier {
         todo!()
     }
 
-    fn source_category(&self) -> &'a UnitCategory {
-        todo!()
-    }
-
-    fn target_category(&self) -> &'a UnitCategory {
-        todo!()
-    }
-
-    fn arrow_mappings(
-        &self,
-    ) -> &HashMap<&MorphismAlias<'a, UnitCategory>, &MorphismAlias<'a, UnitCategory>> {
+    fn arrow_mappings(&self) -> &HashMap<&MorphismAlias<'a, Self::SourceObject>, &MorphismAlias<'a, Self::TargetObject>> {
         todo!()
     }
 }

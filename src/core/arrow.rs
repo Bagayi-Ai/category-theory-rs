@@ -1,11 +1,12 @@
 use crate::core::errors::Errors;
 use crate::core::errors::Errors::{InvalidArrowNoFunctorFound, NoFunctorForIdentityArrow};
-use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::{CategoryTrait, ChildObjectAlias};
+use crate::core::traits::category_trait::{CategoryTrait, MorphismAlias};
 use crate::core::traits::functor_trait::FunctorTrait;
 use std::hash::{Hash, Hasher};
+use std::collections::HashMap;
+use crate::core::functor::Functor;
 
 pub struct Arrow<'a, Id, SourceObject, TargetObject>
 where
@@ -16,8 +17,12 @@ where
     id: Id,
     source: &'a SourceObject,
     target: &'a TargetObject,
-    functor: Option<&'a dyn FunctorTrait<'a, Id, SourceObject, TargetObject>>,
+    functor: Option<&'a Arrow<'a, Id, SourceObject, TargetObject>>,
     identity: bool,
+    mappings: Option<HashMap<
+        &'a MorphismAlias<'a, SourceObject>,
+        &'a MorphismAlias<'a, TargetObject>,
+    >>
 }
 
 impl<'a, Id: Identifier, SourceObject: CategoryTrait<'a>, TargetObject: CategoryTrait<'a>>
@@ -27,7 +32,7 @@ impl<'a, Id: Identifier, SourceObject: CategoryTrait<'a>, TargetObject: Category
         id: Id,
         source: &'a SourceObject,
         target: &'a TargetObject,
-        functor: &'a dyn FunctorTrait<'a, Id, SourceObject, TargetObject>,
+        functor: &'a Arrow<'a, Id, SourceObject, TargetObject>,
     ) -> Self {
         Arrow {
             id,
@@ -35,6 +40,7 @@ impl<'a, Id: Identifier, SourceObject: CategoryTrait<'a>, TargetObject: Category
             target,
             functor: functor.into(),
             identity: false,
+            mappings: None
         }
     }
 
@@ -51,6 +57,7 @@ impl<'a, Id: Identifier, Object: CategoryTrait<'a, Identifier = Id>> Arrow<'a, I
             target: object,
             functor: None,
             identity: true,
+            mappings: None,
         }
     }
 }
@@ -92,7 +99,7 @@ impl<'a, Id: Identifier + 'a, SourceObject: CategoryTrait<'a>, TargetObject: Cat
     fn functor(
         &self,
     ) -> Result<
-        &dyn FunctorTrait<'a, Self::Identifier, Self::SourceObject, Self::TargetObject>,
+        &impl FunctorTrait<'a>,
         Errors,
     > {
         if self.identity {
@@ -101,3 +108,40 @@ impl<'a, Id: Identifier + 'a, SourceObject: CategoryTrait<'a>, TargetObject: Cat
         self.functor.ok_or(InvalidArrowNoFunctorFound)
     }
 }
+
+
+impl<'a, Id: Identifier, SourceObject: CategoryTrait<'a>, TargetObject: CategoryTrait<'a>>
+Functor<'a, Id, SourceObject, TargetObject> {
+    pub fn new_functor(
+        id: Id,
+        source: &'a SourceObject,
+        target: &'a TargetObject,
+        mapping: HashMap<
+            &'a MorphismAlias<'a, SourceObject>,
+            &'a MorphismAlias<'a, TargetObject>,
+        >,
+    ) -> Self {
+        Functor {
+            id,
+            source,
+            target,
+            functor: None,
+            identity: false,
+            mappings: Some(mapping),
+        }
+    }
+
+}
+
+impl<'a, Id: Identifier, SourceObject: CategoryTrait<'a>, TargetObject: CategoryTrait<'a>>
+FunctorTrait<'a> for Functor<'a, Id, SourceObject, TargetObject>
+{
+    fn functor_id(&self) -> &Self::Identifier {
+        todo!()
+    }
+
+    fn arrow_mappings(&self) -> &HashMap<&MorphismAlias<'a, Self::SourceObject>, &MorphismAlias<'a, Self::TargetObject>> {
+        todo!()
+    }
+}
+

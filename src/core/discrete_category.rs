@@ -1,14 +1,13 @@
 use crate::core::errors::Errors;
-use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::{CategoryTrait, ChildObjectAlias};
 use crate::core::traits::functor_trait::FunctorTrait;
 use crate::core::unit::unit_category::UnitCategory;
-use crate::core::unit::unit_functor::UnitFunctor;
 use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Display};
 use std::hash::{Hash, Hasher};
+use crate::core::unit::unit_morphism::UnitMorphism;
 
 pub type DiscreteCategoryString = DiscreteCategory<String>;
 pub type DiscreteCategoryUsize = DiscreteCategory<usize>;
@@ -160,17 +159,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> ArrowTrait<'a
         true
     }
 
-    fn functor(
-        &self,
-    ) -> Result<
-        &dyn FunctorTrait<
-            'a,
-            Self::Identifier,
-            Self::SourceObject,
-            Self::TargetObject,
-        >,
-        Errors,
-    > {
+    fn functor(&self) -> Result<&UnitMorphism<Self::Identifier>, Errors> {
         todo!()
     }
 }

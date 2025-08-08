@@ -21,7 +21,7 @@ pub trait ArrowTrait<'a> {
     fn functor(
         &self,
     ) -> Result<
-        &dyn FunctorTrait<'a, Self::Identifier, Self::SourceObject, Self::TargetObject>,
+        &impl FunctorTrait<'a>,
         Errors,
     >;
 }

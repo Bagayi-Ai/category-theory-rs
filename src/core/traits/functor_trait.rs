@@ -1,7 +1,7 @@
 use crate::core::identifier::Identifier;
-use crate::core::traits::arrow_mapping_trait::ArrowMappingTrait;
 use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::category_trait::MorphismAlias;
+use std::collections::HashMap;
 
 pub trait FunctorTrait<'a, Id, SourceCategory, TargetCategory>
 where
@@ -17,12 +17,5 @@ where
 
     fn arrow_mappings(
         &self,
-    ) -> Vec<
-        &dyn ArrowMappingTrait<
-            'a,
-            Identifier = Id,
-            SourceArrow = MorphismAlias<'a, SourceCategory>,
-            TargetArrow = MorphismAlias<'a, TargetCategory>,
-        >,
-    >;
+    ) -> &HashMap<&MorphismAlias<'a, SourceCategory>, &MorphismAlias<'a, TargetCategory>>;
 }

@@ -7,8 +7,6 @@ mod core {
 
     pub mod identifier;
 
-    pub mod arrow_mapping;
-
     pub mod functor;
 
     pub mod errors;
@@ -17,8 +15,6 @@ mod core {
         pub mod arrow_trait;
         pub mod category_trait;
         pub mod functor_trait;
-
-        pub mod arrow_mapping_trait;
     }
 
     pub mod unit {

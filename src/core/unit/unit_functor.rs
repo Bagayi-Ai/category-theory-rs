@@ -1,8 +1,8 @@
 use crate::core::identifier::Identifier;
-use crate::core::traits::arrow_mapping_trait::ArrowMappingTrait;
-use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::traits::category_trait::{CategoryTrait, MorphismAlias};
 use crate::core::traits::functor_trait::FunctorTrait;
 use crate::core::unit::unit_category::UnitCategory;
+use std::collections::HashMap;
 
 pub struct UnitFunctor {}
 
@@ -21,14 +21,7 @@ impl<'a, Id: Identifier> FunctorTrait<'a, Id, UnitCategory, UnitCategory> for Un
 
     fn arrow_mappings(
         &self,
-    ) -> Vec<
-        &dyn ArrowMappingTrait<
-            'a,
-            Identifier = Id,
-            SourceArrow = <UnitCategory as CategoryTrait<'a>>::Morphism,
-            TargetArrow = <UnitCategory as CategoryTrait<'a>>::Morphism,
-        >,
-    > {
+    ) -> &HashMap<&MorphismAlias<'a, UnitCategory>, &MorphismAlias<'a, UnitCategory>> {
         todo!()
     }
 }

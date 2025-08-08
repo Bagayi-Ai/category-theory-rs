@@ -1,5 +1,4 @@
 use crate::core::arrow::Arrow;
-use crate::core::arrow_mapping::ArrowMapping;
 use crate::core::category::*;
 use crate::core::discrete_category::{
     DiscreteCategory, DiscreteCategoryString, DiscreteCategoryUsize,
@@ -7,9 +6,9 @@ use crate::core::discrete_category::{
 use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::tests::ncategory_test_helper::*;
-use crate::core::traits::arrow_mapping_trait::ArrowMappingAlias;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
+use std::collections::HashMap;
 
 pub struct GenericCategory1TestHelper<'a> {
     category: Category<'a, String, DiscreteCategoryString>,
@@ -176,40 +175,36 @@ pub fn test_identity_cell_tree() {
         .add_morphism(object_3.clone())
         .unwrap();
 
-    let lower_to_numer_mappings: Vec<
-        ArrowMappingAlias<String, DiscreteCategory<String>, DiscreteCategory<usize>>,
-    > = vec![
-        // a to 1
-        ArrowMapping::new(
-            "a->1".to_string(),
-            discreteCategoryALower
-                .get_identity_morphism(object_a.category_id())
-                .unwrap(),
-            discreteCategoryANumber
-                .get_identity_morphism(object_1.category_id())
-                .unwrap(),
-        ),
-        // b to 2
-        ArrowMapping::new(
-            "b->2".to_string(),
-            discreteCategoryALower
-                .get_identity_morphism(object_b.category_id())
-                .unwrap(),
-            discreteCategoryANumber
-                .get_identity_morphism(object_2.category_id())
-                .unwrap(),
-        ),
-        // c to 3
-        ArrowMapping::new(
-            "c->3".to_string(),
-            discreteCategoryALower
-                .get_identity_morphism(object_c.category_id())
-                .unwrap(),
-            discreteCategoryANumber
-                .get_identity_morphism(object_3.category_id())
-                .unwrap(),
-        ),
-    ];
+    let lower_to_numer_mappings: HashMap<&DiscreteCategory<String>, &DiscreteCategory<usize>> =
+        HashMap::from([
+            // a to 1
+            (
+                discreteCategoryALower
+                    .get_identity_morphism(object_a.category_id())
+                    .unwrap(),
+                discreteCategoryANumber
+                    .get_identity_morphism(object_1.category_id())
+                    .unwrap(),
+            ),
+            // b to 2
+            (
+                discreteCategoryALower
+                    .get_identity_morphism(object_b.category_id())
+                    .unwrap(),
+                discreteCategoryANumber
+                    .get_identity_morphism(object_2.category_id())
+                    .unwrap(),
+            ),
+            // c to 3
+            (
+                discreteCategoryALower
+                    .get_identity_morphism(object_c.category_id())
+                    .unwrap(),
+                discreteCategoryANumber
+                    .get_identity_morphism(object_3.category_id())
+                    .unwrap(),
+            ),
+        ]);
     // create a functor from lower to number
     let functor_lower_to_number = Functor::new(
         "functor_lower_to_number".to_string(),
@@ -218,41 +213,36 @@ pub fn test_identity_cell_tree() {
         lower_to_numer_mappings,
     );
 
-    let number_to_upper_mappings: Vec<
-        ArrowMappingAlias<String, DiscreteCategoryUsize, DiscreteCategoryString>,
-    > = vec![
-        // 1 to a
-        ArrowMapping::new(
-            "1->a".to_string(),
-            discreteCategoryANumber
-                .get_identity_morphism(object_1.category_id())
-                .unwrap(),
-            discreteCategoryALower
-                .get_identity_morphism(object_a.category_id())
-                .unwrap(),
-        ),
-        // b to 2
-        ArrowMapping::new(
-            "2->b".to_string(),
-            discreteCategoryANumber
-                .get_identity_morphism(object_2.category_id())
-                .unwrap(),
-            discreteCategoryALower
-                .get_identity_morphism(object_b.category_id())
-                .unwrap(),
-        ),
-        // c to c
-        ArrowMapping::new(
-            "3->c".to_string(),
-            discreteCategoryANumber
-                .get_identity_morphism(object_3.category_id())
-                .unwrap(),
-            discreteCategoryALower
-                .get_identity_morphism(object_c.category_id())
-                .unwrap(),
-        ),
-    ]
-    .into();
+    let number_to_upper_mappings: HashMap<&DiscreteCategoryUsize, &DiscreteCategoryString> =
+        HashMap::from([
+            // 1 to a
+            (
+                discreteCategoryANumber
+                    .get_identity_morphism(object_1.category_id())
+                    .unwrap(),
+                discreteCategoryALower
+                    .get_identity_morphism(object_a.category_id())
+                    .unwrap(),
+            ),
+            // b to 2
+            (
+                discreteCategoryANumber
+                    .get_identity_morphism(object_2.category_id())
+                    .unwrap(),
+                discreteCategoryALower
+                    .get_identity_morphism(object_b.category_id())
+                    .unwrap(),
+            ),
+            // c to c
+            (
+                discreteCategoryANumber
+                    .get_identity_morphism(object_3.category_id())
+                    .unwrap(),
+                discreteCategoryALower
+                    .get_identity_morphism(object_c.category_id())
+                    .unwrap(),
+            ),
+        ]);
     let functor_number_to_upper = Functor::new(
         "functor_lower_to_number".to_string(),
         &discreteCategoryANumber,
@@ -261,40 +251,36 @@ pub fn test_identity_cell_tree() {
     );
 
     // create a functor1 from lower to upper
-    let lower_to_upper_mappings: Vec<
-        ArrowMappingAlias<String, DiscreteCategoryString, DiscreteCategoryString>,
-    > = vec![
-        // a to A
-        ArrowMapping::new(
-            "a->A".to_string(),
-            discreteCategoryALower
-                .get_identity_morphism(object_a.category_id())
-                .unwrap(),
-            discreteCategoryAUpper
-                .get_identity_morphism(object_A.category_id())
-                .unwrap(),
-        ),
-        // b to B
-        ArrowMapping::new(
-            "b->B".to_string(),
-            discreteCategoryALower
-                .get_identity_morphism(object_b.category_id())
-                .unwrap(),
-            discreteCategoryAUpper
-                .get_identity_morphism(object_B.category_id())
-                .unwrap(),
-        ),
-        // c to C
-        ArrowMapping::new(
-            "c->C".to_string(),
-            discreteCategoryALower
-                .get_identity_morphism(object_c.category_id())
-                .unwrap(),
-            discreteCategoryAUpper
-                .get_identity_morphism(object_C.category_id())
-                .unwrap(),
-        ),
-    ];
+    let lower_to_upper_mappings: HashMap<&DiscreteCategoryString, &DiscreteCategoryString> =
+        HashMap::from([
+            // a to A
+            (
+                discreteCategoryALower
+                    .get_identity_morphism(object_a.category_id())
+                    .unwrap(),
+                discreteCategoryAUpper
+                    .get_identity_morphism(object_A.category_id())
+                    .unwrap(),
+            ),
+            // b to B
+            (
+                discreteCategoryALower
+                    .get_identity_morphism(object_b.category_id())
+                    .unwrap(),
+                discreteCategoryAUpper
+                    .get_identity_morphism(object_B.category_id())
+                    .unwrap(),
+            ),
+            // c to C
+            (
+                discreteCategoryALower
+                    .get_identity_morphism(object_c.category_id())
+                    .unwrap(),
+                discreteCategoryAUpper
+                    .get_identity_morphism(object_C.category_id())
+                    .unwrap(),
+            ),
+        ]);
     let functor_lower_to_upper = Functor::new(
         "functor_1".to_string(),
         &discreteCategoryALower,

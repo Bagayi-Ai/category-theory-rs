@@ -1,8 +1,9 @@
+use std::collections::HashMap;
 use crate::core::errors::Errors;
 use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::{CategoryTrait, ChildObjectAlias};
+use crate::core::traits::category_trait::{CategoryTrait, ChildObjectAlias, MorphismAlias};
 use crate::core::traits::functor_trait::FunctorTrait;
 use crate::core::traits::morphism_trait::MorphismTrait;
 use crate::core::unit::unit_category::UnitCategory;
@@ -40,6 +41,19 @@ impl<'a, T: Identifier + 'a> ArrowTrait<'a> for UnitMorphism<T> {
 
 impl<'a, T: Identifier + 'a> MorphismTrait<'a> for UnitMorphism<T> {
     fn functor(&self) -> Result<&UnitMorphism<T>, Errors> {
+        todo!()
+    }
+}
+
+impl<'a, Id: Identifier + 'a> FunctorTrait<'a> for UnitMorphism<Id> {
+    fn functor_id(&self) -> &Self::Identifier {
+        todo!()
+    }
+
+    fn arrow_mappings(
+        &self,
+    ) -> &HashMap<&MorphismAlias<'a, Self::SourceObject>, &MorphismAlias<'a, Self::TargetObject>>
+    {
         todo!()
     }
 }

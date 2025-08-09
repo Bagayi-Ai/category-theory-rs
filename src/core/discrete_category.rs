@@ -6,7 +6,6 @@ use crate::core::traits::category_trait::{CategoryTrait, ChildObjectAlias};
 use crate::core::traits::functor_trait::FunctorTrait;
 use crate::core::traits::morphism_trait::MorphismTrait;
 use crate::core::unit::unit_category::UnitCategory;
-use crate::core::unit::unit_functor::UnitFunctor;
 use crate::core::unit::unit_morphism::UnitMorphism;
 use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Display};

@@ -1,6 +1,5 @@
 use crate::core::errors::Errors;
 use crate::core::traits::category_trait::CategoryTrait;
-use crate::core::unit::unit_functor::UnitFunctor;
 use crate::core::unit::unit_identifier::UnitIdentifier;
 use crate::core::unit::unit_morphism::UnitMorphism;
 use std::collections::HashSet;

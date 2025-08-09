@@ -25,7 +25,6 @@ mod core {
 
         pub mod unit_identifier;
 
-        pub mod unit_functor;
     }
 
     #[cfg(test)]

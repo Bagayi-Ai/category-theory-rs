@@ -70,14 +70,7 @@ where
 
     fn arrows(
         &self,
-    ) -> Vec<
-        &dyn ArrowTrait<
-            'a,
-            SourceObject = Self::SourceObject,
-            TargetObject = Self::TargetObject,
-            Identifier = Self::Identifier,
-        >,
-    > {
+    ) -> Vec<&Functor<'a, Self::Identifier, Self::SourceObject, Self::TargetObject>> {
         todo!()
     }
 }

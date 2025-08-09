@@ -33,33 +33,13 @@ impl<'a, T: Identifier + 'a> ArrowTrait<'a> for UnitMorphism<T> {
         todo!()
     }
 
-    fn arrows(
-        &self,
-    ) -> Vec<
-        &dyn ArrowTrait<
-            'a,
-            SourceObject = Self::SourceObject,
-            TargetObject = Self::TargetObject,
-            Identifier = Self::Identifier,
-        >,
-    > {
+    fn arrows(&self) -> Vec<&UnitMorphism<T>> {
         todo!()
     }
 }
 
 impl<'a, T: Identifier + 'a> MorphismTrait<'a> for UnitMorphism<T> {
-
-    fn functor(
-        &self,
-    ) -> Result<
-        &dyn FunctorTrait<
-            'a,
-            Identifier = Self::Identifier,
-            SourceObject = Self::SourceObject,
-            TargetObject = Self::TargetObject,
-        >,
-        Errors,
-    > {
+    fn functor(&self) -> Result<&UnitMorphism<T>, Errors> {
         todo!()
     }
 }

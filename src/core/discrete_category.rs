@@ -7,6 +7,7 @@ use crate::core::traits::functor_trait::FunctorTrait;
 use crate::core::traits::morphism_trait::MorphismTrait;
 use crate::core::unit::unit_category::UnitCategory;
 use crate::core::unit::unit_functor::UnitFunctor;
+use crate::core::unit::unit_morphism::UnitMorphism;
 use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Display};
 use std::hash::{Hash, Hasher};
@@ -161,16 +162,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> ArrowTrait<'a
         true
     }
 
-    fn arrows(
-        &self,
-    ) -> Vec<
-        &dyn ArrowTrait<
-            'a,
-            SourceObject = Self::SourceObject,
-            TargetObject = Self::TargetObject,
-            Identifier = Self::Identifier,
-        >,
-    > {
+    fn arrows(&self) -> Vec<&DiscreteCategory<T>> {
         vec![self]
     }
 }
@@ -178,17 +170,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> ArrowTrait<'a
 impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> MorphismTrait<'a>
     for DiscreteCategory<T>
 {
-    fn functor(
-        &self,
-    ) -> Result<
-        &dyn FunctorTrait<
-            'a,
-            Identifier = Self::Identifier,
-            SourceObject = Self::SourceObject,
-            TargetObject = Self::TargetObject,
-        >,
-        Errors,
-    > {
+    fn functor(&self) -> Result<&UnitMorphism<T>, Errors> {
         todo!()
     }
 }

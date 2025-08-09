@@ -19,12 +19,7 @@ where
     source: &'a CategoryObjectAlias<'a, Category>,
     target: &'a CategoryObjectAlias<'a, Category>,
     functor: Option<
-        &'a dyn FunctorTrait<
-            'a,
-            Identifier = Id,
-            SourceObject = CategoryObjectAlias<'a, Category>,
-            TargetObject = CategoryObjectAlias<'a, Category>,
-        >,
+        &'a Functor<'a, Id, CategoryObjectAlias<'a, Category>, CategoryObjectAlias<'a, Category>>,
     >,
     identity: bool,
 }
@@ -37,11 +32,11 @@ where
         id: Id,
         source: &'a CategoryObjectAlias<'a, Category>,
         target: &'a CategoryObjectAlias<'a, Category>,
-        functor: &'a dyn FunctorTrait<
+        functor: &'a Functor<
             'a,
-            Identifier = Id,
-            SourceObject = CategoryObjectAlias<'a, Category>,
-            TargetObject = CategoryObjectAlias<'a, Category>,
+            Id,
+            CategoryObjectAlias<'a, Category>,
+            CategoryObjectAlias<'a, Category>,
         >,
     ) -> Self {
         Morphism {
@@ -100,16 +95,7 @@ impl<'a, Id: Identifier, Category: CategoryTrait<'a>> ArrowTrait<'a>
         todo!()
     }
 
-    fn arrows(
-        &self,
-    ) -> Vec<
-        &dyn ArrowTrait<
-            'a,
-            SourceObject = Self::SourceObject,
-            TargetObject = Self::TargetObject,
-            Identifier = Self::Identifier,
-        >,
-    > {
+    fn arrows(&self) -> Vec<&Morphism<'a, Id, Category>> {
         todo!()
     }
 }
@@ -119,15 +105,8 @@ impl<'a, Id: Identifier, Category: CategoryTrait<'a, Identifier = Id>> MorphismT
 {
     fn functor(
         &self,
-    ) -> Result<
-        &dyn FunctorTrait<
-            'a,
-            Identifier = Self::Identifier,
-            SourceObject = Self::SourceObject,
-            TargetObject = Self::TargetObject,
-        >,
-        Errors,
-    > {
+    ) -> Result<&Functor<'a, Self::Identifier, Self::SourceObject, Self::TargetObject>, Errors>
+    {
         if self.identity {
             return Err(Errors::NoFunctorForIdentityArrow);
         }

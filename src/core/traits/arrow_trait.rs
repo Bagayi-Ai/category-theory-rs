@@ -1,13 +1,6 @@
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::traits::category_trait::CategoryTrait;
-use crate::core::traits::functor_trait::FunctorTrait;
-
-pub type ArrowAlias<'a, T: ArrowTrait<'a>> = dyn ArrowTrait<
-    'a,
-    SourceObject = T::SourceObject,
-    TargetObject = T::TargetObject,
-    Identifier = T::Identifier>;
 
 pub trait ArrowTrait<'a> {
     type SourceObject: CategoryTrait<'a>;
@@ -29,7 +22,7 @@ pub trait ArrowTrait<'a> {
     fn arrows(
         &self,
     ) -> Vec<
-        &dyn ArrowTrait<
+        &impl ArrowTrait<
             'a,
             SourceObject = Self::SourceObject,
             TargetObject = Self::TargetObject,
@@ -43,7 +36,7 @@ pub trait ArrowTrait<'a> {
 
     fn validate_commutation(
         &self,
-        other: &dyn ArrowTrait<
+        other: &impl ArrowTrait<
             'a,
             SourceObject = Self::SourceObject,
             TargetObject = Self::TargetObject,

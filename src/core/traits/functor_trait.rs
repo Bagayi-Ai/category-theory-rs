@@ -1,16 +1,14 @@
+use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::category_trait::MorphismAlias;
 use std::collections::HashMap;
-use crate::core::errors::Errors;
 
 pub trait FunctorTrait<'a>: ArrowTrait<'a> {
     fn functor_id(&self) -> &Self::Identifier;
-    
-    fn validate_mappings(
-        &self,
-    ) -> Result<(), Errors>{
+
+    fn validate_mappings(&self) -> Result<(), Errors> {
         todo!()
     }
 

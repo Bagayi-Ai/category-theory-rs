@@ -17,6 +17,24 @@ pub trait ArrowTrait<'a> {
 
     fn is_identity(&self) -> bool;
 
+    fn compose(
+        &self,
+        other: &impl ArrowTrait<
+            'a,
+            SourceObject = Self::SourceObject,
+            TargetObject = Self::TargetObject,
+            Identifier = Self::Identifier,
+        >,
+    ) -> Result<
+        impl ArrowTrait<
+            'a,
+            SourceObject = Self::SourceObject,
+            TargetObject = Self::TargetObject,
+            Identifier = Self::Identifier,
+        >,
+        Errors,
+    >;
+
     // for handling composition of arrows
     // for single arrow just return itself
     fn arrows(

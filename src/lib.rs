@@ -24,7 +24,6 @@ mod core {
         pub mod unit_morphism;
 
         pub mod unit_identifier;
-
     }
 
     #[cfg(test)]

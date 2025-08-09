@@ -95,6 +95,18 @@ impl<'a, Id: Identifier, Category: CategoryTrait<'a>> ArrowTrait<'a>
         todo!()
     }
 
+    fn compose(
+        &self,
+        other: &impl ArrowTrait<
+            'a,
+            SourceObject = Self::SourceObject,
+            TargetObject = Self::TargetObject,
+            Identifier = Self::Identifier,
+        >,
+    ) -> Result<Morphism<'a, Id, Category>, Errors> {
+        todo!()
+    }
+
     fn arrows(&self) -> Vec<&Morphism<'a, Id, Category>> {
         todo!()
     }

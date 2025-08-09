@@ -1,3 +1,4 @@
+use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::{CategoryTrait, MorphismAlias};
@@ -65,6 +66,18 @@ where
     }
 
     fn is_identity(&self) -> bool {
+        todo!()
+    }
+
+    fn compose(
+        &self,
+        other: &impl ArrowTrait<
+            'a,
+            SourceObject = Self::SourceObject,
+            TargetObject = Self::TargetObject,
+            Identifier = Self::Identifier,
+        >,
+    ) -> Result<Functor<'a, Self::Identifier, Self::SourceObject, Self::TargetObject>, Errors> {
         todo!()
     }
 

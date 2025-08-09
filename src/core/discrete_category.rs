@@ -164,6 +164,18 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> ArrowTrait<'a
     fn arrows(&self) -> Vec<&DiscreteCategory<T>> {
         vec![self]
     }
+
+    fn compose(
+        &self,
+        other: &impl ArrowTrait<
+            'a,
+            SourceObject = Self::SourceObject,
+            TargetObject = Self::TargetObject,
+            Identifier = Self::Identifier,
+        >,
+    ) -> Result<DiscreteCategory<T>, Errors> {
+        todo!()
+    }
 }
 
 impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> MorphismTrait<'a>

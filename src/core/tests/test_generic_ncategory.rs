@@ -1,10 +1,10 @@
-use crate::core::arrow::Arrow;
 use crate::core::category::*;
 use crate::core::discrete_category::{
     DiscreteCategory, DiscreteCategoryString, DiscreteCategoryUsize,
 };
 use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
+use crate::core::morphism::Morphism;
 use crate::core::tests::ncategory_test_helper::*;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
@@ -308,7 +308,7 @@ pub fn test_identity_cell_tree() {
 
     // now add morphism from lower to upper
     setCategoryAlphabet
-        .add_morphism(Arrow::new(
+        .add_morphism(Morphism::new(
             "lower_to_upper".to_string(),
             &discreteCategoryALower,
             &discreteCategoryAUpper,

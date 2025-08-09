@@ -17,11 +17,4 @@ pub trait ArrowTrait<'a> {
     fn target_object(&self) -> &Self::TargetObject;
 
     fn is_identity(&self) -> bool;
-
-    fn functor(
-        &self,
-    ) -> Result<
-        &dyn FunctorTrait<'a, Self::Identifier, Self::SourceObject, Self::TargetObject>,
-        Errors,
-    >;
 }

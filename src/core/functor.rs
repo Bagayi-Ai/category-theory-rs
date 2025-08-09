@@ -1,4 +1,5 @@
 use crate::core::identifier::Identifier;
+use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::{CategoryTrait, MorphismAlias};
 use crate::core::traits::functor_trait::FunctorTrait;
 use std::collections::HashMap;
@@ -40,7 +41,35 @@ where
     }
 }
 
-impl<'a, Id, SourceCategory, TargetCategory> FunctorTrait<'a, Id, SourceCategory, TargetCategory>
+impl<'a, Id, SourceCategory, TargetCategory> ArrowTrait<'a>
+    for Functor<'a, Id, SourceCategory, TargetCategory>
+where
+    Id: Identifier,
+    SourceCategory: CategoryTrait<'a>,
+    TargetCategory: CategoryTrait<'a>,
+{
+    type SourceObject = SourceCategory;
+    type TargetObject = TargetCategory;
+    type Identifier = Id;
+
+    fn arrow_id(&self) -> &Self::Identifier {
+        &self.id
+    }
+
+    fn source_object(&self) -> &Self::SourceObject {
+        self.source_category
+    }
+
+    fn target_object(&self) -> &Self::TargetObject {
+        self.target_category
+    }
+
+    fn is_identity(&self) -> bool {
+        todo!()
+    }
+}
+
+impl<'a, Id, SourceCategory, TargetCategory> FunctorTrait<'a>
     for Functor<'a, Id, SourceCategory, TargetCategory>
 where
     Id: Identifier,
@@ -49,14 +78,6 @@ where
 {
     fn functor_id(&self) -> &Id {
         &self.id
-    }
-
-    fn source_category(&self) -> &'a SourceCategory {
-        self.source_category
-    }
-
-    fn target_category(&self) -> &'a TargetCategory {
-        self.target_category
     }
 
     fn arrow_mappings(

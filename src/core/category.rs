@@ -1,17 +1,18 @@
-use crate::core::arrow::Arrow;
 use crate::core::errors::Errors;
 use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
+use crate::core::morphism::Morphism;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::hash::Hash;
+
 pub struct Category<'a, Id: Identifier<Id = Id> + 'a, Object: CategoryTrait<'a, Identifier = Id>> {
     id: Id,
     objects: HashMap<Id, &'a Object>,
     object_mapping: HashMap<Id, HashMap<Id, HashSet<Id>>>,
-    morphism: HashMap<Id, Arrow<'a, Id, Object, Object>>,
+    morphism: HashMap<Id, Morphism<'a, Id, Self>>,
 }
 
 impl<
@@ -35,7 +36,7 @@ impl<'a, Id: Identifier<Id = Id> + 'a, Object: CategoryTrait<'a, Identifier = Id
 {
     type Identifier = Id;
     type Object = Object;
-    type Morphism = Arrow<'a, Self::Identifier, Self::Object, Self::Object>;
+    type Morphism = Morphism<'a, Id, Self>;
 
     fn category_id(&self) -> &Self::Identifier {
         todo!()
@@ -43,7 +44,7 @@ impl<'a, Id: Identifier<Id = Id> + 'a, Object: CategoryTrait<'a, Identifier = Id
 
     fn add_object(&mut self, object: &'a Self::Object) -> Result<(), Errors> {
         self.objects.insert(object.category_id().clone(), object);
-        let identity_cell = Arrow::new_identity_arrow(object);
+        let identity_cell = Morphism::new_identity_morphism(object);
         self.add_morphism(identity_cell)?;
         Ok(())
     }

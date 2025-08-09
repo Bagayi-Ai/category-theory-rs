@@ -1,19 +1,25 @@
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
+use crate::core::traits::morphism_trait::MorphismTrait;
 use std::collections::HashSet;
 
 pub type ChildObjectAlias<'a, Object> = <Object as CategoryTrait<'a>>::Object;
 pub type MorphismAlias<'a, Category> = <Category as CategoryTrait<'a>>::Morphism;
 
+pub type CategoryObjectAlias<'a, Category> = <Category as CategoryTrait<'a>>::Object;
+
+pub type CategoryIdentifierAlias<'a, Category> = <Category as CategoryTrait<'a>>::Identifier;
+
 pub trait CategoryTrait<'a> {
     type Identifier: Identifier;
     type Object: 'a + CategoryTrait<'a>;
-    type Morphism: ArrowTrait<
+    type Morphism: MorphismTrait<
             'a,
             SourceObject = Self::Object,
             TargetObject = Self::Object,
             Identifier = Self::Identifier,
+            Category = Self,
         >;
 
     fn level(&self) -> usize

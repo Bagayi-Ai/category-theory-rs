@@ -3,18 +3,20 @@ mod core {
 
     pub mod discrete_category;
 
-    pub mod arrow;
-
     pub mod identifier;
 
     pub mod functor;
 
     pub mod errors;
 
+    pub mod morphism;
+
     pub mod traits {
         pub mod arrow_trait;
         pub mod category_trait;
         pub mod functor_trait;
+
+        pub mod morphism_trait;
     }
 
     pub mod unit {

@@ -4,6 +4,7 @@ use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::{CategoryTrait, ChildObjectAlias};
 use crate::core::traits::functor_trait::FunctorTrait;
+use crate::core::traits::morphism_trait::MorphismTrait;
 use crate::core::unit::unit_category::UnitCategory;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -31,15 +32,23 @@ impl<'a, T: Identifier + 'a> ArrowTrait<'a> for UnitMorphism<T> {
     fn is_identity(&self) -> bool {
         todo!()
     }
+}
+
+impl<'a, T: Identifier + 'a> MorphismTrait<'a> for UnitMorphism<T> {
+    type Category = UnitCategory;
+
+    fn category(&self) -> &Self::Category {
+        todo!()
+    }
 
     fn functor(
         &self,
     ) -> Result<
         &dyn FunctorTrait<
             'a,
-            Self::Identifier,
-            ChildObjectAlias<'a, Self::SourceObject>,
-            ChildObjectAlias<'a, Self::TargetObject>,
+            Identifier = Self::Identifier,
+            SourceObject = Self::SourceObject,
+            TargetObject = Self::TargetObject,
         >,
         Errors,
     > {

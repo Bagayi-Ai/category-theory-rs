@@ -3,6 +3,12 @@ use crate::core::identifier::Identifier;
 use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::functor_trait::FunctorTrait;
 
+pub type ArrowAlias<'a, T: ArrowTrait<'a>> = dyn ArrowTrait<
+    'a,
+    SourceObject = T::SourceObject,
+    TargetObject = T::TargetObject,
+    Identifier = T::Identifier>;
+
 pub trait ArrowTrait<'a> {
     type SourceObject: CategoryTrait<'a>;
 
@@ -30,4 +36,24 @@ pub trait ArrowTrait<'a> {
             Identifier = Self::Identifier,
         >,
     >;
+
+    fn validate_composition(&self) -> Result<(), Errors> {
+        todo!()
+    }
+
+    fn validate_commutation(
+        &self,
+        other: &dyn ArrowTrait<
+            'a,
+            SourceObject = Self::SourceObject,
+            TargetObject = Self::TargetObject,
+            Identifier = Self::Identifier,
+        >,
+    ) -> Result<(), Errors> {
+        todo!()
+    }
+
+    fn is_isomorphism(&self) -> bool {
+        todo!()
+    }
 }

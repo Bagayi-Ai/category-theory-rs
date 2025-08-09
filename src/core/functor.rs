@@ -67,6 +67,19 @@ where
     fn is_identity(&self) -> bool {
         todo!()
     }
+
+    fn arrows(
+        &self,
+    ) -> Vec<
+        &dyn ArrowTrait<
+            'a,
+            SourceObject = Self::SourceObject,
+            TargetObject = Self::TargetObject,
+            Identifier = Self::Identifier,
+        >,
+    > {
+        todo!()
+    }
 }
 
 impl<'a, Id, SourceCategory, TargetCategory> FunctorTrait<'a>

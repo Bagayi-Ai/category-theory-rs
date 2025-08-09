@@ -17,4 +17,17 @@ pub trait ArrowTrait<'a> {
     fn target_object(&self) -> &Self::TargetObject;
 
     fn is_identity(&self) -> bool;
+
+    // for handling composition of arrows
+    // for single arrow just return itself
+    fn arrows(
+        &self,
+    ) -> Vec<
+        &dyn ArrowTrait<
+            'a,
+            SourceObject = Self::SourceObject,
+            TargetObject = Self::TargetObject,
+            Identifier = Self::Identifier,
+        >,
+    >;
 }

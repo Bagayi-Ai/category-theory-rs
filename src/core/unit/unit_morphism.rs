@@ -32,6 +32,19 @@ impl<'a, T: Identifier + 'a> ArrowTrait<'a> for UnitMorphism<T> {
     fn is_identity(&self) -> bool {
         todo!()
     }
+
+    fn arrows(
+        &self,
+    ) -> Vec<
+        &dyn ArrowTrait<
+            'a,
+            SourceObject = Self::SourceObject,
+            TargetObject = Self::TargetObject,
+            Identifier = Self::Identifier,
+        >,
+    > {
+        todo!()
+    }
 }
 
 impl<'a, T: Identifier + 'a> MorphismTrait<'a> for UnitMorphism<T> {

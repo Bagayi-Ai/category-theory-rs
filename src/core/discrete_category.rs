@@ -160,6 +160,19 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> ArrowTrait<'a
     fn is_identity(&self) -> bool {
         true
     }
+
+    fn arrows(
+        &self,
+    ) -> Vec<
+        &dyn ArrowTrait<
+            'a,
+            SourceObject = Self::SourceObject,
+            TargetObject = Self::TargetObject,
+            Identifier = Self::Identifier,
+        >,
+    > {
+        vec![self]
+    }
 }
 
 impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> MorphismTrait<'a>

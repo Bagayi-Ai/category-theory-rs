@@ -178,12 +178,6 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> ArrowTrait<'a
 impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> MorphismTrait<'a>
     for DiscreteCategory<T>
 {
-    type Category = Self;
-
-    fn category(&self) -> &Self::Category {
-        todo!()
-    }
-
     fn functor(
         &self,
     ) -> Result<

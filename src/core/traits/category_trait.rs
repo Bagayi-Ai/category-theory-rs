@@ -19,7 +19,6 @@ pub trait CategoryTrait<'a> {
             SourceObject = Self::Object,
             TargetObject = Self::Object,
             Identifier = Self::Identifier,
-            Category = Self,
         >;
 
     fn level(&self) -> usize

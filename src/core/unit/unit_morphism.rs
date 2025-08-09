@@ -48,11 +48,6 @@ impl<'a, T: Identifier + 'a> ArrowTrait<'a> for UnitMorphism<T> {
 }
 
 impl<'a, T: Identifier + 'a> MorphismTrait<'a> for UnitMorphism<T> {
-    type Category = UnitCategory;
-
-    fn category(&self) -> &Self::Category {
-        todo!()
-    }
 
     fn functor(
         &self,

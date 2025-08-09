@@ -29,7 +29,10 @@ where
     identity: bool,
 }
 
-impl<'a, Id: Identifier, Category: CategoryTrait<'a, Identifier = Id>> Morphism<'a, Id, Category> {
+impl<'a, Id: Identifier, Category: CategoryTrait<'a, Identifier = Id>> Morphism<'a, Id, Category>
+where
+    <Category as CategoryTrait<'a>>::Object: CategoryTrait<'a, Identifier = Id>,
+{
     pub fn new(
         id: Id,
         source: &'a CategoryObjectAlias<'a, Category>,
@@ -50,25 +53,6 @@ impl<'a, Id: Identifier, Category: CategoryTrait<'a, Identifier = Id>> Morphism<
         }
     }
 
-    // pub fn new_identity_morphism(object: &'a CategoryObjectAlias<'a, Category>) -> Self {
-    //     Morphism {
-    //         id: object.category_id().clone(),
-    //         source: object,
-    //         target: object,
-    //         functor: None,
-    //         identity: true,
-    //     }
-    // }
-
-    pub fn id(&self) -> &CategoryIdentifierAlias<'a, Category> {
-        &self.id
-    }
-}
-
-impl<'a, Id: Identifier, Category: CategoryTrait<'a, Identifier = Id>> Morphism<'a, Id, Category>
-where
-    <Category as CategoryTrait<'a>>::Object: CategoryTrait<'a, Identifier = Id>,
-{
     pub fn new_identity_morphism(object: &'a CategoryObjectAlias<'a, Category>) -> Self {
         Morphism {
             id: object.category_id().clone(),
@@ -77,6 +61,10 @@ where
             functor: None,
             identity: true,
         }
+    }
+
+    pub fn id(&self) -> &CategoryIdentifierAlias<'a, Category> {
+        &self.id
     }
 }
 
@@ -129,12 +117,6 @@ impl<'a, Id: Identifier, Category: CategoryTrait<'a>> ArrowTrait<'a>
 impl<'a, Id: Identifier, Category: CategoryTrait<'a, Identifier = Id>> MorphismTrait<'a>
     for Morphism<'a, Id, Category>
 {
-    type Category = Category;
-
-    fn category(&self) -> &Self::Category {
-        todo!()
-    }
-
     fn functor(
         &self,
     ) -> Result<

@@ -8,6 +8,8 @@ pub trait FunctorTrait<'a> : ArrowTrait<'a>
 {
     fn functor_id(&self) -> &Self::Identifier;
 
+    fn is_identity(&self) -> bool;
+
     fn arrow_mappings(
         &self,
     ) -> &HashMap<&MorphismAlias<'a, Self::SourceObject>, &MorphismAlias<'a, Self::TargetObject>>;

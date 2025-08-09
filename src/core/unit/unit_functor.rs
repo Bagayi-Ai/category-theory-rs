@@ -10,6 +10,10 @@ impl<'a, T: Identifier + 'a> FunctorTrait<'a> for UnitMorphism<T>{
         todo!()
     }
 
+    fn is_identity(&self) -> bool {
+        todo!()
+    }
+
     fn arrow_mappings(&self) -> &HashMap<&MorphismAlias<'a, Self::SourceObject>, &MorphismAlias<'a, Self::TargetObject>> {
         todo!()
     }

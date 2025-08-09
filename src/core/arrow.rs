@@ -140,6 +140,10 @@ FunctorTrait<'a> for Functor<'a, Id, SourceObject, TargetObject>
         todo!()
     }
 
+    fn is_identity(&self) -> bool {
+        todo!()
+    }
+
     fn arrow_mappings(&self) -> &HashMap<&MorphismAlias<'a, Self::SourceObject>, &MorphismAlias<'a, Self::TargetObject>> {
         todo!()
     }

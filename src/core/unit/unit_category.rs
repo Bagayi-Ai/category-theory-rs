@@ -16,6 +16,10 @@ impl<'a> CategoryTrait<'a> for UnitCategory {
 
     type Morphism = UnitMorphism<UnitIdentifier>;
 
+    fn new() -> Self {
+        UnitCategory {}
+    }
+
     fn category_id(&self) -> &Self::Identifier {
         todo!()
     }

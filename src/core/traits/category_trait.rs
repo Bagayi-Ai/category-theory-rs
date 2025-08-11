@@ -21,11 +21,20 @@ pub trait CategoryTrait<'a> {
             Identifier = Self::Identifier,
         >;
 
+    fn new() -> Self;
+
     fn level(&self) -> usize
     where
         Self: Sized,
     {
         Self::nested_level()
+    }
+
+    fn new_instance(&self) -> Self
+    where
+        Self: Sized,
+    {
+        Self::new()
     }
 
     fn category_id(&self) -> &Self::Identifier;

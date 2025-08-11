@@ -15,11 +15,8 @@ pub struct Category<'a, Id: Identifier<Id = Id> + 'a, Object: CategoryTrait<'a, 
     morphism: HashMap<Id, Morphism<'a, Id, Self>>,
 }
 
-impl<
-    'a,
-    Id: Identifier<Id = Id>,
-    Object: CategoryTrait<'a, Identifier = Id> + Debug + Eq + Hash + Clone,
-> Category<'a, Id, Object>
+impl<'a, Id: Identifier<Id = Id>, Object: CategoryTrait<'a, Identifier = Id>>
+    Category<'a, Id, Object>
 {
     pub fn new() -> Self {
         Category {
@@ -37,6 +34,10 @@ impl<'a, Id: Identifier<Id = Id> + 'a, Object: CategoryTrait<'a, Identifier = Id
     type Identifier = Id;
     type Object = Object;
     type Morphism = Morphism<'a, Id, Self>;
+
+    fn new() -> Self {
+        Category::new()
+    }
 
     fn category_id(&self) -> &Self::Identifier {
         todo!()

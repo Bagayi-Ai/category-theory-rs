@@ -5,9 +5,11 @@ use crate::core::discrete_category::{
 use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
+use crate::core::product_endofunctor::ProductEndoFunctor;
 use crate::core::tests::ncategory_test_helper::*;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::traits::functor_trait::FunctorTrait;
 use std::collections::HashMap;
 
 pub struct GenericCategory1TestHelper<'a> {
@@ -307,14 +309,42 @@ pub fn test_identity_cell_tree() {
     assert_eq!(identity_cell.target_object(), &discreteCategoryALower);
 
     // now add morphism from lower to upper
-    setCategoryAlphabet
-        .add_morphism(Morphism::new(
-            "lower_to_upper".to_string(),
-            &discreteCategoryALower,
-            &discreteCategoryAUpper,
-            &functor_lower_to_upper,
-        ))
-        .unwrap();
+    let morphism = Morphism::new(
+        "lower_to_upper".to_string(),
+        &discreteCategoryALower,
+        &discreteCategoryAUpper,
+        &functor_lower_to_upper,
+    );
+    setCategoryAlphabet.add_morphism(morphism).unwrap();
+
+    let mut lower_product = discreteCategoryALower.new_instance();
+
+    let product_endo_functor = ProductEndoFunctor::apply_endofunctor(
+        "product_endo_functor".to_string(),
+        &discreteCategoryALower,
+        &discreteCategoryALower,
+        &mut lower_product,
+    )
+    .unwrap();
+    // create a morphism from lower to upper using the functor
+    let morphism2 = Morphism::new(
+        "lower_to_upper".to_string(),
+        &discreteCategoryALower,
+        &discreteCategoryALower,
+        &product_endo_functor,
+    );
+
+    // add the morphism to the set category alphabet
+    setCategoryAlphabet.add_morphism(morphism2).unwrap();
+
+    // add a new object that is a result of
+
+    // assert!(morphism.validate_composition().is_ok());
+    // assert!(morphism.validate_commutation(&morphism).is_ok());
+    //
+    // assert!(functor_lower_to_upper.validate_composition().is_ok());
+    // assert!(functor_lower_to_upper.validate_commutation(&functor_lower_to_upper).is_ok());
+    // assert!(functor_lower_to_upper.validate_mappings().is_ok());
 
     // let actual_cell_tree = setCategoryAlphabet.get_cell_tree(identity_cell).unwrap();
 

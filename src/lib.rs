@@ -11,6 +11,8 @@ mod core {
 
     pub mod morphism;
 
+    pub mod product_endofunctor;
+
     pub mod traits {
         pub mod arrow_trait;
         pub mod category_trait;

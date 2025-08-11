@@ -62,6 +62,10 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> Ca
     type Object = UnitCategory;
     type Morphism = Self;
 
+    fn new() -> Self {
+        DiscreteCategory::new()
+    }
+
     fn category_id(&self) -> &Self::Identifier {
         &self.category_id
     }

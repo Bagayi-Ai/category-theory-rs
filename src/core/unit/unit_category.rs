@@ -5,11 +5,12 @@ use crate::core::unit::unit_morphism::UnitMorphism;
 use std::collections::HashSet;
 use std::fmt::Debug;
 use std::hash::Hash;
+use std::rc::Rc;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UnitCategory {}
 
-impl<'a> CategoryTrait<'a> for UnitCategory {
+impl CategoryTrait for UnitCategory {
     type Identifier = UnitIdentifier;
 
     type Object = Self;
@@ -24,18 +25,18 @@ impl<'a> CategoryTrait<'a> for UnitCategory {
         todo!()
     }
 
-    fn add_object(&mut self, object: &'a Self::Object) -> Result<(), Errors> {
+    fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors> {
         todo!()
     }
 
-    fn add_morphism(&mut self, cell: Self::Morphism) -> Result<Self::Identifier, Errors> {
+    fn add_morphism(&mut self, cell: Rc<Self::Morphism>) -> Result<Self::Identifier, Errors> {
         todo!()
     }
 
     fn get_identity_morphism(
         &self,
         object_id: &Self::Identifier,
-    ) -> Result<&Self::Morphism, Errors> {
+    ) -> Result<&Rc<Self::Morphism>, Errors> {
         todo!()
     }
 
@@ -43,7 +44,7 @@ impl<'a> CategoryTrait<'a> for UnitCategory {
         todo!()
     }
 
-    fn get_all_morphisms(&self) -> Result<HashSet<&Self::Morphism>, Errors> {
+    fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
         todo!()
     }
 
@@ -54,7 +55,7 @@ impl<'a> CategoryTrait<'a> for UnitCategory {
         todo!()
     }
 
-    fn get_moprhism(&self, cell_id: &Self::Identifier) -> Result<&Self::Morphism, Errors> {
+    fn get_moprhism(&self, cell_id: &Self::Identifier) -> Result<&Rc<Self::Morphism>, Errors> {
         todo!()
     }
 

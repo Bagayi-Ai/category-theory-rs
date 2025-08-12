@@ -1,33 +1,32 @@
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::traits::category_trait::CategoryTrait;
+use std::rc::Rc;
 
-pub trait ArrowTrait<'a> {
-    type SourceObject: CategoryTrait<'a>;
+pub trait ArrowTrait {
+    type SourceObject: CategoryTrait;
 
-    type TargetObject: CategoryTrait<'a>;
+    type TargetObject: CategoryTrait;
 
     type Identifier: Identifier;
 
     fn arrow_id(&self) -> &Self::Identifier;
 
-    fn source_object(&self) -> &Self::SourceObject;
+    fn source_object(&self) -> &Rc<Self::SourceObject>;
 
-    fn target_object(&self) -> &Self::TargetObject;
+    fn target_object(&self) -> &Rc<Self::TargetObject>;
 
     fn is_identity(&self) -> bool;
 
     fn compose(
         &self,
         other: &impl ArrowTrait<
-            'a,
             SourceObject = Self::SourceObject,
             TargetObject = Self::TargetObject,
             Identifier = Self::Identifier,
         >,
     ) -> Result<
         impl ArrowTrait<
-            'a,
             SourceObject = Self::SourceObject,
             TargetObject = Self::TargetObject,
             Identifier = Self::Identifier,
@@ -41,7 +40,6 @@ pub trait ArrowTrait<'a> {
         &self,
     ) -> Vec<
         &impl ArrowTrait<
-            'a,
             SourceObject = Self::SourceObject,
             TargetObject = Self::TargetObject,
             Identifier = Self::Identifier,
@@ -55,7 +53,6 @@ pub trait ArrowTrait<'a> {
     fn validate_commutation(
         &self,
         other: &impl ArrowTrait<
-            'a,
             SourceObject = Self::SourceObject,
             TargetObject = Self::TargetObject,
             Identifier = Self::Identifier,

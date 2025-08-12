@@ -7,17 +7,17 @@ use crate::core::traits::category_trait::CategoryTrait;
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::hash::Hash;
+use std::rc::Rc;
 
-pub struct Category<'a, Id: Identifier<Id = Id> + 'a, Object: CategoryTrait<'a, Identifier = Id>> {
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Category<Id: Identifier<Id = Id>, Object: CategoryTrait<Identifier = Id>> {
     id: Id,
-    objects: HashMap<Id, &'a Object>,
+    objects: HashMap<Id, Rc<Object>>,
     object_mapping: HashMap<Id, HashMap<Id, HashSet<Id>>>,
-    morphism: HashMap<Id, Morphism<'a, Id, Self>>,
+    morphism: HashMap<Id, Rc<Morphism<Id, Self>>>,
 }
 
-impl<'a, Id: Identifier<Id = Id>, Object: CategoryTrait<'a, Identifier = Id>>
-    Category<'a, Id, Object>
-{
+impl<'a, Id: Identifier<Id = Id>, Object: CategoryTrait<Identifier = Id>> Category<Id, Object> {
     pub fn new() -> Self {
         Category {
             id: Id::generate(),
@@ -28,12 +28,12 @@ impl<'a, Id: Identifier<Id = Id>, Object: CategoryTrait<'a, Identifier = Id>>
     }
 }
 
-impl<'a, Id: Identifier<Id = Id> + 'a, Object: CategoryTrait<'a, Identifier = Id> + 'a>
-    CategoryTrait<'a> for Category<'a, Id, Object>
+impl<Id: Identifier<Id = Id>, Object: CategoryTrait<Identifier = Id>> CategoryTrait
+    for Category<Id, Object>
 {
     type Identifier = Id;
     type Object = Object;
-    type Morphism = Morphism<'a, Id, Self>;
+    type Morphism = Morphism<Id, Self>;
 
     fn new() -> Self {
         Category::new()
@@ -43,14 +43,15 @@ impl<'a, Id: Identifier<Id = Id> + 'a, Object: CategoryTrait<'a, Identifier = Id
         todo!()
     }
 
-    fn add_object(&mut self, object: &'a Self::Object) -> Result<(), Errors> {
-        self.objects.insert(object.category_id().clone(), object);
+    fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors> {
+        self.objects
+            .insert(object.category_id().clone(), object.clone());
         let identity_cell = Morphism::new_identity_morphism(object);
         self.add_morphism(identity_cell)?;
         Ok(())
     }
 
-    fn add_morphism(&mut self, cell: Self::Morphism) -> Result<Self::Identifier, Errors> {
+    fn add_morphism(&mut self, cell: Rc<Self::Morphism>) -> Result<Self::Identifier, Errors> {
         if self.morphism.contains_key(cell.id()) {
             return Err(Errors::MorphismAlreadyExists);
         }
@@ -68,7 +69,7 @@ impl<'a, Id: Identifier<Id = Id> + 'a, Object: CategoryTrait<'a, Identifier = Id
     fn get_identity_morphism(
         &self,
         object_id: &Self::Identifier,
-    ) -> Result<&Self::Morphism, Errors> {
+    ) -> Result<&Rc<Self::Morphism>, Errors> {
         // it's basically the cell with the same id as the object
         self.get_moprhism(object_id)
     }
@@ -77,11 +78,11 @@ impl<'a, Id: Identifier<Id = Id> + 'a, Object: CategoryTrait<'a, Identifier = Id
         todo!()
     }
 
-    fn get_all_morphisms(&self) -> Result<HashSet<&Self::Morphism>, Errors> {
+    fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
         // Todo needs optimization
         // Ok(self.cells.values().collect())
 
-        let result: HashSet<&Self::Morphism> = HashSet::new();
+        let result: HashSet<&Rc<Self::Morphism>> = HashSet::new();
         // for (_id, cell) in &self.cells {
         //     result.insert(cell);
         // }
@@ -109,11 +110,22 @@ impl<'a, Id: Identifier<Id = Id> + 'a, Object: CategoryTrait<'a, Identifier = Id
         }
     }
 
-    fn get_moprhism(&self, cell_id: &Self::Identifier) -> Result<&Self::Morphism, Errors> {
+    fn get_moprhism(&self, cell_id: &Self::Identifier) -> Result<&Rc<Self::Morphism>, Errors> {
         if let Some(cell) = self.morphism.get(cell_id) {
             Ok(cell)
         } else {
             Err(Errors::MorphismNotFound)
         }
+    }
+}
+
+impl<Id: Identifier<Id = Id>, Object: CategoryTrait<Identifier = Id>> Hash
+    for Category<Id, Object>
+{
+    fn hash<H>(&self, state: &mut H)
+    where
+        H: std::hash::Hasher,
+    {
+        todo!()
     }
 }

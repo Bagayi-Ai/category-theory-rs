@@ -4,18 +4,19 @@ use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::{CategoryTrait, ChildObjectAlias, MorphismAlias};
+use crate::core::traits::category_trait::{CategoryTrait, MorphismAlias};
 use crate::core::traits::functor_trait::FunctorTrait;
 use crate::core::traits::morphism_trait::MorphismTrait;
 use crate::core::unit::unit_category::UnitCategory;
 use std::collections::HashMap;
+use std::rc::Rc;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UnitMorphism<T: Identifier> {
     _phantom: std::marker::PhantomData<T>,
 }
 
-impl<'a, T: Identifier + 'a> ArrowTrait<'a> for UnitMorphism<T> {
+impl<T: Identifier> ArrowTrait for UnitMorphism<T> {
     type SourceObject = UnitCategory;
     type TargetObject = Self::SourceObject;
     type Identifier = T;
@@ -24,11 +25,11 @@ impl<'a, T: Identifier + 'a> ArrowTrait<'a> for UnitMorphism<T> {
         todo!()
     }
 
-    fn source_object(&self) -> &Self::SourceObject {
+    fn source_object(&self) -> &Rc<Self::SourceObject> {
         todo!()
     }
 
-    fn target_object(&self) -> &Self::TargetObject {
+    fn target_object(&self) -> &Rc<Self::TargetObject> {
         todo!()
     }
 
@@ -39,7 +40,6 @@ impl<'a, T: Identifier + 'a> ArrowTrait<'a> for UnitMorphism<T> {
     fn compose(
         &self,
         other: &impl ArrowTrait<
-            'a,
             SourceObject = Self::SourceObject,
             TargetObject = Self::TargetObject,
             Identifier = Self::Identifier,
@@ -53,21 +53,20 @@ impl<'a, T: Identifier + 'a> ArrowTrait<'a> for UnitMorphism<T> {
     }
 }
 
-impl<'a, T: Identifier + 'a> MorphismTrait<'a> for UnitMorphism<T> {
-    fn functor(&self) -> Result<&UnitMorphism<T>, Errors> {
+impl<T: Identifier> MorphismTrait for UnitMorphism<T> {
+    fn functor(&self) -> Result<&Rc<UnitMorphism<T>>, Errors> {
         todo!()
     }
 }
 
-impl<'a, Id: Identifier + 'a> FunctorTrait<'a> for UnitMorphism<Id> {
+impl<Id: Identifier> FunctorTrait for UnitMorphism<Id> {
     fn functor_id(&self) -> &Self::Identifier {
         todo!()
     }
 
     fn arrow_mappings(
         &self,
-    ) -> &HashMap<&MorphismAlias<'a, Self::SourceObject>, &MorphismAlias<'a, Self::TargetObject>>
-    {
+    ) -> &HashMap<&MorphismAlias<Self::SourceObject>, &MorphismAlias<Self::TargetObject>> {
         todo!()
     }
 }

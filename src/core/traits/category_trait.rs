@@ -3,23 +3,22 @@ use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::morphism_trait::MorphismTrait;
 use std::collections::HashSet;
+use std::fmt::Debug;
+use std::hash::Hash;
+use std::rc::Rc;
 
-pub type ChildObjectAlias<'a, Object> = <Object as CategoryTrait<'a>>::Object;
-pub type MorphismAlias<'a, Category> = <Category as CategoryTrait<'a>>::Morphism;
+pub type MorphismAlias<Category> = <Category as CategoryTrait>::Morphism;
 
-pub type CategoryObjectAlias<'a, Category> = <Category as CategoryTrait<'a>>::Object;
-
-pub type CategoryIdentifierAlias<'a, Category> = <Category as CategoryTrait<'a>>::Identifier;
-
-pub trait CategoryTrait<'a> {
+pub trait CategoryTrait: Eq + Debug {
     type Identifier: Identifier;
-    type Object: 'a + CategoryTrait<'a>;
+    type Object: CategoryTrait;
     type Morphism: MorphismTrait<
-            'a,
             SourceObject = Self::Object,
             TargetObject = Self::Object,
             Identifier = Self::Identifier,
-        >;
+        > + Debug
+        + Eq
+        + Hash;
 
     fn new() -> Self;
 
@@ -39,18 +38,26 @@ pub trait CategoryTrait<'a> {
 
     fn category_id(&self) -> &Self::Identifier;
 
-    fn add_object(&mut self, object: &'a Self::Object) -> Result<(), Errors>;
+    fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors>;
 
-    fn add_morphism(&mut self, morphism: Self::Morphism) -> Result<Self::Identifier, Errors>;
+    fn add_morphism(&mut self, morphism: Rc<Self::Morphism>) -> Result<Self::Identifier, Errors>;
 
     fn get_identity_morphism(
         &self,
         object_id: &Self::Identifier,
-    ) -> Result<&Self::Morphism, Errors>;
+    ) -> Result<&Rc<Self::Morphism>, Errors>;
+
+    fn get_all_identity_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
+        let mut identities = HashSet::new();
+        for object_id in self.get_all_object_ids()? {
+            identities.insert(self.get_identity_morphism(object_id)?);
+        }
+        Ok(identities)
+    }
 
     fn get_all_object_ids(&self) -> Result<HashSet<&Self::Identifier>, Errors>;
 
-    fn get_all_morphisms(&self) -> Result<HashSet<&Self::Morphism>, Errors>;
+    fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors>;
 
     fn get_object_morphisms(
         &self,
@@ -69,7 +76,7 @@ pub trait CategoryTrait<'a> {
         todo!()
     }
 
-    fn get_moprhism(&self, morphism_id: &Self::Identifier) -> Result<&Self::Morphism, Errors>;
+    fn get_moprhism(&self, morphism_id: &Self::Identifier) -> Result<&Rc<Self::Morphism>, Errors>;
 
     fn morphism_commute(
         &self,

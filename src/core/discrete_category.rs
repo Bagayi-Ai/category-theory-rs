@@ -2,7 +2,7 @@ use crate::core::errors::Errors;
 use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::{CategoryTrait, ChildObjectAlias};
+use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::functor_trait::FunctorTrait;
 use crate::core::traits::morphism_trait::MorphismTrait;
 use crate::core::unit::unit_category::UnitCategory;
@@ -10,6 +10,7 @@ use crate::core::unit::unit_morphism::UnitMorphism;
 use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Display};
 use std::hash::{Hash, Hasher};
+use std::rc::Rc;
 
 pub type DiscreteCategoryString = DiscreteCategory<String>;
 pub type DiscreteCategoryUsize = DiscreteCategory<usize>;
@@ -19,7 +20,9 @@ pub struct DiscreteCategory<T: Identifier> {
     category_id: T,
     // TODO: Find a way of avoiding storing identity cells
     // as we could derive them from the objects.
-    cells: Option<HashMap<T, Self>>,
+    cells: Option<HashMap<T, Rc<Self>>>,
+
+    unit: Rc<UnitCategory>,
 }
 
 impl<T: Identifier + Display> Display for DiscreteCategory<T> {
@@ -44,6 +47,7 @@ impl<T: Eq + Clone + Debug + Hash + Identifier> DiscreteCategory<T> {
         DiscreteCategory {
             category_id: T::generate(),
             cells: Some(HashMap::new()),
+            unit: Rc::new(UnitCategory::new()),
         }
     }
 
@@ -51,11 +55,12 @@ impl<T: Eq + Clone + Debug + Hash + Identifier> DiscreteCategory<T> {
         DiscreteCategory {
             category_id,
             cells: None,
+            unit: Rc::new(UnitCategory::new()),
         }
     }
 }
 
-impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> CategoryTrait<'a>
+impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTrait
     for DiscreteCategory<T>
 {
     type Identifier = T;
@@ -70,11 +75,11 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> Ca
         &self.category_id
     }
 
-    fn add_object(&mut self, object: &Self::Object) -> Result<(), Errors> {
+    fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors> {
         Err(Errors::CannotAddObjectInDiscreteCategoryOnlyIdentityMorphism)
     }
 
-    fn add_morphism(&mut self, morphism: Self::Morphism) -> Result<Self::Identifier, Errors> {
+    fn add_morphism(&mut self, morphism: Rc<Self::Morphism>) -> Result<Self::Identifier, Errors> {
         // morphsims in discrete category are only identity morphisms,
         if morphism.source_object() != morphism.target_object() {
             return Err(Errors::OnlyIdentityMorphismDiscreteCategory);
@@ -101,7 +106,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> Ca
     fn get_identity_morphism(
         &self,
         object_id: &Self::Identifier,
-    ) -> Result<&Self::Morphism, Errors> {
+    ) -> Result<&Rc<Self::Morphism>, Errors> {
         self.get_moprhism(object_id)
     }
 
@@ -114,7 +119,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> Ca
         todo!()
     }
 
-    fn get_all_morphisms(&self) -> Result<HashSet<&Self::Morphism>, Errors> {
+    fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
         self.get_all_object_ids()?
             .into_iter()
             .map(|object_id| self.get_identity_morphism(object_id))
@@ -129,7 +134,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> Ca
         Ok(vec![self.get_identity_morphism(object_id)?])
     }
 
-    fn get_moprhism(&self, cell_id: &Self::Identifier) -> Result<&Self::Morphism, Errors> {
+    fn get_moprhism(&self, cell_id: &Self::Identifier) -> Result<&Rc<Self::Morphism>, Errors> {
         if let Some(cells) = &self.cells {
             if let Some(cell) = cells.get(cell_id) {
                 return Ok(cell);
@@ -142,9 +147,7 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + ToString + 'a + Display> Ca
     }
 }
 
-impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> ArrowTrait<'a>
-    for DiscreteCategory<T>
-{
+impl<T: Eq + Clone + Hash + Debug + Identifier + Display> ArrowTrait for DiscreteCategory<T> {
     type Identifier = T;
     type SourceObject = UnitCategory;
     type TargetObject = UnitCategory;
@@ -153,12 +156,12 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> ArrowTrait<'a
         &self.category_id
     }
 
-    fn source_object(&self) -> &Self::SourceObject {
-        &UnitCategory {}
+    fn source_object(&self) -> &Rc<Self::SourceObject> {
+        &self.unit
     }
 
-    fn target_object(&self) -> &Self::TargetObject {
-        &UnitCategory {}
+    fn target_object(&self) -> &Rc<Self::TargetObject> {
+        &self.unit
     }
 
     fn is_identity(&self) -> bool {
@@ -172,7 +175,6 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> ArrowTrait<'a
     fn compose(
         &self,
         other: &impl ArrowTrait<
-            'a,
             SourceObject = Self::SourceObject,
             TargetObject = Self::TargetObject,
             Identifier = Self::Identifier,
@@ -182,10 +184,8 @@ impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> ArrowTrait<'a
     }
 }
 
-impl<'a, T: Eq + Clone + Hash + Debug + Identifier + 'a + Display> MorphismTrait<'a>
-    for DiscreteCategory<T>
-{
-    fn functor(&self) -> Result<&UnitMorphism<T>, Errors> {
+impl<T: Eq + Clone + Hash + Debug + Identifier + Display> MorphismTrait for DiscreteCategory<T> {
+    fn functor(&self) -> Result<&Rc<UnitMorphism<T>>, Errors> {
         todo!()
     }
 }
@@ -201,7 +201,7 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + Display> From<Vec<T>> for Discr
         let mut category = DiscreteCategory::new();
         for object in objects {
             let object = DiscreteCategory::new_with_id(object);
-            category.add_morphism(object).unwrap();
+            category.add_morphism(Rc::new(object)).unwrap();
         }
         category
     }
@@ -212,8 +212,8 @@ mod tests {
     use super::*;
     use crate::core::tests::ncategory_test_helper::*;
 
-    fn generate_morphism() -> DiscreteCategory<String> {
-        DiscreteCategory::new_with_id(random_string(5))
+    fn generate_morphism() -> Rc<DiscreteCategory<String>> {
+        Rc::new(DiscreteCategory::new_with_id(random_string(5)))
     }
 
     fn generate_identifier() -> String {

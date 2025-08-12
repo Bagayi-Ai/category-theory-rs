@@ -3,67 +3,60 @@ use crate::core::errors::Errors::{InvalidArrowNoFunctorFound, NoFunctorForIdenti
 use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::{
-    CategoryIdentifierAlias, CategoryObjectAlias, CategoryTrait,
-};
+use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::functor_trait::FunctorTrait;
 use crate::core::traits::morphism_trait::MorphismTrait;
 use std::hash::{Hash, Hasher};
+use std::rc::Rc;
 
-pub struct Morphism<'a, Id, Category>
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Morphism<Id, Category>
 where
     Id: Identifier,
-    Category: CategoryTrait<'a>,
+    Category: CategoryTrait,
 {
     id: Id,
-    source: &'a CategoryObjectAlias<'a, Category>,
-    target: &'a CategoryObjectAlias<'a, Category>,
-    functor: Option<
-        &'a Functor<'a, Id, CategoryObjectAlias<'a, Category>, CategoryObjectAlias<'a, Category>>,
-    >,
+    source: Rc<Category::Object>,
+    target: Rc<Category::Object>,
+    functor: Option<Rc<Functor<Id, Category::Object, Category::Object>>>,
     identity: bool,
 }
 
-impl<'a, Id: Identifier, Category: CategoryTrait<'a, Identifier = Id>> Morphism<'a, Id, Category>
+impl<Id: Identifier, Category: CategoryTrait<Identifier = Id>> Morphism<Id, Category>
 where
-    <Category as CategoryTrait<'a>>::Object: CategoryTrait<'a, Identifier = Id>,
+    <Category as CategoryTrait>::Object: CategoryTrait<Identifier = Id>,
 {
     pub fn new(
         id: Id,
-        source: &'a CategoryObjectAlias<'a, Category>,
-        target: &'a CategoryObjectAlias<'a, Category>,
-        functor: &'a Functor<
-            'a,
-            Id,
-            CategoryObjectAlias<'a, Category>,
-            CategoryObjectAlias<'a, Category>,
-        >,
+        source: Rc<Category::Object>,
+        target: Rc<Category::Object>,
+        functor: Rc<Functor<Id, Category::Object, Category::Object>>,
     ) -> Self {
         Morphism {
             id,
             source,
             target,
-            functor: functor.into(),
+            functor: Some(functor),
             identity: false,
         }
     }
 
-    pub fn new_identity_morphism(object: &'a CategoryObjectAlias<'a, Category>) -> Self {
-        Morphism {
+    pub fn new_identity_morphism(object: Rc<Category::Object>) -> Rc<Self> {
+        Rc::new(Morphism {
             id: object.category_id().clone(),
-            source: object,
+            source: object.clone(),
             target: object,
             functor: None,
             identity: true,
-        }
+        })
     }
 
-    pub fn id(&self) -> &CategoryIdentifierAlias<'a, Category> {
+    pub fn id(&self) -> &Category::Identifier {
         &self.id
     }
 }
 
-impl<'a, Id: Identifier, Category: CategoryTrait<'a>> Hash for Morphism<'a, Id, Category> {
+impl<Id: Identifier, Category: CategoryTrait> Hash for Morphism<Id, Category> {
     fn hash<H>(&self, _: &mut H)
     where
         H: Hasher,
@@ -72,23 +65,21 @@ impl<'a, Id: Identifier, Category: CategoryTrait<'a>> Hash for Morphism<'a, Id, 
     }
 }
 
-impl<'a, Id: Identifier, Category: CategoryTrait<'a>> ArrowTrait<'a>
-    for Morphism<'a, Id, Category>
-{
-    type SourceObject = CategoryObjectAlias<'a, Category>;
-    type TargetObject = CategoryObjectAlias<'a, Category>;
+impl<Id: Identifier, Category: CategoryTrait> ArrowTrait for Morphism<Id, Category> {
+    type SourceObject = Category::Object;
+    type TargetObject = Category::Object;
     type Identifier = Id;
 
     fn arrow_id(&self) -> &Self::Identifier {
         &self.id
     }
 
-    fn source_object(&self) -> &Self::SourceObject {
-        self.source
+    fn source_object(&self) -> &Rc<Self::SourceObject> {
+        &self.source
     }
 
-    fn target_object(&self) -> &Self::TargetObject {
-        self.target
+    fn target_object(&self) -> &Rc<Self::TargetObject> {
+        &self.target
     }
 
     fn is_identity(&self) -> bool {
@@ -98,30 +89,29 @@ impl<'a, Id: Identifier, Category: CategoryTrait<'a>> ArrowTrait<'a>
     fn compose(
         &self,
         other: &impl ArrowTrait<
-            'a,
             SourceObject = Self::SourceObject,
             TargetObject = Self::TargetObject,
             Identifier = Self::Identifier,
         >,
-    ) -> Result<Morphism<'a, Id, Category>, Errors> {
+    ) -> Result<Morphism<Id, Category>, Errors> {
         todo!()
     }
 
-    fn arrows(&self) -> Vec<&Morphism<'a, Id, Category>> {
+    fn arrows(&self) -> Vec<&Morphism<Id, Category>> {
         todo!()
     }
 }
 
-impl<'a, Id: Identifier, Category: CategoryTrait<'a, Identifier = Id>> MorphismTrait<'a>
-    for Morphism<'a, Id, Category>
+impl<'a, Id: Identifier, Category: CategoryTrait<Identifier = Id>> MorphismTrait
+    for Morphism<Id, Category>
 {
     fn functor(
         &self,
-    ) -> Result<&Functor<'a, Self::Identifier, Self::SourceObject, Self::TargetObject>, Errors>
+    ) -> Result<&Rc<Functor<Self::Identifier, Self::SourceObject, Self::TargetObject>>, Errors>
     {
         if self.identity {
             return Err(Errors::NoFunctorForIdentityArrow);
         }
-        self.functor.ok_or(InvalidArrowNoFunctorFound)
+        self.functor.as_ref().ok_or(InvalidArrowNoFunctorFound)
     }
 }

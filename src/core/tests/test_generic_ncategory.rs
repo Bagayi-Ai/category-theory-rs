@@ -21,7 +21,7 @@ fn generate_object() -> DiscreteCategoryString {
     let random_string = random_string(5);
     let mut object = DiscreteCategory::new();
     object
-        .add_morphism(Rc::new(DiscreteCategory::new_with_id(random_string)))
+        .add_object(Rc::new(DiscreteCategory::new_with_id(random_string)))
         .unwrap();
     object
 }
@@ -130,15 +130,15 @@ pub fn test_identity_cell_tree() {
     let object_c: DiscreteCategory<String> = "c".to_string().into();
     Rc::get_mut(&mut discreteCategoryALower)
         .unwrap()
-        .add_morphism(object_a.clone().into())
+        .add_object(object_a.clone().into())
         .unwrap();
     Rc::get_mut(&mut discreteCategoryALower)
         .unwrap()
-        .add_morphism(object_b.clone().into())
+        .add_object(object_b.clone().into())
         .unwrap();
     Rc::get_mut(&mut discreteCategoryALower)
         .unwrap()
-        .add_morphism(object_c.clone().into())
+        .add_object(object_c.clone().into())
         .unwrap();
 
     // Discrete category A with a, b, c as objects
@@ -149,15 +149,15 @@ pub fn test_identity_cell_tree() {
     let object_C: DiscreteCategory<String> = "C".to_string().into();
     Rc::get_mut(&mut discreteCategoryAUpper)
         .unwrap()
-        .add_morphism(object_A.clone().into())
+        .add_object(object_A.clone().into())
         .unwrap();
     Rc::get_mut(&mut discreteCategoryAUpper)
         .unwrap()
-        .add_morphism(object_B.clone().into())
+        .add_object(object_B.clone().into())
         .unwrap();
     Rc::get_mut(&mut discreteCategoryAUpper)
         .unwrap()
-        .add_morphism(object_C.clone().into())
+        .add_object(object_C.clone().into())
         .unwrap();
 
     let mut discreteCategoryANumber = Rc::new(DiscreteCategory::new());
@@ -166,15 +166,15 @@ pub fn test_identity_cell_tree() {
     let object_3: DiscreteCategory<usize> = 3.into();
     Rc::get_mut(&mut discreteCategoryANumber)
         .unwrap()
-        .add_morphism(object_1.clone().into())
+        .add_object(object_1.clone().into())
         .unwrap();
     Rc::get_mut(&mut discreteCategoryANumber)
         .unwrap()
-        .add_morphism(object_2.clone().into())
+        .add_object(object_2.clone().into())
         .unwrap();
     Rc::get_mut(&mut discreteCategoryANumber)
         .unwrap()
-        .add_morphism(object_3.clone().into())
+        .add_object(object_3.clone().into())
         .unwrap();
 
     let lower_to_numer_mappings: HashMap<

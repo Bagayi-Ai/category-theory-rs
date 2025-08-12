@@ -2,7 +2,7 @@ use crate::core::errors::Errors;
 use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::traits::category_trait::{CategoryTrait, MorphismAlias};
 use crate::core::traits::functor_trait::FunctorTrait;
 use crate::core::traits::morphism_trait::MorphismTrait;
 use crate::core::unit::unit_category::UnitCategory;
@@ -21,8 +21,7 @@ pub struct DiscreteCategory<T: Identifier> {
     // TODO: Find a way of avoiding storing identity cells
     // as we could derive them from the objects.
     cells: Option<HashMap<T, Rc<Self>>>,
-
-    unit: Rc<UnitCategory>,
+    rc_reference: Option<Rc<Self>>,
 }
 
 impl<T: Identifier + Display> Display for DiscreteCategory<T> {
@@ -47,16 +46,18 @@ impl<T: Eq + Clone + Debug + Hash + Identifier> DiscreteCategory<T> {
         DiscreteCategory {
             category_id: T::generate(),
             cells: Some(HashMap::new()),
-            unit: Rc::new(UnitCategory::new()),
+            rc_reference: None,
         }
     }
 
     pub fn new_with_id(category_id: T) -> Self {
-        DiscreteCategory {
+        let mut result = DiscreteCategory {
             category_id,
             cells: None,
-            unit: Rc::new(UnitCategory::new()),
-        }
+            rc_reference: None,
+        };
+        result.rc_reference = Some(Rc::new(result.clone()));
+        result
     }
 }
 
@@ -64,7 +65,7 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTra
     for DiscreteCategory<T>
 {
     type Identifier = T;
-    type Object = UnitCategory;
+    type Object = Self;
     type Morphism = Self;
 
     fn new() -> Self {
@@ -76,31 +77,24 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTra
     }
 
     fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors> {
-        Err(Errors::CannotAddObjectInDiscreteCategoryOnlyIdentityMorphism)
-    }
-
-    fn add_morphism(&mut self, morphism: Rc<Self::Morphism>) -> Result<Self::Identifier, Errors> {
-        // morphsims in discrete category are only identity morphisms,
-        if morphism.source_object() != morphism.target_object() {
-            return Err(Errors::OnlyIdentityMorphismDiscreteCategory);
-        }
-
-        let cell_id = morphism.arrow_id().clone();
-
         if let Some(cells) = &mut self.cells {
-            if cells.contains_key(&cell_id) {
-                return Err(Errors::MorphismAlreadyExists);
+            if cells.contains_key(&object.category_id) {
+                return Err(Errors::ObjectAlreadyExists);
             }
-            cells.insert(cell_id.clone(), morphism);
+            cells.insert(object.category_id.clone(), object);
+            Ok(())
         } else {
             self.cells = Some(HashMap::new());
             self.cells
                 .as_mut()
                 .unwrap()
-                .insert(cell_id.clone(), morphism);
+                .insert(object.category_id.clone(), object);
+            Ok(())
         }
+    }
 
-        Ok(cell_id)
+    fn add_morphism(&mut self, morphism: Rc<Self::Morphism>) -> Result<Self::Identifier, Errors> {
+        Err(Errors::CannotAddMorphismToDiscreteCategory)
     }
 
     fn get_identity_morphism(
@@ -149,19 +143,19 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTra
 
 impl<T: Eq + Clone + Hash + Debug + Identifier + Display> ArrowTrait for DiscreteCategory<T> {
     type Identifier = T;
-    type SourceObject = UnitCategory;
-    type TargetObject = UnitCategory;
+    type SourceObject = Self;
+    type TargetObject = Self;
 
     fn arrow_id(&self) -> &Self::Identifier {
         &self.category_id
     }
 
     fn source_object(&self) -> &Rc<Self::SourceObject> {
-        &self.unit
+        self.rc_reference.as_ref().unwrap()
     }
 
     fn target_object(&self) -> &Rc<Self::TargetObject> {
-        &self.unit
+        self.rc_reference.as_ref().unwrap()
     }
 
     fn is_identity(&self) -> bool {
@@ -185,7 +179,19 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + Display> ArrowTrait for Discret
 }
 
 impl<T: Eq + Clone + Hash + Debug + Identifier + Display> MorphismTrait for DiscreteCategory<T> {
-    fn functor(&self) -> Result<&Rc<UnitMorphism<T>>, Errors> {
+    fn functor(&self) -> Result<&Rc<DiscreteCategory<T>>, Errors> {
+        todo!()
+    }
+}
+
+impl<T: Eq + Clone + Hash + Debug + Identifier + Display> FunctorTrait for DiscreteCategory<T> {
+    fn functor_id(&self) -> &Self::Identifier {
+        todo!()
+    }
+
+    fn arrow_mappings(
+        &self,
+    ) -> &HashMap<&MorphismAlias<Self::SourceObject>, &MorphismAlias<Self::TargetObject>> {
         todo!()
     }
 }
@@ -226,7 +232,7 @@ mod tests {
         // add object 1
         let object1 = generate_morphism();
 
-        category.add_morphism(object1.clone()).unwrap();
+        category.add_object(object1.clone()).unwrap();
         // check identity morphism
         let cell = category.get_object_morphisms(&object1.category_id);
         assert!(cell.is_ok());
@@ -249,7 +255,7 @@ mod tests {
 
         // add object 2
         let object2 = generate_morphism();
-        assert!(category.add_morphism(object2.clone()).is_ok());
+        assert!(category.add_object(object2.clone()).is_ok());
 
         // check identity morphism
         let cells = category.get_object_morphisms(&object2.category_id);
@@ -262,7 +268,7 @@ mod tests {
 
         // add object 3 without id
         let object3 = generate_morphism();
-        assert!(category.add_morphism(object3.clone()).is_ok());
+        assert!(category.add_object(object3.clone()).is_ok());
 
         // check identity morphism
         let cells = category.get_object_morphisms(&object3.category_id);

@@ -19,8 +19,12 @@ pub struct Category<Id: Identifier<Id = Id>, Object: CategoryTrait<Identifier = 
 
 impl<'a, Id: Identifier<Id = Id>, Object: CategoryTrait<Identifier = Id>> Category<Id, Object> {
     pub fn new() -> Self {
+        Self::new_with_id(Id::generate())
+    }
+    
+    pub fn new_with_id(id: Id) -> Self {
         Category {
-            id: Id::generate(),
+            id,
             objects: HashMap::new(),
             object_mapping: HashMap::new(),
             morphism: HashMap::new(),

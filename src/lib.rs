@@ -1,4 +1,4 @@
-mod core {
+pub mod core {
     pub mod category;
 
     pub mod discrete_category;

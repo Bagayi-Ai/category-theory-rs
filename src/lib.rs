@@ -13,6 +13,8 @@ mod core {
 
     pub mod product_endofunctor;
 
+    pub mod product_object;
+
     pub mod traits {
         pub mod arrow_trait;
         pub mod category_trait;

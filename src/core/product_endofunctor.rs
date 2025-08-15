@@ -51,10 +51,8 @@ where
         }
         target_category.add_object(target_object.clone())?;
 
-        let identity_morphism =
-            source_category.get_identity_morphism(source_object.category_id())?;
-        let target_identity_morphism =
-            target_category.get_identity_morphism(target_object.category_id())?;
+        let identity_morphism = source_category.get_identity_morphism(source_object)?;
+        let target_identity_morphism = target_category.get_identity_morphism(&*target_object)?;
         mappings.insert(identity_morphism.clone(), target_identity_morphism.clone());
     }
 

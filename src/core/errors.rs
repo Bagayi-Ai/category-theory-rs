@@ -19,4 +19,6 @@ pub enum Errors {
     NoFunctorForIdentityArrow,
     InvalidArrowNoFunctorFound,
     ObjectAlreadyExists,
+    IdentityMorphismNotFound,
+    CategoryNotInitialized,
 }

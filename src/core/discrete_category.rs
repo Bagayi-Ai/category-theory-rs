@@ -100,11 +100,13 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTra
         Err(Errors::CannotAddMorphismToDiscreteCategory)
     }
 
-    fn get_identity_morphism(
-        &self,
-        object_id: &Self::Identifier,
-    ) -> Result<&Rc<Self::Morphism>, Errors> {
-        self.get_moprhism(object_id)
+    fn get_identity_morphism(&self, object: &Self::Object) -> Result<&Rc<Self::Morphism>, Errors> {
+        if let Some(cells) = &self.cells {
+            if let Some(cell) = cells.get(&object.category_id) {
+                return Ok(cell);
+            }
+        }
+        Err(Errors::ObjectNotFound)
     }
 
     fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
@@ -116,19 +118,20 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTra
         Ok(result)
     }
 
-    fn get_object_morphisms(&self, object: &Self::Object) -> Result<Vec<&Self::Morphism>, Errors> {
-        // only cell in discrete category is the identity cell.
-        Ok(vec![self.get_identity_morphism(object.category_id())?])
+    fn get_hom_set(
+        &self,
+        source_object: &Self::Object,
+        target_object: &Self::Object,
+    ) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
+        // only one morphism in discrete category, the identity morphism.
+        Ok(HashSet::from([self.get_identity_morphism(source_object)?]))
     }
 
-    fn get_moprhism(&self, cell_id: &Self::Identifier) -> Result<&Rc<Self::Morphism>, Errors> {
-        if let Some(cells) = &self.cells {
-            if let Some(cell) = cells.get(cell_id) {
-                return Ok(cell);
-            }
-        }
-        Err(Errors::MorphismNotFound)
+    fn get_object_morphisms(&self, object: &Self::Object) -> Result<Vec<&Self::Morphism>, Errors> {
+        // only cell in discrete category is the identity cell.
+        Ok(vec![self.get_identity_morphism(object)?])
     }
+
     fn nested_level() -> usize {
         1
     }

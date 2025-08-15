@@ -69,12 +69,15 @@ impl<Id: Identifier<Id = Id>, Object: CategoryTrait<Identifier = Id>> CategoryTr
         Ok(cell)
     }
 
-    fn get_identity_morphism(
-        &self,
-        object_id: &Self::Identifier,
-    ) -> Result<&Rc<Self::Morphism>, Errors> {
-        // it's basically the cell with the same id as the object
-        self.get_moprhism(object_id)
+    fn get_identity_morphism(&self, object: &Self::Object) -> Result<&Rc<Self::Morphism>, Errors> {
+        let hom_set = self.get_hom_set(object, object)?;
+        // get the identity morphism
+        for morphism in hom_set {
+            if morphism.is_identity() {
+                return Ok(morphism);
+            }
+        }
+        Err(Errors::IdentityMorphismNotFound)
     }
 
     fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
@@ -85,6 +88,26 @@ impl<Id: Identifier<Id = Id>, Object: CategoryTrait<Identifier = Id>> CategoryTr
         // for (_id, cell) in &self.cells {
         //     result.insert(cell);
         // }
+        Ok(result)
+    }
+
+    fn get_hom_set(
+        &self,
+        source_object: &Self::Object,
+        target_object: &Self::Object,
+    ) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
+        let mut result: HashSet<&Rc<Self::Morphism>> = HashSet::new();
+        if let Some(cells) = self.object_mapping.get(source_object.category_id()) {
+            if let Some(cell_set) = cells.get(target_object.category_id()) {
+                for cell_id in cell_set {
+                    if let Some(cell) = self.morphism.get(cell_id) {
+                        result.insert(cell);
+                    }
+                }
+            }
+        } else {
+            return Err(Errors::ObjectNotFound);
+        }
         Ok(result)
     }
 
@@ -103,14 +126,6 @@ impl<Id: Identifier<Id = Id>, Object: CategoryTrait<Identifier = Id>> CategoryTr
             Ok(result)
         } else {
             Err(Errors::ObjectNotFound)
-        }
-    }
-
-    fn get_moprhism(&self, cell_id: &Self::Identifier) -> Result<&Rc<Self::Morphism>, Errors> {
-        if let Some(cell) = self.morphism.get(cell_id) {
-            Ok(cell)
-        } else {
-            Err(Errors::MorphismNotFound)
         }
     }
 }

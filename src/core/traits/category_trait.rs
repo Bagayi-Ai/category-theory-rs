@@ -43,10 +43,7 @@ pub trait CategoryTrait: Eq + Debug {
     fn add_morphism(&mut self, morphism: Rc<Self::Morphism>)
     -> Result<&Rc<Self::Morphism>, Errors>;
 
-    fn get_identity_morphism(
-        &self,
-        object_id: &Self::Identifier,
-    ) -> Result<&Rc<Self::Morphism>, Errors>;
+    fn get_identity_morphism(&self, object: &Self::Object) -> Result<&Rc<Self::Morphism>, Errors>;
 
     fn get_all_objects(&self) -> Result<HashSet<&Rc<Self::Object>>, Errors> {
         todo!()
@@ -54,24 +51,16 @@ pub trait CategoryTrait: Eq + Debug {
 
     fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors>;
 
+    fn get_hom_set(
+        &self,
+        source_object: &Self::Object,
+        target_object: &Self::Object,
+    ) -> Result<HashSet<&Rc<Self::Morphism>>, Errors>;
+
     fn get_object_morphisms(
         &self,
         object_id: &Self::Object,
     ) -> Result<Vec<&Self::Morphism>, Errors>;
-
-    fn get_object_targets(
-        &self,
-        object_id: &Self::Identifier,
-    ) -> Result<Vec<&Self::Identifier>, Errors> {
-        // self.get_object_cells(object_id)
-        //     .unwrap()
-        //     .iter()
-        //     .map(|cell_id| self.target(cell_id))
-        //     .collect()
-        todo!()
-    }
-
-    fn get_moprhism(&self, morphism_id: &Self::Identifier) -> Result<&Rc<Self::Morphism>, Errors>;
 
     fn morphism_commute(
         &self,

@@ -57,11 +57,11 @@ where
 }
 
 impl<Id: Identifier, Category: CategoryTrait> Hash for Morphism<Id, Category> {
-    fn hash<H>(&self, _: &mut H)
+    fn hash<H>(&self, state: &mut H)
     where
         H: Hasher,
     {
-        todo!()
+        self.id.hash(state)
     }
 }
 
@@ -83,7 +83,7 @@ impl<Id: Identifier, Category: CategoryTrait> ArrowTrait for Morphism<Id, Catego
     }
 
     fn is_identity(&self) -> bool {
-        todo!()
+        self.identity
     }
 
     fn compose(

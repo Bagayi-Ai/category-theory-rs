@@ -35,7 +35,7 @@ impl CategoryTrait for UnitCategory {
 
     fn get_identity_morphism(
         &self,
-        object_id: &Self::Identifier,
+        object_id: &Self::Object,
     ) -> Result<&Rc<Self::Morphism>, Errors> {
         todo!()
     }
@@ -44,14 +44,18 @@ impl CategoryTrait for UnitCategory {
         todo!()
     }
 
+    fn get_hom_set(
+        &self,
+        source_object: &Self::Object,
+        target_object: &Self::Object,
+    ) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
+        todo!()
+    }
+
     fn get_object_morphisms(
         &self,
         object_id: &Self::Object,
     ) -> Result<Vec<&Self::Morphism>, Errors> {
-        todo!()
-    }
-
-    fn get_moprhism(&self, cell_id: &Self::Identifier) -> Result<&Rc<Self::Morphism>, Errors> {
         todo!()
     }
 

@@ -45,6 +45,8 @@ pub trait CategoryTrait: Eq + Debug {
 
     fn get_identity_morphism(&self, object: &Self::Object) -> Result<&Rc<Self::Morphism>, Errors>;
 
+    fn get_object(&self, object: Self::Object) -> Result<&Rc<Self::Object>, Errors>;
+
     fn get_all_objects(&self) -> Result<HashSet<&Rc<Self::Object>>, Errors> {
         todo!()
     }

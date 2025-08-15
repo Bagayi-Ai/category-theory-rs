@@ -80,6 +80,12 @@ impl<Id: Identifier<Id = Id>, Object: CategoryTrait<Identifier = Id>> CategoryTr
         Err(Errors::IdentityMorphismNotFound)
     }
 
+    fn get_object(&self, object: Self::Object) -> Result<&Rc<Self::Object>, Errors> {
+        self.objects
+            .get(object.category_id())
+            .ok_or(Errors::ObjectNotFound)
+    }
+
     fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
         // Todo needs optimization
         // Ok(self.cells.values().collect())

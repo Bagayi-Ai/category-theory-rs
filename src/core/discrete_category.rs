@@ -109,6 +109,15 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTra
         Err(Errors::ObjectNotFound)
     }
 
+    fn get_object(&self, object: Self::Object) -> Result<&Rc<Self::Object>, Errors> {
+        if let Some(cells) = &self.cells {
+            if let Some(cell) = cells.get(&object.category_id) {
+                return Ok(cell);
+            }
+        }
+        Err(Errors::ObjectNotFound)
+    }
+
     fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
         let result = if let Some(cells) = &self.cells {
             cells.values().collect()

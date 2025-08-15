@@ -40,6 +40,10 @@ impl CategoryTrait for UnitCategory {
         todo!()
     }
 
+    fn get_object(&self, object: Self::Object) -> Result<&Rc<Self::Object>, Errors> {
+        todo!()
+    }
+
     fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
         todo!()
     }

@@ -1,9 +1,9 @@
-use std::collections::HashSet;
-use std::rc::Rc;
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
 use crate::core::traits::category_trait::CategoryTrait;
+use std::collections::HashSet;
+use std::rc::Rc;
 
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub struct ProductObject<Id, SourceCategory, TargetCategory>
@@ -16,7 +16,6 @@ where
     source_category: Rc<SourceCategory>,
     target_category: Rc<TargetCategory>,
 }
-
 
 impl<Id, SourceCategory, TargetCategory> ProductObject<Id, SourceCategory, TargetCategory>
 where
@@ -45,7 +44,8 @@ where
     }
 }
 
-impl<Id, SourceCategory, TargetCategory> CategoryTrait for ProductObject<Id, SourceCategory, TargetCategory>
+impl<Id, SourceCategory, TargetCategory> CategoryTrait
+    for ProductObject<Id, SourceCategory, TargetCategory>
 where
     Id: Identifier,
     SourceCategory: CategoryTrait,
@@ -71,11 +71,10 @@ where
         todo!()
     }
 
-    fn get_identity_morphism(&self, object_id: &Self::Identifier) -> Result<&Rc<Self::Morphism>, Errors> {
-        todo!()
-    }
-
-    fn get_all_object_ids(&self) -> Result<HashSet<&Self::Identifier>, Errors> {
+    fn get_identity_morphism(
+        &self,
+        object_id: &Self::Identifier,
+    ) -> Result<&Rc<Self::Morphism>, Errors> {
         todo!()
     }
 
@@ -83,7 +82,10 @@ where
         todo!()
     }
 
-    fn get_object_morphisms(&self, object_id: &Self::Identifier) -> Result<Vec<&Self::Morphism>, Errors> {
+    fn get_object_morphisms(
+        &self,
+        object_id: &Self::Identifier,
+    ) -> Result<Vec<&Self::Morphism>, Errors> {
         todo!()
     }
 

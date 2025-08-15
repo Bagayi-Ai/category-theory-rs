@@ -21,7 +21,7 @@ impl<'a, Id: Identifier<Id = Id>, Object: CategoryTrait<Identifier = Id>> Catego
     pub fn new() -> Self {
         Self::new_with_id(Id::generate())
     }
-    
+
     pub fn new_with_id(id: Id) -> Self {
         Category {
             id,
@@ -76,10 +76,6 @@ impl<Id: Identifier<Id = Id>, Object: CategoryTrait<Identifier = Id>> CategoryTr
     ) -> Result<&Rc<Self::Morphism>, Errors> {
         // it's basically the cell with the same id as the object
         self.get_moprhism(object_id)
-    }
-
-    fn get_all_object_ids(&self) -> Result<HashSet<&Self::Identifier>, Errors> {
-        todo!()
     }
 
     fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {

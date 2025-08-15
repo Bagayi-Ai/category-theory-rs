@@ -47,16 +47,6 @@ pub trait CategoryTrait: Eq + Debug {
         object_id: &Self::Identifier,
     ) -> Result<&Rc<Self::Morphism>, Errors>;
 
-    fn get_all_identity_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
-        let mut identities = HashSet::new();
-        for object_id in self.get_all_object_ids()? {
-            identities.insert(self.get_identity_morphism(object_id)?);
-        }
-        Ok(identities)
-    }
-
-    fn get_all_object_ids(&self) -> Result<HashSet<&Self::Identifier>, Errors>;
-    
     fn get_all_objects(&self) -> Result<HashSet<&Rc<Self::Object>>, Errors> {
         todo!()
     }

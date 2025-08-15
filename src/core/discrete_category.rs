@@ -104,20 +104,13 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTra
         self.get_moprhism(object_id)
     }
 
-    fn get_all_object_ids(&self) -> Result<HashSet<&Self::Identifier>, Errors> {
-        // if let Some(cells) = &self.cells {
-        //     Ok(cells.values().collect())
-        // } else {
-        //     Err(NCategoryError::NoObjectsInCategory)
-        // }
-        todo!()
-    }
-
     fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
-        self.get_all_object_ids()?
-            .into_iter()
-            .map(|object_id| self.get_identity_morphism(object_id))
-            .collect()
+        let result = if let Some(cells) = &self.cells {
+            cells.values().collect()
+        } else {
+            HashSet::new()
+        };
+        Ok(result)
     }
 
     fn get_object_morphisms(

@@ -16,7 +16,6 @@ use crate::core::discrete_category::DiscreteCategory;
 use crate::core::errors::Errors;
 use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
-use crate::core::product_object::ProductObject;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
 use std::collections::{HashMap, HashSet};

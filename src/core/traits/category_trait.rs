@@ -40,7 +40,8 @@ pub trait CategoryTrait: Eq + Debug {
 
     fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors>;
 
-    fn add_morphism(&mut self, morphism: Rc<Self::Morphism>) -> Result<Self::Identifier, Errors>;
+    fn add_morphism(&mut self, morphism: Rc<Self::Morphism>)
+    -> Result<&Rc<Self::Morphism>, Errors>;
 
     fn get_identity_morphism(
         &self,

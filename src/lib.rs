@@ -13,7 +13,6 @@ pub mod core {
 
     pub mod product_endofunctor;
 
-    pub mod product_object;
     pub mod set_category;
 
     pub mod traits {

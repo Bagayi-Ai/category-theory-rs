@@ -29,7 +29,7 @@ impl CategoryTrait for UnitCategory {
         todo!()
     }
 
-    fn add_morphism(&mut self, cell: Rc<Self::Morphism>) -> Result<Self::Identifier, Errors> {
+    fn add_morphism(&mut self, cell: Rc<Self::Morphism>) -> Result<&Rc<Self::Morphism>, Errors> {
         todo!()
     }
 

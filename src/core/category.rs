@@ -55,7 +55,7 @@ impl<Id: Identifier<Id = Id>, Object: CategoryTrait<Identifier = Id>> CategoryTr
         Ok(())
     }
 
-    fn add_morphism(&mut self, cell: Rc<Self::Morphism>) -> Result<Self::Identifier, Errors> {
+    fn add_morphism(&mut self, cell: Rc<Self::Morphism>) -> Result<&Rc<Self::Morphism>, Errors> {
         if self.morphism.contains_key(cell.id()) {
             return Err(Errors::MorphismAlreadyExists);
         }
@@ -66,8 +66,7 @@ impl<Id: Identifier<Id = Id>, Object: CategoryTrait<Identifier = Id>> CategoryTr
             .entry(cell.target_object().category_id().clone())
             .or_default()
             .insert(cell.arrow_id().clone());
-        let cell_id = cell.id().clone();
-        Ok(cell_id)
+        Ok(cell)
     }
 
     fn get_identity_morphism(

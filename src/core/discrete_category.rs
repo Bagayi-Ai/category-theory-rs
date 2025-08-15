@@ -93,7 +93,10 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTra
         }
     }
 
-    fn add_morphism(&mut self, morphism: Rc<Self::Morphism>) -> Result<Self::Identifier, Errors> {
+    fn add_morphism(
+        &mut self,
+        morphism: Rc<Self::Morphism>,
+    ) -> Result<&Rc<Self::Morphism>, Errors> {
         Err(Errors::CannotAddMorphismToDiscreteCategory)
     }
 

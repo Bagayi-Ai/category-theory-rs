@@ -56,7 +56,7 @@ pub trait CategoryTrait: Eq + Debug {
 
     fn get_object_morphisms(
         &self,
-        object_id: &Self::Identifier,
+        object_id: &Self::Object,
     ) -> Result<Vec<&Self::Morphism>, Errors>;
 
     fn get_object_targets(

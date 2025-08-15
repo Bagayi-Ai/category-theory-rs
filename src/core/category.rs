@@ -88,16 +88,13 @@ impl<Id: Identifier<Id = Id>, Object: CategoryTrait<Identifier = Id>> CategoryTr
         Ok(result)
     }
 
-    fn get_object_morphisms(
-        &self,
-        object_id: &Self::Identifier,
-    ) -> Result<Vec<&Self::Morphism>, Errors> {
-        if let Some(cells) = self.object_mapping.get(object_id) {
+    fn get_object_morphisms(&self, object: &Self::Object) -> Result<Vec<&Self::Morphism>, Errors> {
+        if let Some(cells) = self.object_mapping.get(object.category_id()) {
             let mut result: Vec<&Self::Morphism> = Vec::new();
             for cell_set in cells.values() {
                 for cell_id in cell_set {
                     if let Some(cell) = self.morphism.get(cell_id) {
-                        if cell.source_object().category_id() == object_id {
+                        if cell.source_object().category_id() == object.category_id() {
                             result.push(cell);
                         }
                     }

@@ -116,12 +116,9 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTra
         Ok(result)
     }
 
-    fn get_object_morphisms(
-        &self,
-        object_id: &Self::Identifier,
-    ) -> Result<Vec<&Self::Morphism>, Errors> {
+    fn get_object_morphisms(&self, object: &Self::Object) -> Result<Vec<&Self::Morphism>, Errors> {
         // only cell in discrete category is the identity cell.
-        Ok(vec![self.get_identity_morphism(object_id)?])
+        Ok(vec![self.get_identity_morphism(object.category_id())?])
     }
 
     fn get_moprhism(&self, cell_id: &Self::Identifier) -> Result<&Rc<Self::Morphism>, Errors> {
@@ -230,7 +227,7 @@ mod tests {
 
         category.add_object(object1.clone()).unwrap();
         // check identity morphism
-        let cell = category.get_object_morphisms(&object1.category_id);
+        let cell = category.get_object_morphisms(&object1);
         assert!(cell.is_ok());
         let cell = cell.unwrap();
         assert_eq!(cell.len(), 1);
@@ -239,7 +236,7 @@ mod tests {
         assert_eq!(cell.target_object(), object1.target_object());
 
         // check identity morphism
-        let cell = category.get_object_morphisms(&object1.category_id);
+        let cell = category.get_object_morphisms(&object1);
         assert!(cell.is_ok());
         let cell = cell.unwrap();
         assert_eq!(cell.len(), 1);
@@ -254,7 +251,7 @@ mod tests {
         assert!(category.add_object(object2.clone()).is_ok());
 
         // check identity morphism
-        let cells = category.get_object_morphisms(&object2.category_id);
+        let cells = category.get_object_morphisms(&object2);
         assert!(cells.is_ok());
         let cells = cells.unwrap();
         assert_eq!(cells.len(), 1);
@@ -267,7 +264,7 @@ mod tests {
         assert!(category.add_object(object3.clone()).is_ok());
 
         // check identity morphism
-        let cells = category.get_object_morphisms(&object3.category_id);
+        let cells = category.get_object_morphisms(&object3);
         assert!(cells.is_ok());
         let cells = cells.unwrap();
         assert_eq!(cells.len(), 1);

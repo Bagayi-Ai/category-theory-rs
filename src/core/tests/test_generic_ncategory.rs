@@ -36,7 +36,7 @@ pub fn test_base_scenarios() {
 
     category.add_object(object1.clone().into()).unwrap();
     // check identity morphism
-    let cell = category.get_object_morphisms(object1.category_id());
+    let cell = category.get_object_morphisms(&object1);
     assert!(cell.is_ok());
     let cell = cell.unwrap();
     assert_eq!(cell.len(), 1);
@@ -47,7 +47,7 @@ pub fn test_base_scenarios() {
     // TODO: implement comparison of the object assert_eq!(category.get_object(&object1_id).unwrap(), &object);
 
     // check identity morphism
-    let cell = category.get_object_morphisms(object1.category_id());
+    let cell = category.get_object_morphisms(&object1);
     assert!(cell.is_ok());
     let cell = cell.unwrap();
     assert_eq!(cell.len(), 1);
@@ -63,7 +63,7 @@ pub fn test_base_scenarios() {
     let object2_id = CategoryTrait::category_id(&object2).clone();
 
     // check identity morphism
-    let cells = category.get_object_morphisms(object2.category_id());
+    let cells = category.get_object_morphisms(&object2);
     assert!(cells.is_ok());
     let cells = cells.unwrap();
     assert_eq!(cells.len(), 1);
@@ -77,7 +77,7 @@ pub fn test_base_scenarios() {
     category.add_object(object3.clone().into());
 
     // check identity morphism
-    let cells = category.get_object_morphisms(object3.category_id());
+    let cells = category.get_object_morphisms(&object3);
     assert!(cells.is_ok());
     let cells = cells.unwrap();
     assert_eq!(cells.len(), 1);

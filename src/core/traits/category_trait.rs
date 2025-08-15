@@ -40,10 +40,19 @@ pub trait CategoryTrait: Eq + Debug {
 
     fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors>;
 
-    fn add_morphism(&mut self, morphism: Rc<Self::Morphism>)
-    -> Result<&Rc<Self::Morphism>, Errors>;
+    fn add_morphism(&mut self, morphism: Rc<Self::Morphism>) -> Result<&Rc<Self::Morphism>, Errors>;
 
-    fn get_identity_morphism(&self, object: &Self::Object) -> Result<&Rc<Self::Morphism>, Errors>;
+    fn get_identity_morphism(&self, object: &Self::Object) -> Result<&Rc<Self::Morphism>, Errors>
+    {
+        let hom_set = self.get_hom_set(object, object)?;
+        // get the identity morphism
+        for morphism in hom_set {
+            if morphism.is_identity() {
+                return Ok(morphism);
+            }
+        }
+        Err(Errors::IdentityMorphismNotFound)
+    }
 
     fn get_object(&self, object: Self::Object) -> Result<&Rc<Self::Object>, Errors>;
 
@@ -62,7 +71,7 @@ pub trait CategoryTrait: Eq + Debug {
     fn get_object_morphisms(
         &self,
         object_id: &Self::Object,
-    ) -> Result<Vec<&Self::Morphism>, Errors>;
+    ) -> Result<Vec<&Rc<Self::Morphism>>, Errors>;
 
     fn morphism_commute(
         &self,

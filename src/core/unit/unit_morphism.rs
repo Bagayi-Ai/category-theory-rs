@@ -66,7 +66,7 @@ impl<Id: Identifier> FunctorTrait for UnitMorphism<Id> {
 
     fn arrow_mappings(
         &self,
-    ) -> &HashMap<&MorphismAlias<Self::SourceObject>, &MorphismAlias<Self::TargetObject>> {
+    ) -> &HashMap<&Rc<MorphismAlias<Self::SourceObject>>, &Rc<MorphismAlias<Self::TargetObject>>> {
         todo!()
     }
 }

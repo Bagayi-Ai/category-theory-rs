@@ -4,6 +4,7 @@ use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::category_trait::MorphismAlias;
 use std::collections::HashMap;
+use std::rc::Rc;
 
 pub trait FunctorTrait: ArrowTrait {
     fn functor_id(&self) -> &Self::Identifier;
@@ -14,5 +15,5 @@ pub trait FunctorTrait: ArrowTrait {
 
     fn arrow_mappings(
         &self,
-    ) -> &HashMap<&MorphismAlias<Self::SourceObject>, &MorphismAlias<Self::TargetObject>>;
+    ) -> &HashMap<&Rc<MorphismAlias<Self::SourceObject>>, &Rc< MorphismAlias<Self::TargetObject>>>;
 }

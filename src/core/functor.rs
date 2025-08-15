@@ -94,7 +94,7 @@ where
         &self.id
     }
 
-    fn arrow_mappings(&self) -> &HashMap<&SourceCategory::Morphism, &TargetCategory::Morphism> {
+    fn arrow_mappings(&self) -> &HashMap<&Rc<SourceCategory::Morphism>, &Rc<TargetCategory::Morphism>> {
         // self.mappings
         //     .iter()
         //     .map(|m| {

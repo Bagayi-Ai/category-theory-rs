@@ -15,12 +15,16 @@ pub mod core {
 
     pub mod set_category;
 
+    pub mod epic_monic_category;
+
     pub mod traits {
         pub mod arrow_trait;
         pub mod category_trait;
         pub mod functor_trait;
 
         pub mod morphism_trait;
+
+        pub mod factorization_system_trait;
     }
 
     pub mod unit {

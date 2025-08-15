@@ -69,17 +69,6 @@ impl<Id: Identifier<Id = Id>, Object: CategoryTrait<Identifier = Id>> CategoryTr
         Ok(cell)
     }
 
-    fn get_identity_morphism(&self, object: &Self::Object) -> Result<&Rc<Self::Morphism>, Errors> {
-        let hom_set = self.get_hom_set(object, object)?;
-        // get the identity morphism
-        for morphism in hom_set {
-            if morphism.is_identity() {
-                return Ok(morphism);
-            }
-        }
-        Err(Errors::IdentityMorphismNotFound)
-    }
-
     fn get_object(&self, object: Self::Object) -> Result<&Rc<Self::Object>, Errors> {
         self.objects
             .get(object.category_id())
@@ -117,9 +106,9 @@ impl<Id: Identifier<Id = Id>, Object: CategoryTrait<Identifier = Id>> CategoryTr
         Ok(result)
     }
 
-    fn get_object_morphisms(&self, object: &Self::Object) -> Result<Vec<&Self::Morphism>, Errors> {
+    fn get_object_morphisms(&self, object: &Self::Object) -> Result<Vec<&Rc<Self::Morphism>>, Errors> {
         if let Some(cells) = self.object_mapping.get(object.category_id()) {
-            let mut result: Vec<&Self::Morphism> = Vec::new();
+            let mut result: Vec<&Rc<Self::Morphism>> = Vec::new();
             for cell_set in cells.values() {
                 for cell_id in cell_set {
                     if let Some(cell) = self.morphism.get(cell_id) {

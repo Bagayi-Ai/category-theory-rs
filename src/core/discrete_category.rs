@@ -136,7 +136,7 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTra
         Ok(HashSet::from([self.get_identity_morphism(source_object)?]))
     }
 
-    fn get_object_morphisms(&self, object: &Self::Object) -> Result<Vec<&Self::Morphism>, Errors> {
+    fn get_object_morphisms(&self, object: &Self::Object) -> Result<Vec<&Rc<Self::Morphism>>, Errors> {
         // only cell in discrete category is the identity cell.
         Ok(vec![self.get_identity_morphism(object)?])
     }
@@ -196,7 +196,7 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + Display> FunctorTrait for Discr
 
     fn arrow_mappings(
         &self,
-    ) -> &HashMap<&MorphismAlias<Self::SourceObject>, &MorphismAlias<Self::TargetObject>> {
+    ) -> &HashMap<&Rc<MorphismAlias<Self::SourceObject>>, &Rc<MorphismAlias<Self::TargetObject>>> {
         todo!()
     }
 }

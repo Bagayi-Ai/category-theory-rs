@@ -59,7 +59,7 @@ impl CategoryTrait for UnitCategory {
     fn get_object_morphisms(
         &self,
         object_id: &Self::Object,
-    ) -> Result<Vec<&Self::Morphism>, Errors> {
+    ) -> Result<Vec<&Rc<Self::Morphism>>, Errors> {
         todo!()
     }
 

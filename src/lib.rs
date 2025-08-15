@@ -1,4 +1,4 @@
-mod core {
+pub mod core {
     pub mod category;
 
     pub mod discrete_category;
@@ -12,6 +12,8 @@ mod core {
     pub mod morphism;
 
     pub mod product_endofunctor;
+
+    pub mod set_category;
 
     pub mod traits {
         pub mod arrow_trait;

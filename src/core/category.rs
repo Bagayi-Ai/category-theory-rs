@@ -75,6 +75,16 @@ impl<Id: Identifier<Id = Id>, Object: CategoryTrait<Identifier = Id>> CategoryTr
             .ok_or(Errors::ObjectNotFound)
     }
 
+    fn get_all_objects(&self) -> Result<HashSet<&Rc<Self::Object>>, Errors> {
+        Ok(self.objects.values().fold(
+            HashSet::new(),
+            |mut acc : HashSet<&Rc<Self::Object>>, object|
+                {
+                    acc.insert(object);
+                    acc
+                }))
+    }
+
     fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
         // Todo needs optimization
         // Ok(self.cells.values().collect())

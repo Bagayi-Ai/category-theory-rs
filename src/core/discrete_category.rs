@@ -43,11 +43,13 @@ impl<T: Identifier> Hash for DiscreteCategory<T> {
 
 impl<T: Eq + Clone + Debug + Hash + Identifier> DiscreteCategory<T> {
     pub fn new() -> Self {
-        DiscreteCategory {
+        let mut result = DiscreteCategory {
             category_id: T::generate(),
             cells: Some(HashMap::new()),
             rc_reference: None,
-        }
+        };
+        result.rc_reference = Some(Rc::new(result.clone()));
+        result
     }
 
     pub fn new_with_id(category_id: T) -> Self {
@@ -116,6 +118,15 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTra
             }
         }
         Err(Errors::ObjectNotFound)
+    }
+
+    fn get_all_objects(&self) -> Result<HashSet<&Rc<Self::Object>>, Errors> {
+        let result = if let Some(cells) = &self.cells {
+            cells.values().collect()
+        } else {
+            HashSet::new()
+        };
+        Ok(result)
     }
 
     fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
@@ -212,7 +223,23 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + Display> From<Vec<T>> for Discr
         let mut category = DiscreteCategory::new();
         for object in objects {
             let object = DiscreteCategory::new_with_id(object);
-            category.add_morphism(Rc::new(object)).unwrap();
+            category.add_object(Rc::new(object)).unwrap();
+        }
+        category
+    }
+}
+impl From<&str> for DiscreteCategory<String> {
+    fn from(object: &str) -> Self {
+        DiscreteCategory::new_with_id(object.to_string())
+    }
+}
+
+impl From<Vec<&str>> for DiscreteCategory<String> {
+    fn from(objects: Vec<&str>) -> Self {
+        let mut category = DiscreteCategory::new();
+        for object in objects {
+            let object = DiscreteCategory::new_with_id(object.to_string());
+            category.add_object(Rc::new(object)).unwrap();
         }
         category
     }

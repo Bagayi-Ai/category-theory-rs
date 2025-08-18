@@ -9,7 +9,12 @@ use std::rc::Rc;
 
 pub type MorphismAlias<Category> = <Category as CategoryTrait>::Morphism;
 
-pub trait CategoryTrait: Eq + Debug {
+pub enum MorphismCommutationResult<Morphism: MorphismTrait> {
+    Commutative,
+    NonCommutative(HashSet<Morphism>),
+}
+
+pub trait CategoryTrait: Eq + Debug + Hash {
     type Identifier: Identifier;
     type Object: CategoryTrait;
     type Morphism: MorphismTrait<
@@ -56,9 +61,7 @@ pub trait CategoryTrait: Eq + Debug {
 
     fn get_object(&self, object: Self::Object) -> Result<&Rc<Self::Object>, Errors>;
 
-    fn get_all_objects(&self) -> Result<HashSet<&Rc<Self::Object>>, Errors> {
-        todo!()
-    }
+    fn get_all_objects(&self) -> Result<HashSet<&Rc<Self::Object>>, Errors>;
 
     fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors>;
 
@@ -77,10 +80,9 @@ pub trait CategoryTrait: Eq + Debug {
         &self,
         left_morphisms: Vec<&Self::Morphism>,
         right_morphisms: Vec<&Self::Morphism>,
-    ) -> Result<bool, Errors> {
+    ) -> Result<MorphismCommutationResult<MorphismAlias<Self::Object>>, Errors> {
         self.validate_morphisms_commutation(left_morphisms, right_morphisms)?;
-
-        Ok(true)
+        Ok(MorphismCommutationResult::Commutative)
     }
 
     fn validate_morphisms_commutation(

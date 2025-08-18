@@ -4,6 +4,7 @@ use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::functor_trait::FunctorTrait;
 use std::collections::HashMap;
+use std::hash::{Hash, Hasher};
 use std::rc::Rc;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -106,5 +107,18 @@ where
         //     })
         //     .collect()
         todo!()
+    }
+}
+
+impl<Id, SourceCategory, TargetCategory> Hash for Functor<Id, SourceCategory, TargetCategory>
+where
+Id: Identifier,
+SourceCategory: CategoryTrait,
+TargetCategory: CategoryTrait
+{
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.source_category.hash(state);
+        self.target_category.hash(state);
+        self.id.hash(state);
     }
 }

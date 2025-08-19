@@ -69,7 +69,7 @@ impl<Id: Identifier<Id = Id>, Object: CategoryTrait<Identifier = Id>> CategoryTr
         Ok(cell)
     }
 
-    fn get_object(&self, object: Self::Object) -> Result<&Rc<Self::Object>, Errors> {
+    fn get_object(&self, object: &Self::Object) -> Result<&Rc<Self::Object>, Errors> {
         self.objects
             .get(object.category_id())
             .ok_or(Errors::ObjectNotFound)
@@ -78,11 +78,11 @@ impl<Id: Identifier<Id = Id>, Object: CategoryTrait<Identifier = Id>> CategoryTr
     fn get_all_objects(&self) -> Result<HashSet<&Rc<Self::Object>>, Errors> {
         Ok(self.objects.values().fold(
             HashSet::new(),
-            |mut acc : HashSet<&Rc<Self::Object>>, object|
-                {
-                    acc.insert(object);
-                    acc
-                }))
+            |mut acc: HashSet<&Rc<Self::Object>>, object| {
+                acc.insert(object);
+                acc
+            },
+        ))
     }
 
     fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
@@ -116,7 +116,10 @@ impl<Id: Identifier<Id = Id>, Object: CategoryTrait<Identifier = Id>> CategoryTr
         Ok(result)
     }
 
-    fn get_object_morphisms(&self, object: &Self::Object) -> Result<Vec<&Rc<Self::Morphism>>, Errors> {
+    fn get_object_morphisms(
+        &self,
+        object: &Self::Object,
+    ) -> Result<Vec<&Rc<Self::Morphism>>, Errors> {
         if let Some(cells) = self.object_mapping.get(object.category_id()) {
             let mut result: Vec<&Rc<Self::Morphism>> = Vec::new();
             for cell_set in cells.values() {

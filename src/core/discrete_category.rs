@@ -1,6 +1,7 @@
 use crate::core::errors::Errors;
 use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
+use crate::core::morphism::Morphism;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::{CategoryTrait, MorphismAlias};
 use crate::core::traits::functor_trait::FunctorTrait;
@@ -61,6 +62,14 @@ impl<T: Eq + Clone + Debug + Hash + Identifier> DiscreteCategory<T> {
         result.rc_reference = Some(Rc::new(result.clone()));
         result
     }
+
+    pub fn clone_with_new_id(&self) -> Self {
+        Self {
+            category_id: T::generate(),
+            cells: self.cells.clone(),
+            rc_reference: self.rc_reference.clone(),
+        }
+    }
 }
 
 impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTrait
@@ -111,7 +120,7 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTra
         Err(Errors::ObjectNotFound)
     }
 
-    fn get_object(&self, object: Self::Object) -> Result<&Rc<Self::Object>, Errors> {
+    fn get_object(&self, object: &Self::Object) -> Result<&Rc<Self::Object>, Errors> {
         if let Some(cells) = &self.cells {
             if let Some(cell) = cells.get(&object.category_id) {
                 return Ok(cell);
@@ -147,7 +156,10 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTra
         Ok(HashSet::from([self.get_identity_morphism(source_object)?]))
     }
 
-    fn get_object_morphisms(&self, object: &Self::Object) -> Result<Vec<&Rc<Self::Morphism>>, Errors> {
+    fn get_object_morphisms(
+        &self,
+        object: &Self::Object,
+    ) -> Result<Vec<&Rc<Self::Morphism>>, Errors> {
         // only cell in discrete category is the identity cell.
         Ok(vec![self.get_identity_morphism(object)?])
     }
@@ -207,7 +219,8 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + Display> FunctorTrait for Discr
 
     fn arrow_mappings(
         &self,
-    ) -> &HashMap<&Rc<MorphismAlias<Self::SourceObject>>, &Rc<MorphismAlias<Self::TargetObject>>> {
+    ) -> &HashMap<Rc<MorphismAlias<Self::SourceObject>>, Rc<MorphismAlias<Self::TargetObject>>>
+    {
         todo!()
     }
 }

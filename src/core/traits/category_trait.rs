@@ -45,10 +45,10 @@ pub trait CategoryTrait: Eq + Debug + Hash {
 
     fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors>;
 
-    fn add_morphism(&mut self, morphism: Rc<Self::Morphism>) -> Result<&Rc<Self::Morphism>, Errors>;
+    fn add_morphism(&mut self, morphism: Rc<Self::Morphism>)
+    -> Result<&Rc<Self::Morphism>, Errors>;
 
-    fn get_identity_morphism(&self, object: &Self::Object) -> Result<&Rc<Self::Morphism>, Errors>
-    {
+    fn get_identity_morphism(&self, object: &Self::Object) -> Result<&Rc<Self::Morphism>, Errors> {
         let hom_set = self.get_hom_set(object, object)?;
         // get the identity morphism
         for morphism in hom_set {
@@ -59,7 +59,11 @@ pub trait CategoryTrait: Eq + Debug + Hash {
         Err(Errors::IdentityMorphismNotFound)
     }
 
-    fn get_object(&self, object: Self::Object) -> Result<&Rc<Self::Object>, Errors>;
+    fn get_object(&self, object: &Self::Object) -> Result<&Rc<Self::Object>, Errors>;
+
+    fn get_object_reference(&self, object: Self::Object) -> Result<&Rc<Self::Object>, Errors> {
+        self.get_object(&object)
+    }
 
     fn get_all_objects(&self) -> Result<HashSet<&Rc<Self::Object>>, Errors>;
 

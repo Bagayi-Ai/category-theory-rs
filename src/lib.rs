@@ -12,7 +12,7 @@ pub mod core {
     pub mod morphism;
 
     pub mod product_endofunctor;
-    
+
     pub mod expand_functor;
 
     pub mod set_category;

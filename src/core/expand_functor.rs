@@ -1,15 +1,16 @@
-use std::collections::{HashMap, HashSet};
-use std::io::Error;
 use crate::core::discrete_category::DiscreteCategory;
-use std::rc::Rc;
-use rand::seq::index;
 use crate::core::errors::Errors;
 use crate::core::functor::Functor;
-use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::identifier::Identifier;
+use crate::core::traits::category_trait::CategoryTrait;
+use rand::seq::index;
+use std::collections::{HashMap, HashSet};
+use std::io::Error;
+use std::rc::Rc;
 
-pub fn expand_functor(category: &Rc<DiscreteCategory<String>>) -> Result<HashSet<Functor<String, DiscreteCategory<String>, DiscreteCategory<String>>>, Errors>
-{
+pub fn expand_functor(
+    category: &Rc<DiscreteCategory<String>>,
+) -> Result<HashSet<Functor<String, DiscreteCategory<String>, DiscreteCategory<String>>>, Errors> {
     /*
     This expands each object in a category to its own object.
      */
@@ -18,16 +19,15 @@ pub fn expand_functor(category: &Rc<DiscreteCategory<String>>) -> Result<HashSet
     let mut max_functor = 0;
     for (index, object) in category.get_all_objects()?.into_iter().enumerate() {
         for sub_object in object.get_all_objects()? {
-            let current_mapping = object_mappings.entry(object)
-                .or_insert_with(Vec::new);
-            match expanded_category.get_object((**sub_object).clone()) {
+            let current_mapping = object_mappings.entry(object).or_insert_with(Vec::new);
+            match expanded_category.get_object(&*sub_object) {
                 Ok(_) => continue, // object already exists
                 Err(Errors::ObjectNotFound) => {
                     // object does not exist, we can add it
                     expanded_category.add_object(sub_object.clone())?;
                     current_mapping.push(sub_object.clone());
-                    sub_object// return the newly added object
-                },
+                    sub_object // return the newly added object
+                }
                 Err(e) => return Err(e), // some other error occurred
             };
         }
@@ -47,8 +47,7 @@ pub fn expand_functor(category: &Rc<DiscreteCategory<String>>) -> Result<HashSet
             let current_mapping = functor_mapping.entry(index).or_insert_with(HashMap::new);
             let mapped_object = if sub_objects.len() <= index {
                 sub_objects.get(index).ok_or(Errors::ObjectNotFound)?
-            }
-            else {
+            } else {
                 sub_objects.first().ok_or(Errors::ObjectNotFound)?
             };
             let mapped_object_identity = expanded_category.get_identity_morphism(mapped_object)?;

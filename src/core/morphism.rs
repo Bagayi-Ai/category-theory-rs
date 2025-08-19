@@ -3,9 +3,10 @@ use crate::core::errors::Errors::{InvalidArrowNoFunctorFound, NoFunctorForIdenti
 use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::traits::category_trait::{CategoryTrait, MorphismAlias};
 use crate::core::traits::functor_trait::FunctorTrait;
 use crate::core::traits::morphism_trait::MorphismTrait;
+use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
 use std::rc::Rc;
 
@@ -37,6 +38,22 @@ where
             source,
             target,
             functor: Some(functor),
+            identity: false,
+        }
+    }
+
+    pub fn new_with_mappings(
+        source: Rc<Category::Object>,
+        target: Rc<Category::Object>,
+        mappings: HashMap<Rc<MorphismAlias<Category::Object>>, Rc<MorphismAlias<Category::Object>>>,
+    ) -> Self {
+        let id = Id::generate();
+        let functor = Functor::new(id.clone(), source.clone(), target.clone(), mappings);
+        Morphism {
+            id,
+            source,
+            target,
+            functor: Some(functor.into()),
             identity: false,
         }
     }

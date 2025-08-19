@@ -15,5 +15,5 @@ pub trait FunctorTrait: ArrowTrait {
 
     fn arrow_mappings(
         &self,
-    ) -> &HashMap<&Rc<MorphismAlias<Self::SourceObject>>, &Rc< MorphismAlias<Self::TargetObject>>>;
+    ) -> &HashMap<Rc<MorphismAlias<Self::SourceObject>>, Rc<MorphismAlias<Self::TargetObject>>>;
 }

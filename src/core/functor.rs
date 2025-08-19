@@ -95,26 +95,18 @@ where
         &self.id
     }
 
-    fn arrow_mappings(&self) -> &HashMap<&Rc<SourceCategory::Morphism>, &Rc<TargetCategory::Morphism>> {
-        // self.mappings
-        //     .iter()
-        //     .map(|m| {
-        //         m as &dyn ArrowMappingTrait<
-        //             'a,
-        //             SourceArrow = <SourceCategory as CategoryTrait<'a>>::Morphism,
-        //             TargetArrow = <TargetCategory as CategoryTrait<'a>>::Morphism,
-        //         >
-        //     })
-        //     .collect()
-        todo!()
+    fn arrow_mappings(
+        &self,
+    ) -> &HashMap<Rc<SourceCategory::Morphism>, Rc<TargetCategory::Morphism>> {
+        &self.mappings
     }
 }
 
 impl<Id, SourceCategory, TargetCategory> Hash for Functor<Id, SourceCategory, TargetCategory>
 where
-Id: Identifier,
-SourceCategory: CategoryTrait,
-TargetCategory: CategoryTrait
+    Id: Identifier,
+    SourceCategory: CategoryTrait,
+    TargetCategory: CategoryTrait,
 {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.source_category.hash(state);

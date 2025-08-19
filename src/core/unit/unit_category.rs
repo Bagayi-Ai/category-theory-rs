@@ -40,7 +40,7 @@ impl CategoryTrait for UnitCategory {
         todo!()
     }
 
-    fn get_object(&self, object: Self::Object) -> Result<&Rc<Self::Object>, Errors> {
+    fn get_object(&self, object: &Self::Object) -> Result<&Rc<Self::Object>, Errors> {
         todo!()
     }
 

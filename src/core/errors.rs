@@ -18,6 +18,7 @@ pub enum Errors {
     CannotAddMorphismToDiscreteCategory,
     NoFunctorForIdentityArrow,
     InvalidArrowNoFunctorFound,
+    InvalidFactorization,
     ObjectAlreadyExists,
     IdentityMorphismNotFound,
     CategoryNotInitialized,

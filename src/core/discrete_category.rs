@@ -64,21 +64,19 @@ impl<T: Eq + Clone + Debug + Hash + Identifier> DiscreteCategory<T> {
             cells: self.cells.clone(),
         }
     }
+    pub fn category_id(&self) -> &T {
+        &self.category_id
+    }
 }
 
 impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTrait
     for DiscreteCategory<T>
 {
-    type Identifier = T;
     type Object = Self;
-    type Morphism = Morphism<Self::Identifier, Self::Object>;
+    type Morphism = Morphism<T, Self::Object>;
 
     fn new() -> Self {
         DiscreteCategory::new()
-    }
-
-    fn category_id(&self) -> &Self::Identifier {
-        &self.category_id
     }
 
     fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors> {

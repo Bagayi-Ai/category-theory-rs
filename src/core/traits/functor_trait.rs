@@ -7,8 +7,6 @@ use std::collections::HashMap;
 use std::rc::Rc;
 
 pub trait FunctorTrait: ArrowTrait {
-    fn functor_id(&self) -> &Self::Identifier;
-
     fn validate_mappings(&self) -> Result<(), Errors> {
         todo!()
     }

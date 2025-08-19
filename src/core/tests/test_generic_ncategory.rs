@@ -28,11 +28,9 @@ fn generate_object() -> DiscreteCategoryString {
 
 #[test]
 pub fn test_base_scenarios() {
-    let mut category = Category::new();
+    let mut category: Category<String, DiscreteCategory<String>> = Category::new();
     // add object 1
     let object1 = generate_object();
-    let object1_id = CategoryTrait::category_id(&object1).clone();
-    let object2_id = generate_identifier();
 
     category.add_object(object1.clone().into()).unwrap();
     // check identity morphism
@@ -60,7 +58,6 @@ pub fn test_base_scenarios() {
     // add object 2
     let object2 = generate_object();
     category.add_object(object2.clone().into()).unwrap();
-    let object2_id = CategoryTrait::category_id(&object2).clone();
 
     // check identity morphism
     let cells = category.get_object_morphisms(&object2);
@@ -73,7 +70,6 @@ pub fn test_base_scenarios() {
 
     // add object 3
     let object3 = generate_object();
-    let object3_id = CategoryTrait::category_id(&object3);
     category.add_object(object3.clone().into());
 
     // check identity morphism
@@ -223,42 +219,44 @@ pub fn test_identity_cell_tree() {
         lower_to_numer_mappings,
     );
 
-    let number_to_upper_mappings: HashMap<Rc<Morphism<usize, DiscreteCategoryUsize>>, Rc<Morphism<String, DiscreteCategoryString>>> =
-        HashMap::from([
-            // 1 to a
-            (
-                discreteCategoryANumber
-                    .get_identity_morphism(&object_1)
-                    .unwrap()
-                    .clone(),
-                discreteCategoryALower
-                    .get_identity_morphism(&object_a)
-                    .unwrap()
-                    .clone(),
-            ),
-            // b to 2
-            (
-                discreteCategoryANumber
-                    .get_identity_morphism(&object_2)
-                    .unwrap()
-                    .clone(),
-                discreteCategoryALower
-                    .get_identity_morphism(&object_b)
-                    .unwrap()
-                    .clone(),
-            ),
-            // c to c
-            (
-                discreteCategoryANumber
-                    .get_identity_morphism(&object_3)
-                    .unwrap()
-                    .clone(),
-                discreteCategoryALower
-                    .get_identity_morphism(&object_c)
-                    .unwrap()
-                    .clone(),
-            ),
-        ]);
+    let number_to_upper_mappings: HashMap<
+        Rc<Morphism<usize, DiscreteCategoryUsize>>,
+        Rc<Morphism<String, DiscreteCategoryString>>,
+    > = HashMap::from([
+        // 1 to a
+        (
+            discreteCategoryANumber
+                .get_identity_morphism(&object_1)
+                .unwrap()
+                .clone(),
+            discreteCategoryALower
+                .get_identity_morphism(&object_a)
+                .unwrap()
+                .clone(),
+        ),
+        // b to 2
+        (
+            discreteCategoryANumber
+                .get_identity_morphism(&object_2)
+                .unwrap()
+                .clone(),
+            discreteCategoryALower
+                .get_identity_morphism(&object_b)
+                .unwrap()
+                .clone(),
+        ),
+        // c to c
+        (
+            discreteCategoryANumber
+                .get_identity_morphism(&object_3)
+                .unwrap()
+                .clone(),
+            discreteCategoryALower
+                .get_identity_morphism(&object_c)
+                .unwrap()
+                .clone(),
+        ),
+    ]);
     let functor_number_to_upper = Functor::new(
         "functor_lower_to_number".to_string(),
         discreteCategoryANumber.clone(),
@@ -267,42 +265,44 @@ pub fn test_identity_cell_tree() {
     );
 
     // create a functor1 from lower to upper
-    let lower_to_upper_mappings: HashMap<Rc<Morphism<String, DiscreteCategoryString>>, Rc<Morphism<String, DiscreteCategoryString>>> =
-        HashMap::from([
-            // a to A
-            (
-                discreteCategoryALower
-                    .get_identity_morphism(&object_a)
-                    .unwrap()
-                    .clone(),
-                discreteCategoryAUpper
-                    .get_identity_morphism(&object_A)
-                    .unwrap()
-                    .clone(),
-            ),
-            // b to B
-            (
-                discreteCategoryALower
-                    .get_identity_morphism(&object_b)
-                    .unwrap()
-                    .clone(),
-                discreteCategoryAUpper
-                    .get_identity_morphism(&object_B)
-                    .unwrap()
-                    .clone(),
-            ),
-            // c to C
-            (
-                discreteCategoryALower
-                    .get_identity_morphism(&object_c)
-                    .unwrap()
-                    .clone(),
-                discreteCategoryAUpper
-                    .get_identity_morphism(&object_C)
-                    .unwrap()
-                    .clone(),
-            ),
-        ]);
+    let lower_to_upper_mappings: HashMap<
+        Rc<Morphism<String, DiscreteCategoryString>>,
+        Rc<Morphism<String, DiscreteCategoryString>>,
+    > = HashMap::from([
+        // a to A
+        (
+            discreteCategoryALower
+                .get_identity_morphism(&object_a)
+                .unwrap()
+                .clone(),
+            discreteCategoryAUpper
+                .get_identity_morphism(&object_A)
+                .unwrap()
+                .clone(),
+        ),
+        // b to B
+        (
+            discreteCategoryALower
+                .get_identity_morphism(&object_b)
+                .unwrap()
+                .clone(),
+            discreteCategoryAUpper
+                .get_identity_morphism(&object_B)
+                .unwrap()
+                .clone(),
+        ),
+        // c to C
+        (
+            discreteCategoryALower
+                .get_identity_morphism(&object_c)
+                .unwrap()
+                .clone(),
+            discreteCategoryAUpper
+                .get_identity_morphism(&object_C)
+                .unwrap()
+                .clone(),
+        ),
+    ]);
     let functor_lower_to_upper = Rc::new(Functor::new(
         "functor_1".to_string(),
         discreteCategoryALower.clone(),

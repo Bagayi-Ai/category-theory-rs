@@ -17,7 +17,7 @@ use std::rc::Rc;
 pub struct EpicMonicCategory<Id, Obj>
 where
     Id: Identifier<Id = Id>,
-    Obj: CategoryTrait<Identifier = Id>,
+    Obj: CategoryTrait,
 {
     category: Category<Id, Obj>,
     morphism_factors: HashMap<
@@ -32,7 +32,7 @@ where
 impl<Id, Obj> EpicMonicCategory<Id, Obj>
 where
     Id: Identifier<Id = Id>,
-    Obj: CategoryTrait<Identifier = Id, Object = Obj>,
+    Obj: CategoryTrait<Object = Obj>,
 {
     pub fn new() -> Self {
         EpicMonicCategory {
@@ -124,18 +124,13 @@ where
 impl<Id, Obj> CategoryTrait for EpicMonicCategory<Id, Obj>
 where
     Id: Identifier<Id = Id>,
-    Obj: CategoryTrait<Identifier = Id, Object = Obj>,
+    Obj: CategoryTrait<Object = Obj>,
 {
-    type Identifier = Id;
     type Object = Obj;
     type Morphism = Morphism<Id, Category<Id, Obj>>;
 
     fn new() -> Self {
         todo!()
-    }
-
-    fn category_id(&self) -> &Self::Identifier {
-        &self.category.category_id()
     }
 
     fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors> {
@@ -185,7 +180,7 @@ where
 impl<Id, Obj> FactorizationSystemTrait for EpicMonicCategory<Id, Obj>
 where
     Id: Identifier<Id = Id>,
-    Obj: CategoryTrait<Identifier = Id, Object = Obj>,
+    Obj: CategoryTrait<Object = Obj>,
 {
     fn morphism_factors(
         &self,
@@ -197,9 +192,7 @@ where
     }
 }
 
-impl<Id: Identifier<Id = Id>, Object: CategoryTrait<Identifier = Id>> Hash
-    for EpicMonicCategory<Id, Object>
-{
+impl<Id: Identifier<Id = Id>, Object: CategoryTrait> Hash for EpicMonicCategory<Id, Object> {
     fn hash<H>(&self, state: &mut H)
     where
         H: std::hash::Hasher,

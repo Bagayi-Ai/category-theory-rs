@@ -8,10 +8,6 @@ pub trait ArrowTrait {
 
     type TargetObject: CategoryTrait;
 
-    type Identifier: Identifier;
-
-    fn arrow_id(&self) -> &Self::Identifier;
-
     fn source_object(&self) -> &Rc<Self::SourceObject>;
 
     fn target_object(&self) -> &Rc<Self::TargetObject>;
@@ -20,17 +16,9 @@ pub trait ArrowTrait {
 
     fn compose(
         &self,
-        other: &impl ArrowTrait<
-            SourceObject = Self::SourceObject,
-            TargetObject = Self::TargetObject,
-            Identifier = Self::Identifier,
-        >,
+        other: &impl ArrowTrait<SourceObject = Self::SourceObject, TargetObject = Self::TargetObject>,
     ) -> Result<
-        impl ArrowTrait<
-            SourceObject = Self::SourceObject,
-            TargetObject = Self::TargetObject,
-            Identifier = Self::Identifier,
-        >,
+        impl ArrowTrait<SourceObject = Self::SourceObject, TargetObject = Self::TargetObject>,
         Errors,
     >;
 
@@ -38,13 +26,7 @@ pub trait ArrowTrait {
     // for single arrow just return itself
     fn arrows(
         &self,
-    ) -> Vec<
-        &impl ArrowTrait<
-            SourceObject = Self::SourceObject,
-            TargetObject = Self::TargetObject,
-            Identifier = Self::Identifier,
-        >,
-    >;
+    ) -> Vec<&impl ArrowTrait<SourceObject = Self::SourceObject, TargetObject = Self::TargetObject>>;
 
     fn validate_composition(&self) -> Result<(), Errors> {
         todo!()
@@ -52,11 +34,7 @@ pub trait ArrowTrait {
 
     fn validate_commutation(
         &self,
-        other: &impl ArrowTrait<
-            SourceObject = Self::SourceObject,
-            TargetObject = Self::TargetObject,
-            Identifier = Self::Identifier,
-        >,
+        other: &impl ArrowTrait<SourceObject = Self::SourceObject, TargetObject = Self::TargetObject>,
     ) -> Result<(), Errors> {
         todo!()
     }

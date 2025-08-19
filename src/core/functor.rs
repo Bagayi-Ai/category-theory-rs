@@ -50,11 +50,6 @@ where
 {
     type SourceObject = SourceCategory;
     type TargetObject = TargetCategory;
-    type Identifier = Id;
-
-    fn arrow_id(&self) -> &Self::Identifier {
-        &self.id
-    }
 
     fn source_object(&self) -> &Rc<Self::SourceObject> {
         &self.source_category
@@ -70,16 +65,12 @@ where
 
     fn compose(
         &self,
-        other: &impl ArrowTrait<
-            SourceObject = Self::SourceObject,
-            TargetObject = Self::TargetObject,
-            Identifier = Self::Identifier,
-        >,
-    ) -> Result<Functor<Self::Identifier, Self::SourceObject, Self::TargetObject>, Errors> {
+        other: &impl ArrowTrait<SourceObject = Self::SourceObject, TargetObject = Self::TargetObject>,
+    ) -> Result<Functor<Id, Self::SourceObject, Self::TargetObject>, Errors> {
         todo!()
     }
 
-    fn arrows(&self) -> Vec<&Functor<Self::Identifier, Self::SourceObject, Self::TargetObject>> {
+    fn arrows(&self) -> Vec<&Functor<Id, Self::SourceObject, Self::TargetObject>> {
         todo!()
     }
 }
@@ -91,10 +82,6 @@ where
     SourceCategory: CategoryTrait,
     TargetCategory: CategoryTrait,
 {
-    fn functor_id(&self) -> &Id {
-        &self.id
-    }
-
     fn arrow_mappings(
         &self,
     ) -> &HashMap<Rc<SourceCategory::Morphism>, Rc<TargetCategory::Morphism>> {

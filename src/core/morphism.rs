@@ -23,9 +23,9 @@ where
     identity: bool,
 }
 
-impl<Id: Identifier, Category: CategoryTrait<Identifier = Id>> Morphism<Id, Category>
+impl<Id: Identifier, Category: CategoryTrait> Morphism<Id, Category>
 where
-    <Category as CategoryTrait>::Object: CategoryTrait<Identifier = Id>,
+    <Category as CategoryTrait>::Object: CategoryTrait,
 {
     pub fn new(
         id: Id,
@@ -59,8 +59,9 @@ where
     }
 
     pub fn new_identity_morphism(object: Rc<Category::Object>) -> Rc<Self> {
+        let id = Id::generate();
         Rc::new(Morphism {
-            id: object.category_id().clone(),
+            id,
             source: object.clone(),
             target: object,
             functor: None,
@@ -68,7 +69,7 @@ where
         })
     }
 
-    pub fn id(&self) -> &Category::Identifier {
+    pub fn id(&self) -> &Id {
         &self.id
     }
 }
@@ -85,11 +86,6 @@ impl<Id: Identifier, Category: CategoryTrait> Hash for Morphism<Id, Category> {
 impl<Id: Identifier, Category: CategoryTrait> ArrowTrait for Morphism<Id, Category> {
     type SourceObject = Category::Object;
     type TargetObject = Category::Object;
-    type Identifier = Id;
-
-    fn arrow_id(&self) -> &Self::Identifier {
-        &self.id
-    }
 
     fn source_object(&self) -> &Rc<Self::SourceObject> {
         &self.source
@@ -105,11 +101,7 @@ impl<Id: Identifier, Category: CategoryTrait> ArrowTrait for Morphism<Id, Catego
 
     fn compose(
         &self,
-        other: &impl ArrowTrait<
-            SourceObject = Self::SourceObject,
-            TargetObject = Self::TargetObject,
-            Identifier = Self::Identifier,
-        >,
+        other: &impl ArrowTrait<SourceObject = Self::SourceObject, TargetObject = Self::TargetObject>,
     ) -> Result<Morphism<Id, Category>, Errors> {
         todo!()
     }
@@ -119,13 +111,8 @@ impl<Id: Identifier, Category: CategoryTrait> ArrowTrait for Morphism<Id, Catego
     }
 }
 
-impl<'a, Id: Identifier, Category: CategoryTrait<Identifier = Id>> MorphismTrait
-    for Morphism<Id, Category>
-{
-    fn functor(
-        &self,
-    ) -> Result<&Rc<Functor<Self::Identifier, Self::SourceObject, Self::TargetObject>>, Errors>
-    {
+impl<'a, Id: Identifier, Category: CategoryTrait> MorphismTrait for Morphism<Id, Category> {
+    fn functor(&self) -> Result<&Rc<Functor<Id, Self::SourceObject, Self::TargetObject>>, Errors> {
         if self.identity {
             return Err(Errors::NoFunctorForIdentityArrow);
         }

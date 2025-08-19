@@ -15,13 +15,9 @@ pub enum MorphismCommutationResult<Morphism: MorphismTrait> {
 }
 
 pub trait CategoryTrait: Eq + Debug + Hash {
-    type Identifier: Identifier;
     type Object: CategoryTrait;
-    type Morphism: MorphismTrait<
-            SourceObject = Self::Object,
-            TargetObject = Self::Object,
-            Identifier = Self::Identifier,
-        > + Debug
+    type Morphism: MorphismTrait<SourceObject = Self::Object, TargetObject = Self::Object>
+        + Debug
         + Eq
         + Hash;
 
@@ -40,8 +36,6 @@ pub trait CategoryTrait: Eq + Debug + Hash {
     {
         Self::new()
     }
-
-    fn category_id(&self) -> &Self::Identifier;
 
     fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors>;
 

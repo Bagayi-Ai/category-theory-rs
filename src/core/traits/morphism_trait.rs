@@ -10,11 +10,7 @@ pub trait MorphismTrait: ArrowTrait {
         &self,
     ) -> Result<
         &Rc<
-            impl FunctorTrait<
-                Identifier = Self::Identifier,
-                SourceObject = Self::SourceObject,
-                TargetObject = Self::TargetObject,
-            >,
+            impl FunctorTrait<SourceObject = Self::SourceObject, TargetObject = Self::TargetObject>,
         >,
         Errors,
     >;

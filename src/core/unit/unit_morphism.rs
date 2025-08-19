@@ -19,11 +19,6 @@ pub struct UnitMorphism<T: Identifier> {
 impl<T: Identifier> ArrowTrait for UnitMorphism<T> {
     type SourceObject = UnitCategory;
     type TargetObject = Self::SourceObject;
-    type Identifier = T;
-
-    fn arrow_id(&self) -> &Self::Identifier {
-        todo!()
-    }
 
     fn source_object(&self) -> &Rc<Self::SourceObject> {
         todo!()
@@ -39,11 +34,7 @@ impl<T: Identifier> ArrowTrait for UnitMorphism<T> {
 
     fn compose(
         &self,
-        other: &impl ArrowTrait<
-            SourceObject = Self::SourceObject,
-            TargetObject = Self::TargetObject,
-            Identifier = Self::Identifier,
-        >,
+        other: &impl ArrowTrait<SourceObject = Self::SourceObject, TargetObject = Self::TargetObject>,
     ) -> Result<UnitMorphism<T>, Errors> {
         todo!()
     }
@@ -60,10 +51,6 @@ impl<T: Identifier> MorphismTrait for UnitMorphism<T> {
 }
 
 impl<Id: Identifier> FunctorTrait for UnitMorphism<Id> {
-    fn functor_id(&self) -> &Self::Identifier {
-        todo!()
-    }
-
     fn arrow_mappings(
         &self,
     ) -> &HashMap<Rc<MorphismAlias<Self::SourceObject>>, Rc<MorphismAlias<Self::TargetObject>>>

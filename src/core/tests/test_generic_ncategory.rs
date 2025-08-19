@@ -178,8 +178,8 @@ pub fn test_identity_cell_tree() {
         .unwrap();
 
     let lower_to_numer_mappings: HashMap<
-        Rc<DiscreteCategory<String>>,
-        Rc<DiscreteCategory<usize>>,
+        Rc<Morphism<String, DiscreteCategory<String>>>,
+        Rc<Morphism<usize, DiscreteCategory<usize>>>,
     > = HashMap::from([
         // a to 1
         (
@@ -223,7 +223,7 @@ pub fn test_identity_cell_tree() {
         lower_to_numer_mappings,
     );
 
-    let number_to_upper_mappings: HashMap<Rc<DiscreteCategoryUsize>, Rc<DiscreteCategoryString>> =
+    let number_to_upper_mappings: HashMap<Rc<Morphism<usize, DiscreteCategoryUsize>>, Rc<Morphism<String, DiscreteCategoryString>>> =
         HashMap::from([
             // 1 to a
             (
@@ -267,7 +267,7 @@ pub fn test_identity_cell_tree() {
     );
 
     // create a functor1 from lower to upper
-    let lower_to_upper_mappings: HashMap<Rc<DiscreteCategoryString>, Rc<DiscreteCategoryString>> =
+    let lower_to_upper_mappings: HashMap<Rc<Morphism<String, DiscreteCategoryString>>, Rc<Morphism<String, DiscreteCategoryString>>> =
         HashMap::from([
             // a to A
             (

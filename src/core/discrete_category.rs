@@ -21,8 +21,7 @@ pub struct DiscreteCategory<T: Identifier> {
     category_id: T,
     // TODO: Find a way of avoiding storing identity cells
     // as we could derive them from the objects.
-    cells: Option<HashMap<T, Rc<Self>>>,
-    rc_reference: Option<Rc<Self>>,
+    cells: Option<HashMap<T, Rc<Morphism<T, Self>>>>,
 }
 
 impl<T: Identifier + Display> Display for DiscreteCategory<T> {
@@ -47,9 +46,7 @@ impl<T: Eq + Clone + Debug + Hash + Identifier> DiscreteCategory<T> {
         let mut result = DiscreteCategory {
             category_id: T::generate(),
             cells: Some(HashMap::new()),
-            rc_reference: None,
         };
-        result.rc_reference = Some(Rc::new(result.clone()));
         result
     }
 
@@ -57,9 +54,7 @@ impl<T: Eq + Clone + Debug + Hash + Identifier> DiscreteCategory<T> {
         let mut result = DiscreteCategory {
             category_id,
             cells: None,
-            rc_reference: None,
         };
-        result.rc_reference = Some(Rc::new(result.clone()));
         result
     }
 
@@ -67,7 +62,6 @@ impl<T: Eq + Clone + Debug + Hash + Identifier> DiscreteCategory<T> {
         Self {
             category_id: T::generate(),
             cells: self.cells.clone(),
-            rc_reference: self.rc_reference.clone(),
         }
     }
 }
@@ -77,7 +71,7 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTra
 {
     type Identifier = T;
     type Object = Self;
-    type Morphism = Self;
+    type Morphism = Morphism<Self::Identifier, Self::Object>;
 
     fn new() -> Self {
         DiscreteCategory::new()
@@ -88,18 +82,19 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTra
     }
 
     fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors> {
+        let identity_morphism = Morphism::new_identity_morphism(object.clone());
         if let Some(cells) = &mut self.cells {
             if cells.contains_key(&object.category_id) {
                 return Err(Errors::ObjectAlreadyExists);
             }
-            cells.insert(object.category_id.clone(), object);
+            cells.insert(object.category_id.clone(), identity_morphism);
             Ok(())
         } else {
             self.cells = Some(HashMap::new());
             self.cells
                 .as_mut()
                 .unwrap()
-                .insert(object.category_id.clone(), object);
+                .insert(object.category_id.clone(), identity_morphism);
             Ok(())
         }
     }
@@ -123,7 +118,7 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTra
     fn get_object(&self, object: &Self::Object) -> Result<&Rc<Self::Object>, Errors> {
         if let Some(cells) = &self.cells {
             if let Some(cell) = cells.get(&object.category_id) {
-                return Ok(cell);
+                return Ok(cell.source_object());
             }
         }
         Err(Errors::ObjectNotFound)
@@ -131,7 +126,7 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTra
 
     fn get_all_objects(&self) -> Result<HashSet<&Rc<Self::Object>>, Errors> {
         let result = if let Some(cells) = &self.cells {
-            cells.values().collect()
+            cells.values().map(|item| item.source_object()).collect()
         } else {
             HashSet::new()
         };
@@ -166,62 +161,6 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTra
 
     fn nested_level() -> usize {
         1
-    }
-}
-
-impl<T: Eq + Clone + Hash + Debug + Identifier + Display> ArrowTrait for DiscreteCategory<T> {
-    type Identifier = T;
-    type SourceObject = Self;
-    type TargetObject = Self;
-
-    fn arrow_id(&self) -> &Self::Identifier {
-        &self.category_id
-    }
-
-    fn source_object(&self) -> &Rc<Self::SourceObject> {
-        self.rc_reference.as_ref().unwrap()
-    }
-
-    fn target_object(&self) -> &Rc<Self::TargetObject> {
-        self.rc_reference.as_ref().unwrap()
-    }
-
-    fn is_identity(&self) -> bool {
-        true
-    }
-
-    fn arrows(&self) -> Vec<&DiscreteCategory<T>> {
-        vec![self]
-    }
-
-    fn compose(
-        &self,
-        other: &impl ArrowTrait<
-            SourceObject = Self::SourceObject,
-            TargetObject = Self::TargetObject,
-            Identifier = Self::Identifier,
-        >,
-    ) -> Result<DiscreteCategory<T>, Errors> {
-        todo!()
-    }
-}
-
-impl<T: Eq + Clone + Hash + Debug + Identifier + Display> MorphismTrait for DiscreteCategory<T> {
-    fn functor(&self) -> Result<&Rc<DiscreteCategory<T>>, Errors> {
-        todo!()
-    }
-}
-
-impl<T: Eq + Clone + Hash + Debug + Identifier + Display> FunctorTrait for DiscreteCategory<T> {
-    fn functor_id(&self) -> &Self::Identifier {
-        todo!()
-    }
-
-    fn arrow_mappings(
-        &self,
-    ) -> &HashMap<Rc<MorphismAlias<Self::SourceObject>>, Rc<MorphismAlias<Self::TargetObject>>>
-    {
-        todo!()
     }
 }
 
@@ -284,8 +223,8 @@ mod tests {
         let cell = cell.unwrap();
         assert_eq!(cell.len(), 1);
         let cell = cell.first().unwrap();
-        assert_eq!(cell.source_object(), object1.source_object());
-        assert_eq!(cell.target_object(), object1.target_object());
+        assert_eq!(cell.source_object(), &object1);
+        assert_eq!(cell.target_object(), &object1);
 
         // check identity morphism
         let cell = category.get_object_morphisms(&object1);
@@ -293,8 +232,8 @@ mod tests {
         let cell = cell.unwrap();
         assert_eq!(cell.len(), 1);
         let cell = cell.first().unwrap();
-        assert_eq!(cell.source_object(), object1.source_object());
-        assert_eq!(cell.target_object(), object1.target_object());
+        assert_eq!(cell.source_object(), &object1);
+        assert_eq!(cell.target_object(), &object1);
 
         // TODO: implement comparison of the object assert_eq!(category.get_object(&object1_id).unwrap(), &object);
 
@@ -308,8 +247,8 @@ mod tests {
         let cells = cells.unwrap();
         assert_eq!(cells.len(), 1);
         let cell = cells.first().unwrap();
-        assert_eq!(cell.source_object(), object2.source_object());
-        assert_eq!(cell.target_object(), object2.target_object());
+        assert_eq!(cell.source_object(), &object2);
+        assert_eq!(cell.target_object(), &object2);
 
         // add object 3 without id
         let object3 = generate_morphism();
@@ -321,7 +260,7 @@ mod tests {
         let cells = cells.unwrap();
         assert_eq!(cells.len(), 1);
         let cell = cells.first().unwrap();
-        assert_eq!(cell.source_object(), object3.source_object());
-        assert_eq!(cell.target_object(), object3.target_object());
+        assert_eq!(cell.source_object(), &object3);
+        assert_eq!(cell.target_object(), &object3);
     }
 }

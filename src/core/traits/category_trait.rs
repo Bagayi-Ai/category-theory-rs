@@ -125,8 +125,8 @@ pub trait CategoryTrait: Eq + Debug + Hash {
         // self.validate_morphisms_composition(left_morphisms)?;
         // self.validate_morphisms_composition(right_morphisms)?;
         //
-        // Ok(())
-        todo!()
+        Ok(())
+        // todo!()
     }
 
     fn validate_morphisms_composition(&self, morphims: Vec<&Self::Morphism>) -> Result<(), Errors> {

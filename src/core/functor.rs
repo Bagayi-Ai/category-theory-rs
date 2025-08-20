@@ -1,9 +1,10 @@
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
+use crate::core::morphism::Morphism;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::functor_trait::FunctorTrait;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::hash::{Hash, Hasher};
 use std::rc::Rc;
 
@@ -86,6 +87,59 @@ where
         &self,
     ) -> &HashMap<Rc<SourceCategory::Morphism>, Rc<TargetCategory::Morphism>> {
         &self.mappings
+    }
+}
+
+impl<Id, SourceCategory, TargetCategory> CategoryTrait
+    for Functor<Id, SourceCategory, TargetCategory>
+where
+    Id: Identifier,
+    SourceCategory: CategoryTrait,
+    TargetCategory: CategoryTrait,
+{
+    type Object = Self;
+    type Morphism = Morphism<Id, Self::Object>;
+
+    fn new() -> Self {
+        todo!()
+    }
+
+    fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors> {
+        todo!()
+    }
+
+    fn add_morphism(
+        &mut self,
+        morphism: Rc<Self::Morphism>,
+    ) -> Result<&Rc<Self::Morphism>, Errors> {
+        todo!()
+    }
+
+    fn get_object(&self, object: &Self::Object) -> Result<&Rc<Self::Object>, Errors> {
+        todo!()
+    }
+
+    fn get_all_objects(&self) -> Result<HashSet<&Rc<Self::Object>>, Errors> {
+        todo!()
+    }
+
+    fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
+        todo!()
+    }
+
+    fn get_hom_set(
+        &self,
+        source_object: &Self::Object,
+        target_object: &Self::Object,
+    ) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
+        todo!()
+    }
+
+    fn get_object_morphisms(
+        &self,
+        object_id: &Self::Object,
+    ) -> Result<Vec<&Rc<Self::Morphism>>, Errors> {
+        todo!()
     }
 }
 

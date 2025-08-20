@@ -512,3 +512,264 @@ pub fn test_identity_cell_tree() {
     //     ]
     // );
 }
+
+#[test]
+pub fn test_nested_category() {
+    // start with discrete category A with a, b, c as objects
+    let mut categoryAlphaLower: Rc<DiscreteCategory<String>> = Rc::new(vec!["a", "b", "c"].into());
+
+    let categoryAlphaUpper: Rc<DiscreteCategory<String>> = Rc::new(vec!["A", "B", "C"].into());
+
+    let categoryAlphaNumber: Rc<DiscreteCategory<usize>> = Rc::new(vec![1, 2, 3].into());
+
+    Rc::get_mut(&mut categoryAlphaLower)
+        .unwrap()
+        .add_object(categoryAlphaUpper.clone())
+        .unwrap();
+
+    for object in categoryAlphaLower.get_all_objects().unwrap() {
+        println!("Object: {}", object.category_id());
+    }
+
+    let lower_to_number_mappings: HashMap<
+        Rc<Morphism<String, DiscreteCategory<String>>>,
+        Rc<Morphism<usize, DiscreteCategory<usize>>>,
+    > = HashMap::from([
+        // a to 1
+        (
+            categoryAlphaLower
+                .get_identity_morphism(&"a".into())
+                .unwrap()
+                .clone(),
+            categoryAlphaNumber
+                .get_identity_morphism(&1.into())
+                .unwrap()
+                .clone(),
+        ),
+        // b to 2
+        (
+            categoryAlphaLower
+                .get_identity_morphism(&"b".into())
+                .unwrap()
+                .clone(),
+            categoryAlphaNumber
+                .get_identity_morphism(&2.into())
+                .unwrap()
+                .clone(),
+        ),
+        // c to 3
+        (
+            categoryAlphaLower
+                .get_identity_morphism(&"c".into())
+                .unwrap()
+                .clone(),
+            categoryAlphaNumber
+                .get_identity_morphism(&3.into())
+                .unwrap()
+                .clone(),
+        ),
+    ]);
+
+    // create a functor from lower to number
+    let functor_lower_to_number = Rc::new(Functor::new(
+        "functor_lower_to_number".to_string(),
+        categoryAlphaLower.clone(),
+        categoryAlphaNumber.clone(),
+        lower_to_number_mappings,
+    ));
+
+    let number_to_upper_mappings: HashMap<
+        Rc<Morphism<usize, DiscreteCategory<usize>>>,
+        Rc<Morphism<String, DiscreteCategory<String>>>,
+    > = HashMap::from([
+        // 1 to a
+        (
+            categoryAlphaNumber
+                .get_identity_morphism(&1.into())
+                .unwrap()
+                .clone(),
+            categoryAlphaLower
+                .get_identity_morphism(&"a".into())
+                .unwrap()
+                .clone(),
+        ),
+        // 2 to b
+        (
+            categoryAlphaNumber
+                .get_identity_morphism(&2.into())
+                .unwrap()
+                .clone(),
+            categoryAlphaLower
+                .get_identity_morphism(&"b".into())
+                .unwrap()
+                .clone(),
+        ),
+        // 3 to c
+        (
+            categoryAlphaNumber
+                .get_identity_morphism(&3.into())
+                .unwrap()
+                .clone(),
+            categoryAlphaLower
+                .get_identity_morphism(&"c".into())
+                .unwrap()
+                .clone(),
+        ),
+    ]);
+
+    let functor_number_to_upper = Functor::new(
+        "functor_number_to_upper".to_string(),
+        categoryAlphaNumber.clone(),
+        categoryAlphaUpper.clone(),
+        number_to_upper_mappings,
+    );
+
+    // create a functor1 from lower to upper
+    let lower_to_upper_mappings: HashMap<
+        Rc<Morphism<String, DiscreteCategory<String>>>,
+        Rc<Morphism<String, DiscreteCategory<String>>>,
+    > = HashMap::from([
+        // a to A
+        (
+            categoryAlphaLower
+                .get_identity_morphism(&"a".into())
+                .unwrap()
+                .clone(),
+            categoryAlphaUpper
+                .get_identity_morphism(&"A".into())
+                .unwrap()
+                .clone(),
+        ),
+        // b to B
+        (
+            categoryAlphaLower
+                .get_identity_morphism(&"b".into())
+                .unwrap()
+                .clone(),
+            categoryAlphaUpper
+                .get_identity_morphism(&"B".into())
+                .unwrap()
+                .clone(),
+        ),
+        // c to C
+        (
+            categoryAlphaLower
+                .get_identity_morphism(&"c".into())
+                .unwrap()
+                .clone(),
+            categoryAlphaUpper
+                .get_identity_morphism(&"C".into())
+                .unwrap()
+                .clone(),
+        ),
+    ]);
+
+    let functor_lower_to_upper = Rc::new(Functor::new(
+        "functor_1".to_string(),
+        categoryAlphaLower.clone(),
+        categoryAlphaUpper.clone(),
+        lower_to_upper_mappings,
+    ));
+
+    // functor from lower to upper in reverse
+    let lower_to_upper_reverse_mappings: HashMap<
+        Rc<Morphism<String, DiscreteCategory<String>>>,
+        Rc<Morphism<String, DiscreteCategory<String>>>,
+    > = HashMap::from([
+        // a to C
+        (
+            categoryAlphaLower
+                .get_identity_morphism(&"a".into())
+                .unwrap()
+                .clone(),
+            categoryAlphaUpper
+                .get_identity_morphism(&"C".into())
+                .unwrap()
+                .clone(),
+        ),
+        // b to B
+        (
+            categoryAlphaLower
+                .get_identity_morphism(&"b".into())
+                .unwrap()
+                .clone(),
+            categoryAlphaUpper
+                .get_identity_morphism(&"B".into())
+                .unwrap()
+                .clone(),
+        ),
+        // c to A
+        (
+            categoryAlphaLower
+                .get_identity_morphism(&"c".into())
+                .unwrap()
+                .clone(),
+            categoryAlphaUpper
+                .get_identity_morphism(&"A".into())
+                .unwrap()
+                .clone(),
+        ),
+    ]);
+
+    let functor_lower_to_upper_reverse = Rc::new(Functor::new(
+        "functor_1_reverse".to_string(),
+        categoryAlphaLower.clone(),
+        categoryAlphaUpper.clone(),
+        lower_to_upper_reverse_mappings,
+    ));
+
+    let mut setCategoryAlphabet: Category<String, DiscreteCategory<String>> = Category::new();
+    // Add the discrete category A as an object in Set category alphabet
+    setCategoryAlphabet
+        .add_object(categoryAlphaLower.clone())
+        .unwrap();
+    // Add the discrete category A as an object in Set category alphabet
+    setCategoryAlphabet
+        .add_object(categoryAlphaUpper.clone())
+        .unwrap();
+    let setCategoryAlphabet = Rc::new(setCategoryAlphabet);
+
+    // category of numbers
+    let mut setCategoryNumber: Category<usize, DiscreteCategory<usize>> = Category::new();
+    // Add the discrete category A as an object in Set category number
+    setCategoryNumber
+        .add_object(categoryAlphaNumber.clone())
+        .unwrap();
+
+    let setCategoryAlphabetNumber = Rc::new(setCategoryNumber);
+
+    // lets create a functor category
+    // where objects are functors and morphisms are natural transformations
+    let mut functorCategory: Category<
+        String,
+        Functor<String, DiscreteCategory<String>, DiscreteCategory<String>>,
+    > = Category::new();
+
+    functorCategory
+        .add_object(functor_lower_to_upper.clone())
+        .unwrap();
+    functorCategory
+        .add_object(functor_lower_to_upper_reverse.clone())
+        .unwrap();
+
+    // now creating a morphism from lower to upper functor which is a natural transformation
+    let natural_transformation_morphism: Morphism<
+        String,
+        Functor<String, DiscreteCategory<String>, DiscreteCategory<String>>,
+    > = Morphism::new(
+        "natural_transformation_lower_to_upper".to_string(),
+        functor_lower_to_upper.clone(),
+        functor_lower_to_upper_reverse.clone(),
+        Rc::new(Functor::new(
+            "natural_transformation_lower_to_upper".to_string(),
+            functor_lower_to_upper.clone(),
+            functor_lower_to_upper_reverse.clone(),
+            HashMap::new(),
+        )),
+    );
+    let natural_transformation_morphism = Rc::new(natural_transformation_morphism);
+
+    functorCategory
+        .add_morphism(natural_transformation_morphism)
+        .unwrap();
+}

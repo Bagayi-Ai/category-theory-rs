@@ -17,16 +17,11 @@ use std::rc::Rc;
 pub struct EpicMonicCategory<Id, Obj>
 where
     Id: Identifier<Id = Id>,
-    Obj: CategoryTrait,
+    Obj: CategoryTrait<Object = Obj>,
 {
     category: Category<Id, Obj>,
-    morphism_factors: HashMap<
-        Rc<Morphism<Id, Category<Id, Obj>>>,
-        (
-            Rc<Morphism<Id, Category<Id, Obj>>>,
-            Rc<Morphism<Id, Category<Id, Obj>>>,
-        ),
-    >,
+    morphism_factors:
+        HashMap<Rc<Morphism<Id, Obj>>, (Rc<Morphism<Id, Obj>>, Rc<Morphism<Id, Obj>>)>,
 }
 
 impl<Id, Obj> EpicMonicCategory<Id, Obj>
@@ -47,14 +42,8 @@ where
 
     fn factorize(
         &mut self,
-        morphism: &Morphism<Id, Category<Id, Obj>>,
-    ) -> Result<
-        (
-            Morphism<Id, Category<Id, Obj>>,
-            Morphism<Id, Category<Id, Obj>>,
-        ),
-        Errors,
-    > {
+        morphism: &Morphism<Id, Obj>,
+    ) -> Result<(Morphism<Id, Obj>, Morphism<Id, Obj>), Errors> {
         // we factorize to image of f and from image of f to target object
         let source_object = morphism.source_object();
         let target_object = morphism.target_object();
@@ -127,7 +116,7 @@ where
     Obj: CategoryTrait<Object = Obj>,
 {
     type Object = Obj;
-    type Morphism = Morphism<Id, Category<Id, Obj>>;
+    type Morphism = Morphism<Id, Obj>;
 
     fn new() -> Self {
         todo!()
@@ -192,7 +181,9 @@ where
     }
 }
 
-impl<Id: Identifier<Id = Id>, Object: CategoryTrait> Hash for EpicMonicCategory<Id, Object> {
+impl<Id: Identifier<Id = Id>, Object: CategoryTrait<Object = Object>> Hash
+    for EpicMonicCategory<Id, Object>
+{
     fn hash<H>(&self, state: &mut H)
     where
         H: std::hash::Hasher,

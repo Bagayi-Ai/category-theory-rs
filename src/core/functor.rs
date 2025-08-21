@@ -97,7 +97,7 @@ where
     SourceCategory: CategoryTrait,
     TargetCategory: CategoryTrait,
 {
-    type Object = Self;
+    type Object = TargetCategory;
     type Morphism = Morphism<Id, Self::Object>;
 
     fn new() -> Self {

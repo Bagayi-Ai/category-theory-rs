@@ -96,10 +96,7 @@ impl<Id: Identifier, Object: CategoryTrait> ArrowTrait for Morphism<Id, Object> 
         self.identity
     }
 
-    fn compose(
-        &self,
-        other: &impl ArrowTrait<SourceObject = Self::SourceObject, TargetObject = Self::TargetObject>,
-    ) -> Result<Morphism<Id, Object>, Errors> {
+    fn compose(&self, other: &impl ArrowTrait) -> Result<Morphism<Id, Object>, Errors> {
         todo!()
     }
 

@@ -16,7 +16,7 @@ pub trait ArrowTrait {
 
     fn compose(
         &self,
-        other: &impl ArrowTrait<SourceObject = Self::SourceObject, TargetObject = Self::TargetObject>,
+        other: &impl ArrowTrait,
     ) -> Result<
         impl ArrowTrait<SourceObject = Self::SourceObject, TargetObject = Self::TargetObject>,
         Errors,
@@ -32,10 +32,7 @@ pub trait ArrowTrait {
         todo!()
     }
 
-    fn validate_commutation(
-        &self,
-        other: &impl ArrowTrait<SourceObject = Self::SourceObject, TargetObject = Self::TargetObject>,
-    ) -> Result<(), Errors> {
+    fn validate_commutation(&self, other: &impl ArrowTrait) -> Result<(), Errors> {
         todo!()
     }
 

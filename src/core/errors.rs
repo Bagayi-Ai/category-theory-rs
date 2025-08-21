@@ -12,7 +12,7 @@ pub enum Errors {
     NoObjectsInCategory,
     InvalidCategory,
     InvalidFunctorLevelMissmatch,
-    InvalidFunctor,
+    InvalidFunctor(String),
     InvalidFunctorMappings,
     InvalidBaseFunctor,
     CannotAddMorphismToDiscreteCategory,

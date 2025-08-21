@@ -53,6 +53,19 @@ pub trait CategoryTrait: Eq + Debug + Hash {
         Err(Errors::IdentityMorphismNotFound)
     }
 
+    fn get_all_identity_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
+        let mut identity_morphisms = HashSet::new();
+        for object in self.get_all_objects()? {
+            match self.get_identity_morphism(object) {
+                Ok(identity_morphism) => {
+                    identity_morphisms.insert(identity_morphism);
+                }
+                Err(_) => continue,
+            }
+        }
+        Ok(identity_morphisms)
+    }
+
     fn get_object(&self, object: &Self::Object) -> Result<&Rc<Self::Object>, Errors>;
 
     fn get_object_reference(&self, object: Self::Object) -> Result<&Rc<Self::Object>, Errors> {
@@ -63,11 +76,23 @@ pub trait CategoryTrait: Eq + Debug + Hash {
 
     fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors>;
 
+    fn get_hom_set_x(
+        &self,
+        source_object: &Self::Object,
+    ) -> Result<HashSet<&Rc<Self::Morphism>>, Errors>;
+
     fn get_hom_set(
         &self,
         source_object: &Self::Object,
         target_object: &Self::Object,
-    ) -> Result<HashSet<&Rc<Self::Morphism>>, Errors>;
+    ) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
+        Ok(self
+            .get_hom_set_x(source_object)?
+            .iter()
+            .filter(|item| &**item.target_object() == target_object)
+            .map(|item| *item)
+            .collect::<HashSet<_>>())
+    }
 
     fn get_object_morphisms(
         &self,

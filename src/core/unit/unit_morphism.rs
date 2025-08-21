@@ -32,10 +32,7 @@ impl<T: Identifier> ArrowTrait for UnitMorphism<T> {
         todo!()
     }
 
-    fn compose(
-        &self,
-        other: &impl ArrowTrait<SourceObject = Self::SourceObject, TargetObject = Self::TargetObject>,
-    ) -> Result<UnitMorphism<T>, Errors> {
+    fn compose(&self, other: &impl ArrowTrait) -> Result<UnitMorphism<T>, Errors> {
         todo!()
     }
 

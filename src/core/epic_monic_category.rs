@@ -150,12 +150,11 @@ where
         self.category.get_all_morphisms()
     }
 
-    fn get_hom_set(
+    fn get_hom_set_x(
         &self,
         source_object: &Self::Object,
-        target_object: &Self::Object,
     ) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
-        self.category.get_hom_set(source_object, target_object)
+        self.category.get_hom_set_x(source_object)
     }
 
     fn get_object_morphisms(

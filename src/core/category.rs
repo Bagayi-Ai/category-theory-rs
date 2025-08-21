@@ -104,17 +104,15 @@ where
         Ok(result)
     }
 
-    fn get_hom_set(
+    fn get_hom_set_x(
         &self,
         source_object: &Self::Object,
-        target_object: &Self::Object,
     ) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
         let result = self
             .objects
             .get(source_object)
             .ok_or(Errors::ObjectNotFound)?
             .iter()
-            .filter(|item| &**item.target_object() == target_object)
             .collect::<HashSet<_>>();
         Ok(result)
     }

@@ -66,7 +66,7 @@ where
 
     fn compose(
         &self,
-        other: &impl ArrowTrait<SourceObject = Self::SourceObject, TargetObject = Self::TargetObject>,
+        other: &impl ArrowTrait,
     ) -> Result<Functor<Id, Self::SourceObject, Self::TargetObject>, Errors> {
         todo!()
     }
@@ -127,10 +127,9 @@ where
         todo!()
     }
 
-    fn get_hom_set(
+    fn get_hom_set_x(
         &self,
         source_object: &Self::Object,
-        target_object: &Self::Object,
     ) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
         todo!()
     }

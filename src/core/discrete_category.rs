@@ -140,10 +140,9 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTra
         Ok(result)
     }
 
-    fn get_hom_set(
+    fn get_hom_set_x(
         &self,
         source_object: &Self::Object,
-        target_object: &Self::Object,
     ) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
         // only one morphism in discrete category, the identity morphism.
         Ok(HashSet::from([self.get_identity_morphism(source_object)?]))

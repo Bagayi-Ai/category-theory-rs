@@ -46,10 +46,9 @@ impl CategoryTrait for UnitCategory {
         todo!()
     }
 
-    fn get_hom_set(
+    fn get_hom_set_x(
         &self,
         source_object: &Self::Object,
-        target_object: &Self::Object,
     ) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
         todo!()
     }

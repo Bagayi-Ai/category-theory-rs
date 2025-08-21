@@ -11,27 +11,24 @@ use std::hash::{Hash, Hasher};
 use std::rc::Rc;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Morphism<Id, Category>
+pub struct Morphism<Id, Object>
 where
     Id: Identifier,
-    Category: CategoryTrait,
+    Object: CategoryTrait,
 {
     id: Id,
-    source: Rc<Category::Object>,
-    target: Rc<Category::Object>,
-    functor: Option<Rc<Functor<Id, Category::Object, Category::Object>>>,
+    source: Rc<Object>,
+    target: Rc<Object>,
+    functor: Option<Rc<Functor<Id, Object, Object>>>,
     identity: bool,
 }
 
-impl<Id: Identifier, Category: CategoryTrait> Morphism<Id, Category>
-where
-    <Category as CategoryTrait>::Object: CategoryTrait,
-{
+impl<Id: Identifier, Object: CategoryTrait> Morphism<Id, Object> {
     pub fn new(
         id: Id,
-        source: Rc<Category::Object>,
-        target: Rc<Category::Object>,
-        functor: Rc<Functor<Id, Category::Object, Category::Object>>,
+        source: Rc<Object>,
+        target: Rc<Object>,
+        functor: Rc<Functor<Id, Object, Object>>,
     ) -> Self {
         Morphism {
             id,
@@ -43,9 +40,9 @@ where
     }
 
     pub fn new_with_mappings(
-        source: Rc<Category::Object>,
-        target: Rc<Category::Object>,
-        mappings: HashMap<Rc<MorphismAlias<Category::Object>>, Rc<MorphismAlias<Category::Object>>>,
+        source: Rc<Object>,
+        target: Rc<Object>,
+        mappings: HashMap<Rc<MorphismAlias<Object>>, Rc<MorphismAlias<Object>>>,
     ) -> Self {
         let id = Id::generate();
         let functor = Functor::new(id.clone(), source.clone(), target.clone(), mappings);
@@ -58,7 +55,7 @@ where
         }
     }
 
-    pub fn new_identity_morphism(object: Rc<Category::Object>) -> Rc<Self> {
+    pub fn new_identity_morphism(object: Rc<Object>) -> Rc<Self> {
         let id = Id::generate();
         Rc::new(Morphism {
             id,
@@ -74,7 +71,7 @@ where
     }
 }
 
-impl<Id: Identifier, Category: CategoryTrait> Hash for Morphism<Id, Category> {
+impl<Id: Identifier, Object: CategoryTrait> Hash for Morphism<Id, Object> {
     fn hash<H>(&self, state: &mut H)
     where
         H: Hasher,
@@ -83,9 +80,9 @@ impl<Id: Identifier, Category: CategoryTrait> Hash for Morphism<Id, Category> {
     }
 }
 
-impl<Id: Identifier, Category: CategoryTrait> ArrowTrait for Morphism<Id, Category> {
-    type SourceObject = Category::Object;
-    type TargetObject = Category::Object;
+impl<Id: Identifier, Object: CategoryTrait> ArrowTrait for Morphism<Id, Object> {
+    type SourceObject = Object;
+    type TargetObject = Object;
 
     fn source_object(&self) -> &Rc<Self::SourceObject> {
         &self.source
@@ -102,11 +99,11 @@ impl<Id: Identifier, Category: CategoryTrait> ArrowTrait for Morphism<Id, Catego
     fn compose(
         &self,
         other: &impl ArrowTrait<SourceObject = Self::SourceObject, TargetObject = Self::TargetObject>,
-    ) -> Result<Morphism<Id, Category>, Errors> {
+    ) -> Result<Morphism<Id, Object>, Errors> {
         todo!()
     }
 
-    fn arrows(&self) -> Vec<&Morphism<Id, Category>> {
+    fn arrows(&self) -> Vec<&Morphism<Id, Object>> {
         todo!()
     }
 }

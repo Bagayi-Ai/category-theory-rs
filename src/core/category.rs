@@ -10,13 +10,13 @@ use std::hash::Hash;
 use std::rc::Rc;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Category<Id: Identifier<Id = Id>, Object: CategoryTrait<Object = Object>> {
+pub struct Category<Id: Identifier<Id = Id>, Object: CategoryTrait> {
     id: Id,
     objects: HashMap<Rc<Object>, HashSet<Rc<Morphism<Id, Object>>>>,
     morphism: HashMap<Id, Rc<Morphism<Id, Object>>>,
 }
 
-impl<'a, Id: Identifier<Id = Id>, Object: CategoryTrait<Object = Object>> Category<Id, Object> {
+impl<'a, Id: Identifier<Id = Id>, Object: CategoryTrait> Category<Id, Object> {
     pub fn new() -> Self {
         Self::new_with_id(Id::generate())
     }
@@ -33,10 +33,10 @@ impl<'a, Id: Identifier<Id = Id>, Object: CategoryTrait<Object = Object>> Catego
 impl<Id: Identifier<Id = Id>, Object> CategoryTrait for Category<Id, Object>
 where
     Id: Identifier<Id = Id>,
-    Object: CategoryTrait<Object = Object>,
+    Object: CategoryTrait,
 {
     type Object = Object;
-    type Morphism = Morphism<Id, Self::Object>;
+    type Morphism = Morphism<Id, Object>;
 
     fn new() -> Self {
         Category::new()
@@ -143,9 +143,7 @@ where
     }
 }
 
-impl<Id: Identifier<Id = Id>, Object: CategoryTrait<Object = Object>> Hash
-    for Category<Id, Object>
-{
+impl<Id: Identifier<Id = Id>, Object: CategoryTrait> Hash for Category<Id, Object> {
     fn hash<H>(&self, state: &mut H)
     where
         H: std::hash::Hasher,

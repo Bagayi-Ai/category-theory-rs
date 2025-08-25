@@ -14,14 +14,16 @@ pub enum MorphismCommutationResult<Morphism: MorphismTrait> {
     NonCommutative(HashSet<Morphism>),
 }
 
-pub trait CategoryTrait: Eq + Debug + Hash {
-    type Object: CategoryTrait;
+pub trait CategoryTrait: Debug {
+    type Object: CategoryTrait + Debug + Eq + Hash;
     type Morphism: MorphismTrait<SourceObject = Self::Object, TargetObject = Self::Object>
         + Debug
         + Eq
         + Hash;
 
-    fn new() -> Self;
+    fn new() -> Self
+    where
+        Self: Sized;
 
     fn level(&self) -> usize
     where

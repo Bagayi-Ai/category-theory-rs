@@ -15,6 +15,8 @@ pub mod core {
 
     pub mod expand_functor;
 
+    pub mod dynamic_category;
+
     pub mod set_category;
 
     pub mod epic_monic_category;

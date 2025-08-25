@@ -94,8 +94,8 @@ impl<Id, SourceCategory, TargetCategory> CategoryTrait
     for Functor<Id, SourceCategory, TargetCategory>
 where
     Id: Identifier,
-    SourceCategory: CategoryTrait,
-    TargetCategory: CategoryTrait,
+    SourceCategory: CategoryTrait + Hash + Eq,
+    TargetCategory: CategoryTrait + Hash + Eq,
 {
     type Object = TargetCategory;
     type Morphism = Morphism<Id, Self::Object>;
@@ -145,8 +145,8 @@ where
 impl<Id, SourceCategory, TargetCategory> Hash for Functor<Id, SourceCategory, TargetCategory>
 where
     Id: Identifier,
-    SourceCategory: CategoryTrait,
-    TargetCategory: CategoryTrait,
+    SourceCategory: CategoryTrait + Hash + Eq,
+    TargetCategory: CategoryTrait + Hash + Eq,
 {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.source_category.hash(state);

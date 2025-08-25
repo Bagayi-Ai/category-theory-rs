@@ -1,19 +1,41 @@
+use std::any::Any;
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
 use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::morphism_trait::MorphismTrait;
 use std::collections::{HashMap, HashSet};
+use std::fmt::{Debug, Display};
 use std::hash::{Hash, Hasher};
 use std::rc::Rc;
+use crate::core::dynamic_value::DynamicValue;
 
 #[derive(Debug)]
 pub struct DynamicCategory {
-    id: String,
+    id: DynamicValue,
     objects:
-        HashMap<String, Rc<dyn CategoryTrait<Object = Self, Morphism = Morphism<String, Self>>>>,
-    object_mapping: HashMap<String, HashSet<Rc<Morphism<String, Self>>>>,
+        HashMap<DynamicValue, Rc<dyn CategoryTrait<Object = Self, Morphism = Morphism<String, Self>>>>,
+    object_mapping: HashMap<DynamicValue, HashSet<Rc<Morphism<String, Self>>>>,
     morphisms: HashMap<String, Rc<Morphism<String, Self>>>,
+}
+
+impl DynamicCategory {
+    pub fn new_with_id(id: DynamicValue) -> Self {
+        DynamicCategory {
+            id,
+            objects: HashMap::new(),
+            object_mapping: HashMap::new(),
+            morphisms: HashMap::new(),
+        }
+    }
+
+    pub fn new() -> Self {
+        Self::new_with_id(DynamicValue::Str(uuid::Uuid::new_v4().to_string()))
+    }
+
+    pub fn id(&self) -> &DynamicValue {
+        &self.id
+    }
 }
 
 impl PartialEq for DynamicCategory {
@@ -85,6 +107,48 @@ impl CategoryTrait for DynamicCategory {
         &self,
         object_id: &Self::Object,
     ) -> Result<Vec<&Rc<Self::Morphism>>, Errors> {
+        todo!()
+    }
+}
+
+
+impl<T: Eq + Clone + Hash + Debug> From<T> for DynamicCategory
+where
+    T: Into<DynamicValue>
+{
+    fn from(value: T) -> Self {
+        DynamicCategory::new_with_id(value.into())
+    }
+}
+
+
+impl<T: Eq + Clone + Hash + Debug> From<Vec<T>> for DynamicCategory
+where
+    T: Into<DynamicValue>
+{
+    fn from(objects: Vec<T>) -> Self {
+        let mut category = DynamicCategory::new();
+        for object in objects {
+            let object = DynamicCategory::new_with_id(object.into());
+            category.add_object(Rc::new(object)).unwrap();
+        }
+        category
+    }
+}
+
+impl From<Vec<Rc<DynamicCategory>>> for DynamicCategory {
+    fn from(value: Vec<Rc<DynamicCategory>>) -> Self {
+        let mut category = DynamicCategory::new();
+        for object in value {
+            category.add_object(object).unwrap();
+        }
+        category
+    }
+}
+
+
+impl From<Vec<Rc<dyn CategoryTrait<Object=DynamicCategory, Morphism=Morphism<String, DynamicCategory>>>>> for DynamicCategory {
+    fn from(value: Vec<Rc<dyn CategoryTrait<Object=DynamicCategory, Morphism=Morphism<String, DynamicCategory>>>>) -> Self {
         todo!()
     }
 }

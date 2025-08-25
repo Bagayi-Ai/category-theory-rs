@@ -17,6 +17,7 @@ pub mod core {
 
     pub mod dynamic_category;
 
+    pub mod dynamic_value;
     pub mod set_category;
 
     pub mod epic_monic_category;
@@ -42,6 +43,8 @@ pub mod core {
     mod tests {
         pub mod ncategory_test_helper;
         pub mod test_generic_ncategory;
+
+        pub mod test_dynamic_category;
     }
 }
 

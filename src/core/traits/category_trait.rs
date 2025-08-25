@@ -55,6 +55,10 @@ pub trait CategoryTrait: Debug {
         Err(Errors::IdentityMorphismNotFound)
     }
 
+    fn get_identity_morphism_reference(&self, object: Self::Object) -> Result<&Rc<Self::Morphism>, Errors> {
+        self.get_identity_morphism(&object)
+    }
+
     fn get_all_identity_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
         let mut identity_morphisms = HashSet::new();
         for object in self.get_all_objects()? {

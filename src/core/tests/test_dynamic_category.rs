@@ -1,5 +1,5 @@
 use std::rc::Rc;
-use crate::core::dynamic_category::DynamicCategory;
+use crate::core::dynamic_category::dynamic_category::DynamicCategory;
 use crate::core::morphism::Morphism;
 use crate::core::traits::category_trait::CategoryTrait;
 

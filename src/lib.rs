@@ -15,9 +15,6 @@ pub mod core {
 
     pub mod expand_functor;
 
-    pub mod dynamic_category;
-
-    pub mod dynamic_value;
     pub mod set_category;
 
     pub mod epic_monic_category;
@@ -30,6 +27,13 @@ pub mod core {
         pub mod morphism_trait;
 
         pub mod factorization_system_trait;
+    }
+
+    pub mod dynamic_category {
+        pub mod dynamic_category;
+        pub mod dynamic_value;
+
+        pub mod dynamic_arrow;
     }
 
     pub mod unit {

@@ -8,7 +8,13 @@ use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Display};
 use std::hash::{Hash, Hasher};
 use std::rc::Rc;
-use crate::core::dynamic_value::DynamicValue;
+use crate::core::dynamic_category::dynamic_value::DynamicValue;
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DynamicType {
+    Category,
+    Arrow
+}
 
 #[derive(Debug)]
 pub struct DynamicCategory {
@@ -17,6 +23,7 @@ pub struct DynamicCategory {
         HashMap<DynamicValue, Rc<dyn CategoryTrait<Object = Self, Morphism = Morphism<String, Self>>>>,
     object_mapping: HashMap<DynamicValue, HashSet<Rc<Morphism<String, Self>>>>,
     morphisms: HashMap<String, Rc<Morphism<String, Self>>>,
+    dynamic_type: DynamicType
 }
 
 impl DynamicCategory {
@@ -26,11 +33,20 @@ impl DynamicCategory {
             objects: HashMap::new(),
             object_mapping: HashMap::new(),
             morphisms: HashMap::new(),
+            dynamic_type: DynamicType::Category
         }
     }
 
     pub fn new() -> Self {
         Self::new_with_id(DynamicValue::Str(uuid::Uuid::new_v4().to_string()))
+    }
+
+    pub fn new_arrow(source: &Rc<Self>, target: &Rc<Self>) -> Result<Self, Errors> {
+        let mut category = Self::new_with_id(DynamicValue::Str(uuid::Uuid::new_v4().to_string()));
+        category.dynamic_type = DynamicType::Arrow;
+        category.objects.insert(source.id().clone(), source.clone());
+        category.objects.insert(target.id().clone(), target.clone());
+        Ok(category)
     }
 
     pub fn id(&self) -> &DynamicValue {
@@ -64,6 +80,11 @@ impl CategoryTrait for DynamicCategory {
     }
 
     fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors> {
+        if self.dynamic_type != DynamicType::Category {
+            return Err(Errors::InvalidOperation(
+                "Cannot add object to an arrow category".to_string()));
+        }
+
         if self.objects.contains_key(&object.id) {
             return Err(Errors::ObjectAlreadyExists);
         }

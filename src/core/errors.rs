@@ -1,5 +1,6 @@
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Errors {
+    InvalidOperation(String),
     MorphismAlreadyExists,
     MorphismNotFound,
     OnlyIdentityMorphismDiscreteCategory,

@@ -44,6 +44,13 @@ impl ArrowTrait for DynamicCategory {
 }
 
 impl FunctorTrait for DynamicCategory {
+    fn new(source_category: Rc<Self::SourceObject>, target_category: Rc<Self::TargetObject>, mappings: HashMap<Rc<MorphismAlias<Self::SourceObject>>, Rc<MorphismAlias<Self::TargetObject>>>) -> Result<Self, Errors>
+    where
+        Self: Sized
+    {
+        todo!()
+    }
+
     fn arrow_mappings(
         &self,
     ) -> &HashMap<Rc<MorphismAlias<Self::SourceObject>>, Rc<MorphismAlias<Self::TargetObject>>>

@@ -40,6 +40,10 @@ impl DynamicMorphism {
     pub fn new_identity_morphism(object: Rc<DynamicCategoryTypeAlias>) -> Rc<DynamicMorphism> {
         todo!()
     }
+
+    pub fn id(&self) -> &String {
+        &self.id
+    }
 }
 
 impl ArrowTrait for DynamicMorphism {

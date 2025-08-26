@@ -2,7 +2,7 @@ use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::traits::category_trait::{CategoryTrait, MorphismAlias};
 use crate::core::traits::functor_trait::FunctorTrait;
 use std::collections::{HashMap, HashSet};
 use std::hash::{Hash, Hasher};
@@ -83,6 +83,13 @@ where
     SourceCategory: CategoryTrait,
     TargetCategory: CategoryTrait,
 {
+    fn new(source_category: Rc<Self::SourceObject>, target_category: Rc<Self::TargetObject>, mappings: HashMap<Rc<MorphismAlias<Self::SourceObject>>, Rc<MorphismAlias<Self::TargetObject>>>) -> Result<Self, Errors>
+    where
+        Self: Sized
+    {
+        todo!()
+    }
+
     fn arrow_mappings(
         &self,
     ) -> &HashMap<Rc<SourceCategory::Morphism>, Rc<TargetCategory::Morphism>> {

@@ -1,4 +1,3 @@
-use crate::core::dynamic_category::dynamic_morphism::DynamicMorphism;
 use crate::core::dynamic_category::dynamic_value::DynamicValue;
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
@@ -7,11 +6,13 @@ use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 use std::rc::Rc;
+use crate::core::morphism::Morphism;
+use crate::core::traits::arrow_trait::ArrowTrait;
+use crate::core::dynamic_category::dynamic_morphism::DynamicMorphism;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DynamicType {
     Category,
-    Morphism,
     Functor,
 }
 
@@ -21,8 +22,7 @@ pub type DynamicCategoryTypeAlias =
 #[derive(Debug)]
 pub struct DynamicCategory {
     id: DynamicValue,
-    objects: HashMap<DynamicValue, Rc<DynamicCategory>>,
-    object_mapping: HashMap<DynamicValue, HashSet<Rc<DynamicMorphism>>>,
+    objects: HashMap<Rc<DynamicCategory>, HashSet<Rc<DynamicMorphism>>>,
     morphisms: HashMap<String, Rc<DynamicMorphism>>,
     dynamic_type: DynamicType,
 }
@@ -38,7 +38,6 @@ impl DynamicCategory {
         DynamicCategory {
             id,
             objects: HashMap::new(),
-            object_mapping: HashMap::new(),
             morphisms: HashMap::new(),
             dynamic_type: DynamicType::Category,
         }
@@ -48,20 +47,21 @@ impl DynamicCategory {
         Self::new_with_id(DynamicValue::Str(uuid::Uuid::new_v4().to_string()))
     }
 
-    // pub fn new_arrow(source: &Rc<Self>, target: &Rc<Self>) -> Result<Self, Errors> {
-    //     let mut category = Self::new_with_id(DynamicValue::Str(uuid::Uuid::new_v4().to_string()));
-    //     category.dynamic_type = DynamicType::Arrow;
-    //     category.objects.insert(source.id().clone(), source.clone());
-    //     category.objects.insert(target.id().clone(), target.clone());
-    //     Ok(category)
-    // }
-
     pub fn id(&self) -> &DynamicValue {
         &self.id
     }
 
     pub fn dynamic_type(&self) -> &DynamicType {
         &self.dynamic_type
+    }
+
+    pub fn expecting_category_type(&self) -> Result<(), Errors> {
+        if self.dynamic_type != DynamicType::Category {
+            return Err(Errors::InvalidOperation(
+                "Expected a category type".to_string(),
+            ));
+        }
+        Ok(())
     }
 }
 
@@ -75,7 +75,7 @@ impl Eq for DynamicCategory {}
 
 impl Hash for DynamicCategory {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        todo!()
+        self.id.hash(state);
     }
 }
 
@@ -87,23 +87,17 @@ impl CategoryTrait for DynamicCategory {
     where
         Self: Sized,
     {
-        todo!()
+        DynamicCategory::new()
     }
 
     fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors> {
-        if self.dynamic_type != DynamicType::Category {
-            return Err(Errors::InvalidOperation(
-                "Cannot add object to an arrow category".to_string(),
-            ));
-        }
-
-        if self.objects.contains_key(object.id()) {
+        self.expecting_category_type()?;
+        if self.objects.contains_key(&object) {
             return Err(Errors::ObjectAlreadyExists);
         }
-        self.objects.insert(object.id().clone(), object.clone());
         let identity_cell = DynamicMorphism::new_identity_morphism(object.clone());
-        self.object_mapping
-            .entry(object.id().clone())
+        self.objects
+            .entry(object)
             .or_default()
             .insert(identity_cell.clone());
         self.add_morphism(identity_cell)?;
@@ -114,33 +108,66 @@ impl CategoryTrait for DynamicCategory {
         &mut self,
         morphism: Rc<Self::Morphism>,
     ) -> Result<&Rc<Self::Morphism>, Errors> {
-        todo!()
+        self.expecting_category_type()?;
+        if self.morphisms.contains_key(morphism.id()) {
+            return Err(Errors::MorphismAlreadyExists);
+        }
+        // validate target object is part of the category
+        if !self.objects.contains_key(morphism.target_object()) {
+            return Err(Errors::ObjectNotFound);
+        }
+
+        // if its not identity morphism add it to the objects as part of the hom-set
+        if !morphism.is_identity() {
+            self.objects
+                .get_mut(morphism.source_object())
+                .ok_or(Errors::ObjectNotFound)?
+                .insert(morphism.clone());
+        }
+
+        let cell = self
+            .morphisms
+            .entry(morphism.id().clone())
+            .or_insert(morphism);
+        Ok(cell)
     }
 
     fn get_object(&self, object: &Self::Object) -> Result<&Rc<Self::Object>, Errors> {
-        todo!()
+        self.expecting_category_type()?;
+        self.objects
+            .get_key_value(object)
+            .map(|(k, _)| k)
+            .ok_or(Errors::ObjectNotFound)
     }
 
     fn get_all_objects(&self) -> Result<HashSet<&Rc<Self::Object>>, Errors> {
-        todo!()
+        self.expecting_category_type()?;
+        Ok(self.objects.keys().collect())
     }
 
     fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
-        todo!()
+        Ok(self.morphisms.values().collect())
     }
 
     fn get_hom_set_x(
         &self,
         source_object: &Self::Object,
     ) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
-        todo!()
+        let result = self
+            .objects
+            .get(source_object)
+            .ok_or(Errors::ObjectNotFound)?
+            .iter()
+            .collect::<HashSet<_>>();
+        Ok(result)
     }
 
     fn get_object_morphisms(
         &self,
-        object_id: &Self::Object,
+        object: &Self::Object,
     ) -> Result<Vec<&Rc<Self::Morphism>>, Errors> {
-        todo!()
+        let result = self.objects.get(object).ok_or(Errors::ObjectNotFound)?;
+        Ok(result.iter().collect())
     }
 }
 
@@ -158,29 +185,22 @@ where
     T: Into<DynamicValue>,
 {
     fn from(objects: Vec<T>) -> Self {
-        // let mut category = DynamicCategory::new();
-        // for object in objects {
-        //     let object = DynamicCategory::new_with_id(object.into());
-        //     category.add_object(Rc::new(object)).unwrap();
-        // }
-        // category
-        todo!()
+        let mut category = DynamicCategory::new();
+        for object in objects {
+            let object = DynamicCategory::new_with_id(object.into());
+            category.add_object(Rc::new(object)).unwrap();
+        }
+        category
     }
 }
 
 impl From<Vec<Rc<DynamicCategory>>> for DynamicCategory {
     fn from(value: Vec<Rc<DynamicCategory>>) -> Self {
-        // let mut category = DynamicCategory::new();
-        // for object in value {
-        //     category.add_object(object).unwrap();
-        // }
-        // category
-        todo!()
+        let mut category = DynamicCategory::new();
+        for object in value {
+            category.add_object(object).unwrap();
+        }
+        category
     }
 }
 
-impl From<Vec<Rc<DynamicCategoryTypeAlias>>> for DynamicCategory {
-    fn from(value: Vec<Rc<DynamicCategoryTypeAlias>>) -> Self {
-        todo!()
-    }
-}

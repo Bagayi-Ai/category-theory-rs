@@ -6,6 +6,16 @@ use std::collections::HashMap;
 use std::rc::Rc;
 
 pub trait FunctorTrait: ArrowTrait {
+
+    fn new(
+        source_category: Rc<Self::SourceObject>,
+        target_category: Rc<Self::TargetObject>,
+        mappings: HashMap<
+            Rc<MorphismAlias<Self::SourceObject>>,
+            Rc<MorphismAlias<Self::TargetObject>>,
+        >,
+    ) -> Result<Self, Errors> where Self: Sized;
+
     fn validate_mappings(&self) -> Result<(), Errors> {
         /*
         Functor should validate that all objects in the source category

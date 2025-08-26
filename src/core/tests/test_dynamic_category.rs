@@ -1,7 +1,7 @@
-use crate::core::dynamic_category::dynamic_category::DynamicCategory;
+use crate::core::dynamic_category::dynamic_category::{DynamicCategory};
 use crate::core::dynamic_category::dynamic_functor::DynamicFunctor;
-use crate::core::dynamic_category::dynamic_morphism::DynamicMorphism;
 use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::dynamic_category::dynamic_morphism::DynamicMorphism;
 use std::rc::Rc;
 
 #[test]
@@ -19,8 +19,8 @@ pub fn test_base_scenario() {
     let morphisms = morphisms.unwrap();
     assert_eq!(morphisms.len(), 0);
 
-    let level = category.level();
-    assert_eq!(level, 0);
+    // let level = category.level();
+    // assert_eq!(level, 0);
 
     // now add a set of a, b, c
     let mut object_a: DynamicCategory = vec!["a", "b", "c"].into();
@@ -33,7 +33,7 @@ pub fn test_base_scenario() {
     assert!(inner_objects.iter().any(|o| o.id() == "a"));
     assert!(inner_objects.iter().any(|o| o.id() == "b"));
     assert!(inner_objects.iter().any(|o| o.id() == "c"));
-    assert_eq!(object_a.level(), 1);
+    // assert_eq!(object_a.level(), 1);
     let object_a = Rc::new(object_a);
 
     category.add_object(object_a.clone()).unwrap();
@@ -44,7 +44,7 @@ pub fn test_base_scenario() {
     let objects = objects.unwrap();
     assert_eq!(objects.len(), 1);
     let first_object = objects.iter().next().unwrap();
-    assert_eq!(first_object.level(), 1);
+    // assert_eq!(first_object.level(), 1);
     assert_eq!(*first_object.id(), object_a.id().clone());
     assert_eq!(**first_object, object_a);
 

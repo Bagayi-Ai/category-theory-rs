@@ -103,7 +103,7 @@ pub trait CategoryTrait: Debug {
 
     fn get_object_morphisms(
         &self,
-        object_id: &Self::Object,
+        object: &Self::Object,
     ) -> Result<Vec<&Rc<Self::Morphism>>, Errors>;
 
     fn morphism_commute(

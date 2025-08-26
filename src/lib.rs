@@ -33,7 +33,9 @@ pub mod core {
         pub mod dynamic_category;
         pub mod dynamic_value;
 
-        pub mod dynamic_arrow;
+        pub mod dynamic_morphism;
+
+        pub mod dynamic_functor;
     }
 
     pub mod unit {

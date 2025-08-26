@@ -23,4 +23,5 @@ pub enum Errors {
     ObjectAlreadyExists,
     IdentityMorphismNotFound,
     CategoryNotInitialized,
+    InvalidDynamicType(String),
 }

@@ -41,20 +41,19 @@ impl PartialEq<DynamicValue> for i32 {
     }
 }
 
-
-impl From<i32> for DynamicValue{
+impl From<i32> for DynamicValue {
     fn from(value: i32) -> Self {
         DynamicValue::Int(value)
     }
 }
 
-impl From<String> for DynamicValue{
+impl From<String> for DynamicValue {
     fn from(value: String) -> Self {
         DynamicValue::Str(value)
     }
 }
 
-impl From<&str> for DynamicValue{
+impl From<&str> for DynamicValue {
     fn from(value: &str) -> Self {
         DynamicValue::Str(value.to_string())
     }

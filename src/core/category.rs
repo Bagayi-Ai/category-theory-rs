@@ -1,5 +1,4 @@
 use crate::core::errors::Errors;
-use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
 use crate::core::traits::arrow_trait::ArrowTrait;
@@ -14,6 +13,12 @@ pub struct Category<Id: Identifier<Id = Id>, Object: CategoryTrait + Hash + Eq> 
     id: Id,
     objects: HashMap<Rc<Object>, HashSet<Rc<Morphism<Id, Object>>>>,
     morphism: HashMap<Id, Rc<Morphism<Id, Object>>>,
+}
+
+impl<'a, Id: Identifier<Id = Id>, Object: CategoryTrait + Hash + Eq> Default for Category<Id, Object> {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl<'a, Id: Identifier<Id = Id>, Object: CategoryTrait + Hash + Eq> Category<Id, Object> {
@@ -49,7 +54,7 @@ where
         let identity_cell = Morphism::new_identity_morphism(object.clone());
         self.objects
             .entry(object)
-            .or_insert(HashSet::new())
+            .or_default()
             .insert(identity_cell.clone());
         self.add_morphism(identity_cell)?;
         Ok(())

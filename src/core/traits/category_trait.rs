@@ -1,5 +1,4 @@
 use crate::core::errors::Errors;
-use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::morphism_trait::MorphismTrait;
 use std::collections::HashSet;
@@ -98,8 +97,7 @@ pub trait CategoryTrait: Debug {
         Ok(self
             .get_hom_set_x(source_object)?
             .iter()
-            .filter(|item| &**item.target_object() == target_object)
-            .map(|item| *item)
+            .filter(|item| &**item.target_object() == target_object).copied()
             .collect::<HashSet<_>>())
     }
 

@@ -1,7 +1,6 @@
 use crate::core::dynamic_category::dynamic_category::DynamicCategory;
 use crate::core::dynamic_category::dynamic_functor::DynamicFunctor;
 use crate::core::dynamic_category::dynamic_morphism::DynamicMorphism;
-use crate::core::morphism::Morphism;
 use crate::core::traits::category_trait::CategoryTrait;
 use std::rc::Rc;
 

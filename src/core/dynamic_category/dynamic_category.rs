@@ -2,12 +2,9 @@ use crate::core::dynamic_category::dynamic_morphism::DynamicMorphism;
 use crate::core::dynamic_category::dynamic_value::DynamicValue;
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
-use crate::core::morphism::Morphism;
 use crate::core::traits::category_trait::CategoryTrait;
-use crate::core::traits::morphism_trait::MorphismTrait;
-use std::any::Any;
 use std::collections::{HashMap, HashSet};
-use std::fmt::{Debug, Display};
+use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 use std::rc::Rc;
 
@@ -28,6 +25,12 @@ pub struct DynamicCategory {
     object_mapping: HashMap<DynamicValue, HashSet<Rc<DynamicMorphism>>>,
     morphisms: HashMap<String, Rc<DynamicMorphism>>,
     dynamic_type: DynamicType,
+}
+
+impl Default for DynamicCategory {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl DynamicCategory {
@@ -94,14 +97,14 @@ impl CategoryTrait for DynamicCategory {
             ));
         }
 
-        if self.objects.contains_key(&object.id()) {
+        if self.objects.contains_key(object.id()) {
             return Err(Errors::ObjectAlreadyExists);
         }
         self.objects.insert(object.id().clone(), object.clone());
         let identity_cell = DynamicMorphism::new_identity_morphism(object.clone());
         self.object_mapping
             .entry(object.id().clone())
-            .or_insert(HashSet::new())
+            .or_default()
             .insert(identity_cell.clone());
         self.add_morphism(identity_cell)?;
         Ok(())

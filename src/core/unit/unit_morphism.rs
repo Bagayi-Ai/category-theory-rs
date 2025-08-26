@@ -1,10 +1,7 @@
-use crate::core::category::Category;
 use crate::core::errors::Errors;
-use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
-use crate::core::morphism::Morphism;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::{CategoryTrait, MorphismAlias};
+use crate::core::traits::category_trait::MorphismAlias;
 use crate::core::traits::functor_trait::FunctorTrait;
 use crate::core::traits::morphism_trait::MorphismTrait;
 use crate::core::unit::unit_category::UnitCategory;

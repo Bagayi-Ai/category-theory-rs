@@ -1,10 +1,9 @@
 use crate::core::errors::Errors;
-use crate::core::errors::Errors::{InvalidArrowNoFunctorFound, NoFunctorForIdentityArrow};
+use crate::core::errors::Errors::InvalidArrowNoFunctorFound;
 use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::{CategoryTrait, MorphismAlias};
-use crate::core::traits::functor_trait::FunctorTrait;
 use crate::core::traits::morphism_trait::MorphismTrait;
 use std::collections::HashMap;
 use std::hash::{Hash, Hasher};

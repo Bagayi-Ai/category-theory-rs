@@ -11,14 +11,12 @@ For instance if category A has objects {a, b} and morphisms {f: a -> b, g: b -> 
 an endo functor F would map these to a new category B with objects {F(a), F(b)} and morphisms {F(f): F(a) -> F(b), F(g): F(b) -> F(a)}.
 This is useful for creating new categories that are derived from the original category, such as the category of sets or the category of groups.
  */
-use crate::core::category::Category;
 use crate::core::discrete_category::DiscreteCategory;
 use crate::core::errors::Errors;
 use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
-use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::rc::Rc;
 
 pub fn apply_product(

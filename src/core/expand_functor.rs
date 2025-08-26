@@ -3,9 +3,7 @@ use crate::core::errors::Errors;
 use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::traits::category_trait::CategoryTrait;
-use rand::seq::index;
 use std::collections::{HashMap, HashSet};
-use std::io::Error;
 use std::rc::Rc;
 
 pub fn expand_functor(
@@ -20,7 +18,7 @@ pub fn expand_functor(
     for (index, object) in category.get_all_objects()?.into_iter().enumerate() {
         for sub_object in object.get_all_objects()? {
             let current_mapping = object_mappings.entry(object).or_insert_with(Vec::new);
-            match expanded_category.get_object(&*sub_object) {
+            match expanded_category.get_object(sub_object) {
                 Ok(_) => continue, // object already exists
                 Err(Errors::ObjectNotFound) => {
                     // object does not exist, we can add it
@@ -31,7 +29,7 @@ pub fn expand_functor(
                 Err(e) => return Err(e), // some other error occurred
             };
         }
-        let current_count = object_mappings.iter().count();
+        let current_count = object_mappings.len();
         if current_count > max_functor {
             max_functor = current_count;
         }

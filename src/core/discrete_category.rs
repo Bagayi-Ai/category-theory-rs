@@ -1,13 +1,8 @@
 use crate::core::errors::Errors;
-use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::{CategoryTrait, MorphismAlias};
-use crate::core::traits::functor_trait::FunctorTrait;
-use crate::core::traits::morphism_trait::MorphismTrait;
-use crate::core::unit::unit_category::UnitCategory;
-use crate::core::unit::unit_morphism::UnitMorphism;
+use crate::core::traits::category_trait::CategoryTrait;
 use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Display};
 use std::hash::{Hash, Hasher};
@@ -41,21 +36,27 @@ impl<T: Identifier> Hash for DiscreteCategory<T> {
     }
 }
 
+impl<T: Eq + Clone + Debug + Hash + Identifier> Default for DiscreteCategory<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<T: Eq + Clone + Debug + Hash + Identifier> DiscreteCategory<T> {
     pub fn new() -> Self {
-        let mut result = DiscreteCategory {
+        
+        DiscreteCategory {
             category_id: T::generate(),
             cells: Some(HashMap::new()),
-        };
-        result
+        }
     }
 
     pub fn new_with_id(category_id: T) -> Self {
-        let mut result = DiscreteCategory {
+        
+        DiscreteCategory {
             category_id,
             cells: None,
-        };
-        result
+        }
     }
 
     pub fn clone_with_new_id(&self) -> Self {

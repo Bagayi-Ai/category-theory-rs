@@ -5,11 +5,9 @@ use crate::core::discrete_category::{
 use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
-use crate::core::product_endofunctor::apply_product;
 use crate::core::tests::ncategory_test_helper::*;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
-use crate::core::traits::functor_trait::FunctorTrait;
 use std::collections::HashMap;
 use std::rc::Rc;
 

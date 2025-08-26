@@ -1,5 +1,4 @@
 use crate::core::errors::Errors;
-use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::category_trait::MorphismAlias;
@@ -24,7 +23,7 @@ pub trait FunctorTrait: ArrowTrait {
         for source_object in self.source_object().get_all_objects()? {
             let identity_morphism = self
                 .source_object()
-                .get_identity_morphism(&*source_object)?;
+                .get_identity_morphism(source_object)?;
 
             // a -> F(a)
             let mapped_identity_morphism =
@@ -35,7 +34,7 @@ pub trait FunctorTrait: ArrowTrait {
                     ))?;
 
             // now get the hom-set for the source object
-            let hom_set_x = self.source_object().get_hom_set_x(&*source_object)?;
+            let hom_set_x = self.source_object().get_hom_set_x(source_object)?;
 
             for morphism in hom_set_x {
                 if morphism.is_identity() {

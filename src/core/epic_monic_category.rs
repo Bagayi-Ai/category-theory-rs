@@ -1,7 +1,5 @@
 use crate::core::category::Category;
-use crate::core::discrete_category::DiscreteCategory;
 use crate::core::errors::Errors;
-use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
 use crate::core::traits::arrow_trait::ArrowTrait;
@@ -22,6 +20,16 @@ where
     category: Category<Id, Obj>,
     morphism_factors:
         HashMap<Rc<Morphism<Id, Obj>>, (Rc<Morphism<Id, Obj>>, Rc<Morphism<Id, Obj>>)>,
+}
+
+impl<Id, Obj> Default for EpicMonicCategory<Id, Obj>
+where
+    Id: Identifier<Id = Id>,
+    Obj: CategoryTrait<Object = Obj> + Hash + Eq,
+ {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl<Id, Obj> EpicMonicCategory<Id, Obj>
@@ -71,7 +79,7 @@ where
                 }
 
                 // if object has already been added to image_object
-                if let Ok(object) = image_object.get_object(&*target_morphism.target_object()) {
+                if let Ok(object) = image_object.get_object(target_morphism.target_object()) {
                     let target_morphism = image_object.get_identity_morphism(object)?;
                     image_mapping.insert((*source_morphism).clone(), target_morphism.clone());
                 } else {

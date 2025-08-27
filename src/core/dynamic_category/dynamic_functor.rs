@@ -1,4 +1,4 @@
-use crate::core::dynamic_category::dynamic_category::DynamicCategory;
+use crate::core::dynamic_category::dynamic_category::{DynamicCategory, DynamicType};
 use crate::core::errors::Errors;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::MorphismAlias;
@@ -8,16 +8,6 @@ use std::rc::Rc;
 
 pub type DynamicFunctor = DynamicCategory;
 
-impl DynamicFunctor {
-    pub fn new_functor(
-        id: String,
-        source: Rc<DynamicCategory>,
-        target: Rc<DynamicCategory>,
-        mappings: HashMap<Rc<MorphismAlias<DynamicCategory>>, Rc<MorphismAlias<DynamicCategory>>>,
-    ) -> Result<Self, Errors> {
-        todo!()
-    }
-}
 impl ArrowTrait for DynamicCategory {
     type SourceObject = DynamicCategory;
     type TargetObject = DynamicCategory;

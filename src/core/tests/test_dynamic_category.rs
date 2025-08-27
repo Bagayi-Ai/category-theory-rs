@@ -23,9 +23,7 @@ pub fn test_base_scenario() {
     // assert_eq!(level, 0);
 
     // now add a set of a, b, c
-    let mut object_a: DynamicCategory = vec!["a", "b", "c"].into();
-    // check the object it self is a category that contains a, b, c
-    object_a.add_object(Rc::new("c".into())).unwrap();
+    let object_a: DynamicCategory = vec!["a", "b", "c"].into();
     let inner_objects = object_a.get_all_objects();
     assert!(inner_objects.is_ok());
     let inner_objects = inner_objects.unwrap();

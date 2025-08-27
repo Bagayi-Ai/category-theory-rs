@@ -1,7 +1,7 @@
 use crate::core::dynamic_category::dynamic_value::DynamicValue;
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
-use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::traits::category_trait::{CategoryTrait, MorphismAlias};
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
@@ -19,7 +19,7 @@ pub enum DynamicType {
 pub type DynamicCategoryTypeAlias =
     dyn CategoryTrait<Object = DynamicCategory, Morphism = DynamicMorphism>;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct DynamicCategory {
     id: DynamicValue,
     objects: HashMap<Rc<DynamicCategory>, HashSet<Rc<DynamicMorphism>>>,
@@ -47,6 +47,21 @@ impl DynamicCategory {
         Self::new_with_id(DynamicValue::Str(uuid::Uuid::new_v4().to_string()))
     }
 
+    pub fn new_functor(
+        id: String,
+        source: Rc<DynamicCategory>,
+        target: Rc<DynamicCategory>,
+        mappings: HashMap<Rc<MorphismAlias<DynamicCategory>>, Rc<MorphismAlias<DynamicCategory>>>,
+    ) -> Result<Self, Errors> {
+        let mut result = DynamicCategory::new_with_id(id.into());
+        result.dynamic_type = DynamicType::Functor;
+
+        // a functor is technically an object in the target category.
+
+
+        Ok(result)
+    }
+
     pub fn id(&self) -> &DynamicValue {
         &self.id
     }
@@ -64,14 +79,6 @@ impl DynamicCategory {
         Ok(())
     }
 }
-
-impl PartialEq for DynamicCategory {
-    fn eq(&self, other: &Self) -> bool {
-        todo!()
-    }
-}
-
-impl Eq for DynamicCategory {}
 
 impl Hash for DynamicCategory {
     fn hash<H: Hasher>(&self, state: &mut H) {

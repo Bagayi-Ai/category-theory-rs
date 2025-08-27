@@ -37,8 +37,15 @@ impl DynamicMorphism {
         })
     }
 
-    pub fn new_identity_morphism(object: Rc<DynamicCategoryTypeAlias>) -> Rc<DynamicMorphism> {
-        todo!()
+    pub fn new_identity_morphism(object: Rc<DynamicCategory>) -> Rc<DynamicMorphism> {
+        let id = uuid::Uuid::new_v4().to_string();
+        Rc::new(DynamicMorphism {
+            id,
+            source: object.clone(),
+            target: object.clone(),
+            functor: None,
+            identity: true,
+        })
     }
 
     pub fn id(&self) -> &String {
@@ -51,15 +58,15 @@ impl ArrowTrait for DynamicMorphism {
     type TargetObject = DynamicCategory;
 
     fn source_object(&self) -> &Rc<Self::SourceObject> {
-        todo!()
+        &self.source
     }
 
     fn target_object(&self) -> &Rc<Self::TargetObject> {
-        todo!()
+        &self.target
     }
 
     fn is_identity(&self) -> bool {
-        todo!()
+        self.identity
     }
 
     fn compose(&self, other: &impl ArrowTrait) -> Result<Self, Errors> {

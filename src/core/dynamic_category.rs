@@ -125,12 +125,27 @@ impl CategoryTrait for DynamicCategory {
     }
 }
 
-impl<T: Eq + Clone + Hash + Debug> From<T> for DynamicCategory
-where
-    T: Into<DynamicValue>,
-{
-    fn from(value: T) -> Self {
-        DynamicCategory::new_with_id(value.into())
+impl From<DynamicValue> for DynamicCategory {
+    fn from(value: DynamicValue) -> Self {
+        DynamicCategory::new_with_id(value)
+    }
+}
+
+impl From<String> for DynamicCategory {
+    fn from(s: String) -> Self {
+        DynamicCategory::new_with_id(DynamicValue::Str(s))
+    }
+}
+
+impl From<&str> for DynamicCategory {
+    fn from(s: &str) -> Self {
+        DynamicCategory::new_with_id(DynamicValue::Str(s.to_string()))
+    }
+}
+
+impl From<i32> for DynamicCategory {
+    fn from(n: i32) -> Self {
+        DynamicCategory::new_with_id(DynamicValue::Int(n))
     }
 }
 
@@ -154,6 +169,19 @@ impl From<Vec<Rc<DynamicCategory>>> for DynamicCategory {
         for object in value {
             category.add_object(object).unwrap();
         }
+        category
+    }
+}
+
+impl<C> From<C> for DynamicCategory
+where
+    Category<DynamicValue, DynamicCategory>: From<C>,
+{
+    fn from(value: C) -> Self {
+        // First convert to the inner Category to obtain its id
+        let inner: Category<DynamicValue, DynamicCategory> = value.into();
+        let mut category = DynamicCategory::new_with_id(inner.id().clone());
+        category.inner_category = inner;
         category
     }
 }

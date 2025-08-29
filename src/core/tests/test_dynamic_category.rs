@@ -1,6 +1,4 @@
-use crate::core::dynamic_category::dynamic_category::{
-    DynamicCategory, DynamicFunctor, DynamicMorphism,
-};
+use crate::core::dynamic_category::{DynamicCategory, DynamicFunctor, DynamicMorphism};
 use crate::core::functor::Functor;
 use crate::core::traits::category_trait::CategoryTrait;
 use std::rc::Rc;
@@ -81,7 +79,7 @@ pub fn test_base_scenario() {
     // a -> 1, b -> 2, c -> 3
     // then use it to create a morphism in the category
     let functor = Functor::new(
-        "functor_1".to_string(),
+        "functor_1".into(),
         object_a.clone(),
         object_num.clone(),
         vec![
@@ -125,7 +123,7 @@ pub fn test_base_scenario() {
     let functor = Rc::new(functor);
 
     let morphism_a_num = DynamicMorphism::new(
-        "morphism_a_num".to_string(),
+        "morphism_a_num".into(),
         object_a.clone(),
         object_num.clone(),
         functor,
@@ -138,7 +136,7 @@ pub fn test_base_scenario() {
     // create another functor from object_a to object_num
     // a -> 3, b -> 2, c -> 1
     let functor_2 = Functor::new(
-        "functor_2".to_string(),
+        "functor_2".into(),
         object_a.clone(),
         object_num.clone(),
         vec![
@@ -181,7 +179,7 @@ pub fn test_base_scenario() {
     let functor_2 = Rc::new(functor_2);
 
     let morphism_a_num_2 = DynamicMorphism::new(
-        "morphism_a_num_2".to_string(),
+        "morphism_a_num_2".into(),
         object_a.clone(),
         object_num.clone(),
         functor_2.clone(),

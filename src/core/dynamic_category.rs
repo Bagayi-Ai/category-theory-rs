@@ -1,4 +1,5 @@
-use crate::core::dynamic_category::dynamic_value::DynamicValue;
+use crate::core::category::Category;
+use crate::core::dynamic_value::DynamicValue;
 use crate::core::errors::Errors;
 use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
@@ -17,18 +18,16 @@ pub enum DynamicType {
     Functor,
 }
 
-pub type DynamicMorphism = Morphism<String, DynamicCategory>;
+pub type DynamicMorphism = Morphism<DynamicValue, DynamicCategory>;
 
-pub type DynamicFunctor = Functor<String, DynamicCategory, DynamicCategory>;
+pub type DynamicFunctor = Functor<DynamicValue, DynamicCategory, DynamicCategory>;
 
 pub type DynamicCategoryTypeAlias =
     dyn CategoryTrait<Object = DynamicCategory, Morphism = DynamicMorphism>;
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone, Hash)]
 pub struct DynamicCategory {
-    id: DynamicValue,
-    objects: HashMap<Rc<DynamicCategory>, HashSet<Rc<DynamicMorphism>>>,
-    morphisms: HashMap<String, Rc<DynamicMorphism>>,
+    inner_category: Category<DynamicValue, DynamicCategory>,
     dynamic_type: DynamicType,
     functor: Option<Rc<DynamicFunctor>>,
 }
@@ -42,9 +41,7 @@ impl Default for DynamicCategory {
 impl DynamicCategory {
     pub fn new_with_id(id: DynamicValue) -> Self {
         DynamicCategory {
-            id,
-            objects: HashMap::new(),
-            morphisms: HashMap::new(),
+            inner_category: Category::new_with_id(id.clone()),
             dynamic_type: DynamicType::Category,
             functor: None,
         }
@@ -62,7 +59,7 @@ impl DynamicCategory {
     }
 
     pub fn id(&self) -> &DynamicValue {
-        &self.id
+        &self.inner_category.id()
     }
 
     pub fn dynamic_type(&self) -> &DynamicType {
@@ -79,12 +76,6 @@ impl DynamicCategory {
     }
 }
 
-impl Hash for DynamicCategory {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.id.hash(state);
-    }
-}
-
 impl CategoryTrait for DynamicCategory {
     type Object = DynamicCategory;
     type Morphism = DynamicMorphism;
@@ -97,83 +88,40 @@ impl CategoryTrait for DynamicCategory {
     }
 
     fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors> {
-        self.expecting_category_type()?;
-        if self.objects.contains_key(&object) {
-            return Err(Errors::ObjectAlreadyExists);
-        }
-        let identity_cell = DynamicMorphism::new_identity_morphism(object.clone());
-        self.objects
-            .entry(object)
-            .or_default()
-            .insert(identity_cell.clone());
-        self.add_morphism(identity_cell)?;
-        Ok(())
+        self.inner_category.add_object(object)
     }
 
     fn add_morphism(
         &mut self,
         morphism: Rc<Self::Morphism>,
     ) -> Result<&Rc<Self::Morphism>, Errors> {
-        self.expecting_category_type()?;
-        if self.morphisms.contains_key(morphism.id()) {
-            return Err(Errors::MorphismAlreadyExists);
-        }
-        // validate target object is part of the category
-        if !self.objects.contains_key(morphism.target_object()) {
-            return Err(Errors::ObjectNotFound);
-        }
-
-        // if its not identity morphism add it to the objects as part of the hom-set
-        if !morphism.is_identity() {
-            self.objects
-                .get_mut(morphism.source_object())
-                .ok_or(Errors::ObjectNotFound)?
-                .insert(morphism.clone());
-        }
-
-        let cell = self
-            .morphisms
-            .entry(morphism.id().clone())
-            .or_insert(morphism);
-        Ok(cell)
+        self.inner_category.add_morphism(morphism)
     }
 
     fn get_object(&self, object: &Self::Object) -> Result<&Rc<Self::Object>, Errors> {
-        self.expecting_category_type()?;
-        self.objects
-            .get_key_value(object)
-            .map(|(k, _)| k)
-            .ok_or(Errors::ObjectNotFound)
+        self.inner_category.get_object(object)
     }
 
     fn get_all_objects(&self) -> Result<HashSet<&Rc<Self::Object>>, Errors> {
-        self.expecting_category_type()?;
-        Ok(self.objects.keys().collect())
+        self.inner_category.get_all_objects()
     }
 
     fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
-        Ok(self.morphisms.values().collect())
+        self.inner_category.get_all_morphisms()
     }
 
     fn get_hom_set_x(
         &self,
         source_object: &Self::Object,
     ) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
-        let result = self
-            .objects
-            .get(source_object)
-            .ok_or(Errors::ObjectNotFound)?
-            .iter()
-            .collect::<HashSet<_>>();
-        Ok(result)
+        self.inner_category.get_hom_set_x(source_object)
     }
 
     fn get_object_morphisms(
         &self,
         object: &Self::Object,
     ) -> Result<Vec<&Rc<Self::Morphism>>, Errors> {
-        let result = self.objects.get(object).ok_or(Errors::ObjectNotFound)?;
-        Ok(result.iter().collect())
+        self.inner_category.get_object_morphisms(object)
     }
 }
 

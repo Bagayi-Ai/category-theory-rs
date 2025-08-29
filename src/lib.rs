@@ -1,6 +1,4 @@
 pub mod core {
-    pub mod category;
-
     pub mod discrete_category;
 
     pub mod identifier;
@@ -17,6 +15,9 @@ pub mod core {
 
     pub mod set_category;
 
+    pub mod category;
+    pub mod dynamic_category;
+    pub mod dynamic_value;
     pub mod epic_monic_category;
 
     pub mod traits {
@@ -29,10 +30,7 @@ pub mod core {
         pub mod factorization_system_trait;
     }
 
-    pub mod dynamic_category {
-        pub mod dynamic_category;
-        pub mod dynamic_value;
-    }
+    pub mod concrete_category {}
 
     pub mod unit {
         pub mod unit_category;

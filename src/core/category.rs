@@ -35,6 +35,10 @@ impl<'a, Id: Identifier<Id = Id>, Object: CategoryTrait + Hash + Eq> Category<Id
             morphism: HashMap::new(),
         }
     }
+
+    pub fn id(&self) -> &Id {
+        &self.id
+    }
 }
 
 impl<Id: Identifier<Id = Id>, Object> CategoryTrait for Category<Id, Object>
@@ -153,6 +157,6 @@ impl<Id: Identifier<Id = Id>, Object: CategoryTrait + Hash + Eq> Hash for Catego
     where
         H: std::hash::Hasher,
     {
-        todo!()
+        self.id.hash(state);
     }
 }

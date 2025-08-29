@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 #[derive(Debug, Clone, Eq, Hash)]
 pub enum DynamicValue {
     Int(i32),
@@ -13,6 +15,16 @@ impl PartialEq for DynamicValue {
             (Str(a), Str(b)) => a == b,
             (Bool(a), Bool(b)) => a == b,
             _ => false,
+        }
+    }
+}
+
+impl Display for DynamicValue {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            DynamicValue::Int(v) => write!(f, "{}", v),
+            DynamicValue::Str(v) => write!(f, "{}", v),
+            DynamicValue::Bool(v) => write!(f, "{}", v),
         }
     }
 }

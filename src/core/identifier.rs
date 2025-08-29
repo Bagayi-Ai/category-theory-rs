@@ -1,3 +1,5 @@
+use crate::core::dynamic_category::{DynamicCategory, DynamicType};
+use crate::core::dynamic_value::DynamicValue;
 use rand::Rng;
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
@@ -33,5 +35,18 @@ impl Identifier for usize {
     fn generate() -> Self::Id {
         let mut rng = rand::thread_rng();
         rng.r#gen::<usize>()
+    }
+}
+
+impl Identifier for DynamicValue {
+    type Id = DynamicValue;
+
+    fn id(&self) -> &Self::Id {
+        todo!()
+    }
+
+    fn generate() -> Self {
+        // generate based on Dynamic value using match
+        DynamicValue::Str(Uuid::new_v4().to_string())
     }
 }

@@ -15,7 +15,9 @@ pub struct Category<Id: Identifier<Id = Id>, Object: CategoryTrait + Hash + Eq> 
     morphism: HashMap<Id, Rc<Morphism<Id, Object>>>,
 }
 
-impl<'a, Id: Identifier<Id = Id>, Object: CategoryTrait + Hash + Eq> Default for Category<Id, Object> {
+impl<'a, Id: Identifier<Id = Id>, Object: CategoryTrait + Hash + Eq> Default
+    for Category<Id, Object>
+{
     fn default() -> Self {
         Self::new()
     }

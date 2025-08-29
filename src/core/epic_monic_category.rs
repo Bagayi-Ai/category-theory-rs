@@ -26,7 +26,7 @@ impl<Id, Obj> Default for EpicMonicCategory<Id, Obj>
 where
     Id: Identifier<Id = Id>,
     Obj: CategoryTrait<Object = Obj> + Hash + Eq,
- {
+{
     fn default() -> Self {
         Self::new()
     }

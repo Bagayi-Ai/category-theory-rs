@@ -97,7 +97,8 @@ pub trait CategoryTrait: Debug {
         Ok(self
             .get_hom_set_x(source_object)?
             .iter()
-            .filter(|item| &**item.target_object() == target_object).copied()
+            .filter(|item| &**item.target_object() == target_object)
+            .copied()
             .collect::<HashSet<_>>())
     }
 

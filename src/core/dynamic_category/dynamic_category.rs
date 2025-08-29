@@ -1,20 +1,25 @@
 use crate::core::dynamic_category::dynamic_value::DynamicValue;
 use crate::core::errors::Errors;
+use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
+use crate::core::morphism::Morphism;
+use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::{CategoryTrait, MorphismAlias};
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 use std::rc::Rc;
-use crate::core::morphism::Morphism;
-use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::dynamic_category::dynamic_morphism::DynamicMorphism;
+// use crate::core::dynamic_category::dynamic_morphism::DynamicMorphism;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DynamicType {
     Category,
     Functor,
 }
+
+pub type DynamicMorphism = Morphism<String, DynamicCategory>;
+
+pub type DynamicFunctor = Functor<String, DynamicCategory, DynamicCategory>;
 
 pub type DynamicCategoryTypeAlias =
     dyn CategoryTrait<Object = DynamicCategory, Morphism = DynamicMorphism>;
@@ -25,6 +30,7 @@ pub struct DynamicCategory {
     objects: HashMap<Rc<DynamicCategory>, HashSet<Rc<DynamicMorphism>>>,
     morphisms: HashMap<String, Rc<DynamicMorphism>>,
     dynamic_type: DynamicType,
+    functor: Option<Rc<DynamicFunctor>>,
 }
 
 impl Default for DynamicCategory {
@@ -40,6 +46,7 @@ impl DynamicCategory {
             objects: HashMap::new(),
             morphisms: HashMap::new(),
             dynamic_type: DynamicType::Category,
+            functor: None,
         }
     }
 
@@ -47,18 +54,10 @@ impl DynamicCategory {
         Self::new_with_id(DynamicValue::Str(uuid::Uuid::new_v4().to_string()))
     }
 
-    pub fn new_functor(
-        id: String,
-        source: Rc<DynamicCategory>,
-        target: Rc<DynamicCategory>,
-        mappings: HashMap<Rc<MorphismAlias<DynamicCategory>>, Rc<MorphismAlias<DynamicCategory>>>,
-    ) -> Result<Self, Errors> {
-        let mut result = DynamicCategory::new_with_id(id.into());
+    pub fn functor_to_category(functor: Rc<DynamicFunctor>) -> Result<Self, Errors> {
+        let mut result = DynamicCategory::new_with_id(functor.id().clone().into());
         result.dynamic_type = DynamicType::Functor;
-
-        // a functor is technically an object in the target category.
-
-
+        result.functor = Some(functor);
         Ok(result)
     }
 
@@ -210,4 +209,3 @@ impl From<Vec<Rc<DynamicCategory>>> for DynamicCategory {
         category
     }
 }
-

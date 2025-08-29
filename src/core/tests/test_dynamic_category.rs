@@ -1,7 +1,8 @@
-use crate::core::dynamic_category::dynamic_category::{DynamicCategory};
-use crate::core::dynamic_category::dynamic_functor::DynamicFunctor;
+use crate::core::dynamic_category::dynamic_category::{
+    DynamicCategory, DynamicFunctor, DynamicMorphism,
+};
+use crate::core::functor::Functor;
 use crate::core::traits::category_trait::CategoryTrait;
-use crate::core::dynamic_category::dynamic_morphism::DynamicMorphism;
 use std::rc::Rc;
 
 #[test]
@@ -79,7 +80,7 @@ pub fn test_base_scenario() {
     // now add a functor from object_a to object_num
     // a -> 1, b -> 2, c -> 3
     // then use it to create a morphism in the category
-    let functor = DynamicFunctor::new_functor(
+    let functor = Functor::new(
         "functor_1".to_string(),
         object_a.clone(),
         object_num.clone(),
@@ -118,8 +119,8 @@ pub fn test_base_scenario() {
         .into_iter()
         .collect(),
     );
-    assert!(functor.is_ok());
-    let functor = functor.unwrap();
+    // assert!(functor.is_ok());
+    // let functor = functor.unwrap();
 
     let functor = Rc::new(functor);
 
@@ -129,14 +130,14 @@ pub fn test_base_scenario() {
         object_num.clone(),
         functor,
     );
-    assert!(morphism_a_num.is_ok());
-    let morphism_a_num = morphism_a_num.unwrap();
+    // assert!(morphism_a_num.is_ok());
+    // let morphism_a_num = morphism_a_num.unwrap();
 
     category.add_morphism(Rc::new(morphism_a_num)).unwrap();
 
     // create another functor from object_a to object_num
     // a -> 3, b -> 2, c -> 1
-    let functor_2 = DynamicFunctor::new_functor(
+    let functor_2 = Functor::new(
         "functor_2".to_string(),
         object_a.clone(),
         object_num.clone(),
@@ -175,8 +176,8 @@ pub fn test_base_scenario() {
         .into_iter()
         .collect(),
     );
-    assert!(functor_2.is_ok());
-    let functor_2 = functor_2.unwrap();
+    // assert!(functor_2.is_ok());
+    // let functor_2 = functor_2.unwrap();
     let functor_2 = Rc::new(functor_2);
 
     let morphism_a_num_2 = DynamicMorphism::new(
@@ -185,8 +186,8 @@ pub fn test_base_scenario() {
         object_num.clone(),
         functor_2.clone(),
     );
-    assert!(morphism_a_num_2.is_ok());
-    let morphism_a_num_2 = morphism_a_num_2.unwrap();
+    // assert!(morphism_a_num_2.is_ok());
+    // let morphism_a_num_2 = morphism_a_num_2.unwrap();
     category.add_morphism(Rc::new(morphism_a_num_2)).unwrap();
 
     let category = Rc::new(category);
@@ -194,5 +195,9 @@ pub fn test_base_scenario() {
     // now create a category of the functor category
     // let functor_category: DynamicCategory = vec![functor, functor_2].into();
     let mut functor_category = DynamicCategory::new_with_id("FunctorCategory".into());
-    functor_category.add_object(functor_2);
+    functor_category.add_object(
+        DynamicCategory::functor_to_category(functor_2)
+            .expect("Expecting category")
+            .into(),
+    );
 }

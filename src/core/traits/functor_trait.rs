@@ -6,7 +6,6 @@ use std::collections::HashMap;
 use std::rc::Rc;
 
 pub trait FunctorTrait: ArrowTrait {
-
     fn new(
         source_category: Rc<Self::SourceObject>,
         target_category: Rc<Self::TargetObject>,
@@ -14,7 +13,9 @@ pub trait FunctorTrait: ArrowTrait {
             Rc<MorphismAlias<Self::SourceObject>>,
             Rc<MorphismAlias<Self::TargetObject>>,
         >,
-    ) -> Result<Self, Errors> where Self: Sized;
+    ) -> Result<Self, Errors>
+    where
+        Self: Sized;
 
     fn validate_mappings(&self) -> Result<(), Errors> {
         /*
@@ -31,9 +32,7 @@ pub trait FunctorTrait: ArrowTrait {
         // start with checking if all objects in the source category have a corresponding object in the target category
         let mapping = self.arrow_mappings();
         for source_object in self.source_object().get_all_objects()? {
-            let identity_morphism = self
-                .source_object()
-                .get_identity_morphism(source_object)?;
+            let identity_morphism = self.source_object().get_identity_morphism(source_object)?;
 
             // a -> F(a)
             let mapped_identity_morphism =

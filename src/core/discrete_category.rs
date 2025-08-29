@@ -44,7 +44,6 @@ impl<T: Eq + Clone + Debug + Hash + Identifier> Default for DiscreteCategory<T> 
 
 impl<T: Eq + Clone + Debug + Hash + Identifier> DiscreteCategory<T> {
     pub fn new() -> Self {
-        
         DiscreteCategory {
             category_id: T::generate(),
             cells: Some(HashMap::new()),
@@ -52,7 +51,6 @@ impl<T: Eq + Clone + Debug + Hash + Identifier> DiscreteCategory<T> {
     }
 
     pub fn new_with_id(category_id: T) -> Self {
-        
         DiscreteCategory {
             category_id,
             cells: None,

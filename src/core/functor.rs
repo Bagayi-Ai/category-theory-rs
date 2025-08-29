@@ -40,6 +40,10 @@ where
             mappings,
         }
     }
+
+    pub fn id(&self) -> &Id {
+        &self.id
+    }
 }
 
 impl<'a, Id, SourceCategory, TargetCategory> ArrowTrait
@@ -83,9 +87,16 @@ where
     SourceCategory: CategoryTrait,
     TargetCategory: CategoryTrait,
 {
-    fn new(source_category: Rc<Self::SourceObject>, target_category: Rc<Self::TargetObject>, mappings: HashMap<Rc<MorphismAlias<Self::SourceObject>>, Rc<MorphismAlias<Self::TargetObject>>>) -> Result<Self, Errors>
+    fn new(
+        source_category: Rc<Self::SourceObject>,
+        target_category: Rc<Self::TargetObject>,
+        mappings: HashMap<
+            Rc<MorphismAlias<Self::SourceObject>>,
+            Rc<MorphismAlias<Self::TargetObject>>,
+        >,
+    ) -> Result<Self, Errors>
     where
-        Self: Sized
+        Self: Sized,
     {
         todo!()
     }

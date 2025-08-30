@@ -71,11 +71,16 @@ impl<T: Eq + Clone + Debug + Hash + Identifier> DiscreteCategory<T> {
 impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTrait
     for DiscreteCategory<T>
 {
+    type Id = T;
     type Object = Self;
     type Morphism = Morphism<T, Self::Object>;
 
     fn new() -> Self {
         DiscreteCategory::new()
+    }
+
+    fn category_id(&self) -> &Self::Id {
+        &self.category_id
     }
 
     fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors> {

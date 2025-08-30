@@ -1,4 +1,5 @@
 use crate::core::errors::Errors;
+use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::morphism_trait::MorphismTrait;
 use std::collections::HashSet;
@@ -14,6 +15,7 @@ pub enum MorphismCommutationResult<Morphism: MorphismTrait> {
 }
 
 pub trait CategoryTrait: Debug {
+    type Id: Identifier;
     type Object: CategoryTrait + Debug + Eq + Hash;
     type Morphism: MorphismTrait<SourceObject = Self::Object, TargetObject = Self::Object>
         + Debug
@@ -37,6 +39,8 @@ pub trait CategoryTrait: Debug {
     {
         Self::new()
     }
+
+    fn category_id(&self) -> &Self::Id;
 
     fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors>;
 

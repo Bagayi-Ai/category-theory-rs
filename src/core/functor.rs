@@ -115,11 +115,16 @@ where
     SourceCategory: CategoryTrait + Hash + Eq,
     TargetCategory: CategoryTrait + Hash + Eq,
 {
+    type Id = Id;
     type Object = TargetCategory;
     type Morphism = Morphism<Id, Self::Object>;
 
     fn new() -> Self {
         todo!()
+    }
+
+    fn category_id(&self) -> &Self::Id {
+        &self.id
     }
 
     fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors> {

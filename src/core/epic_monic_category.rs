@@ -123,11 +123,16 @@ where
     Id: Identifier<Id = Id>,
     Obj: CategoryTrait<Object = Obj> + Hash + Eq,
 {
+    type Id = Id;
     type Object = Obj;
     type Morphism = Morphism<Id, Obj>;
 
     fn new() -> Self {
         todo!()
+    }
+
+    fn category_id(&self) -> &Self::Id {
+        self.category.category_id()
     }
 
     fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors> {

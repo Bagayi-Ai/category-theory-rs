@@ -46,11 +46,16 @@ where
     Id: Identifier<Id = Id>,
     Object: CategoryTrait + Hash + Eq,
 {
+    type Id = Id;
     type Object = Object;
     type Morphism = Morphism<Id, Object>;
 
     fn new() -> Self {
         Category::new()
+    }
+
+    fn category_id(&self) -> &Self::Id {
+        &self.id
     }
 
     fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors> {

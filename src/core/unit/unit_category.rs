@@ -11,12 +11,17 @@ use std::rc::Rc;
 pub struct UnitCategory {}
 
 impl CategoryTrait for UnitCategory {
+    type Id = UnitIdentifier;
     type Object = Self;
 
     type Morphism = UnitMorphism<UnitIdentifier>;
 
     fn new() -> Self {
         UnitCategory {}
+    }
+
+    fn category_id(&self) -> &Self::Id {
+        todo!()
     }
 
     fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors> {

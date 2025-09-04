@@ -1,10 +1,10 @@
-use crate::core::category::*;
-use crate::core::discrete_category::{
-    DiscreteCategory, DiscreteCategoryString, DiscreteCategoryUsize,
-};
+use crate::core::base_category::*;
+use crate::core::discrete_category::DiscreteCategory;
+use crate::core::dynamic_category::DynamicCategory;
 use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
+use crate::core::object_id::ObjectId;
 use crate::core::tests::ncategory_test_helper::*;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
@@ -15,69 +15,71 @@ fn generate_identifier() -> String {
     String::generate()
 }
 
-fn generate_object() -> DiscreteCategoryString {
+fn generate_object() -> Rc<DiscreteCategory> {
     let random_string = random_string(5);
     let mut object = DiscreteCategory::new();
     object
-        .add_object(Rc::new(DiscreteCategory::new_with_id(random_string)))
+        .add_object(Rc::new(DiscreteCategory::new_with_id(ObjectId::Str(
+            random_string,
+        ))))
         .unwrap();
-    object
+    Rc::new(object)
 }
 
 #[test]
 pub fn test_base_scenarios() {
-    let mut category: Category<String, DiscreteCategory<String>> = Category::new();
+    let mut category: BaseCategory<DiscreteCategory> = BaseCategory::new();
     // add object 1
     let object1 = generate_object();
 
-    category.add_object(object1.clone().into()).unwrap();
+    category.add_object(object1.clone()).unwrap();
     // check identity morphism
-    let cell = category.get_object_morphisms(&object1);
+    let cell = category.get_object_morphisms(&*object1);
     assert!(cell.is_ok());
     let cell = cell.unwrap();
     assert_eq!(cell.len(), 1);
     let cell = cell.first().unwrap();
-    assert_eq!(**cell.source_object(), object1);
-    assert_eq!(**cell.target_object(), object1);
+    assert!(cell.source_object().equal_to(&*object1));
+    assert!(cell.target_object().equal_to(&*object1));
 
     // TODO: implement comparison of the object assert_eq!(category.get_object(&object1_id).unwrap(), &object);
 
     // check identity morphism
-    let cell = category.get_object_morphisms(&object1);
+    let cell = category.get_object_morphisms(&*object1);
     assert!(cell.is_ok());
     let cell = cell.unwrap();
     assert_eq!(cell.len(), 1);
     let cell = cell.first().unwrap();
-    assert_eq!(**cell.source_object(), object1);
-    assert_eq!(**cell.target_object(), object1);
+    assert!(cell.source_object().equal_to(&*object1));
+    assert!(cell.target_object().equal_to(&*object1));
 
     // TODO: implement comparison of the object assert_eq!(category.get_object(&object1_id).unwrap(), &object);
 
     // add object 2
     let object2 = generate_object();
-    category.add_object(object2.clone().into()).unwrap();
+    category.add_object(object2.clone()).unwrap();
 
     // check identity morphism
-    let cells = category.get_object_morphisms(&object2);
+    let cells = category.get_object_morphisms(&*object2);
     assert!(cells.is_ok());
     let cells = cells.unwrap();
     assert_eq!(cells.len(), 1);
     let cell = cells.first().unwrap();
-    assert_eq!(**cell.source_object(), object2);
-    assert_eq!(**cell.target_object(), object2);
+    assert!(cell.source_object().equal_to(&*object2));
+    assert!(cell.target_object().equal_to(&*object2));
 
     // add object 3
     let object3 = generate_object();
-    category.add_object(object3.clone().into());
+    category.add_object(object3.clone());
 
     // check identity morphism
-    let cells = category.get_object_morphisms(&object3);
+    let cells = category.get_object_morphisms(&*object3);
     assert!(cells.is_ok());
     let cells = cells.unwrap();
     assert_eq!(cells.len(), 1);
     let cell = cells.first().unwrap();
-    assert_eq!(**cell.source_object(), object3);
-    assert_eq!(**cell.target_object(), object3);
+    assert!(cell.source_object().equal_to(&*object3));
+    assert!(cell.target_object().equal_to(&*object3));
 
     // // now add a cell between object1 and object2
     // let cell_id = generate_identifier();
@@ -117,94 +119,96 @@ pub fn test_base_scenarios() {
 #[test]
 pub fn test_identity_cell_tree() {
     // Discrete category A with a, b, c as objects
-    let mut discreteCategoryALower =
-        Rc::new(DiscreteCategory::new_with_id("alphabet_lower".to_string()));
-    let object_a: DiscreteCategory<String> = "a".to_string().into();
-    let object_b: DiscreteCategory<String> = "b".to_string().into();
-    let object_c: DiscreteCategory<String> = "c".to_string().into();
+    let mut discreteCategoryALower = Rc::new(DiscreteCategory::new_with_id(ObjectId::Str(
+        "alphabet_lower".to_string(),
+    )));
+    let object_a: Rc<DiscreteCategory> = Rc::new("a".into());
+    let object_b: Rc<DiscreteCategory> = Rc::new("b".into());
+    let object_c: Rc<DiscreteCategory> = Rc::new("c".into());
     Rc::get_mut(&mut discreteCategoryALower)
         .unwrap()
-        .add_object(object_a.clone().into())
+        .add_object(object_a.clone())
         .unwrap();
     Rc::get_mut(&mut discreteCategoryALower)
         .unwrap()
-        .add_object(object_b.clone().into())
+        .add_object(object_b.clone())
         .unwrap();
     Rc::get_mut(&mut discreteCategoryALower)
         .unwrap()
-        .add_object(object_c.clone().into())
+        .add_object(object_c.clone())
         .unwrap();
 
     // Discrete category A with a, b, c as objects
-    let mut discreteCategoryAUpper =
-        Rc::new(DiscreteCategory::new_with_id("alphabet_upper".to_string()));
-    let object_A: DiscreteCategory<String> = "A".to_string().into();
-    let object_B: DiscreteCategory<String> = "B".to_string().into();
-    let object_C: DiscreteCategory<String> = "C".to_string().into();
+    let mut discreteCategoryAUpper = Rc::new(DiscreteCategory::new_with_id(ObjectId::Str(
+        "alphabet_upper".to_string(),
+    )));
+    let object_A: Rc<DiscreteCategory> = Rc::new("A".into());
+    let object_B: Rc<DiscreteCategory> = Rc::new("B".into());
+    let object_C: Rc<DiscreteCategory> = Rc::new("C".into());
     Rc::get_mut(&mut discreteCategoryAUpper)
         .unwrap()
-        .add_object(object_A.clone().into())
+        .add_object(object_A.clone())
         .unwrap();
     Rc::get_mut(&mut discreteCategoryAUpper)
         .unwrap()
-        .add_object(object_B.clone().into())
+        .add_object(object_B.clone())
         .unwrap();
     Rc::get_mut(&mut discreteCategoryAUpper)
         .unwrap()
-        .add_object(object_C.clone().into())
+        .add_object(object_C.clone())
         .unwrap();
 
     let mut discreteCategoryANumber = Rc::new(DiscreteCategory::new());
-    let object_1: DiscreteCategory<usize> = 1.into();
-    let object_2: DiscreteCategory<usize> = 2.into();
-    let object_3: DiscreteCategory<usize> = 3.into();
+    let object_1: Rc<DiscreteCategory> = Rc::new(1.into());
+    let object_2: Rc<DiscreteCategory> = Rc::new(2.into());
+    let object_3: Rc<DiscreteCategory> = Rc::new(3.into());
     Rc::get_mut(&mut discreteCategoryANumber)
         .unwrap()
-        .add_object(object_1.clone().into())
+        .add_object(object_1.clone())
         .unwrap();
     Rc::get_mut(&mut discreteCategoryANumber)
         .unwrap()
-        .add_object(object_2.clone().into())
+        .add_object(object_2.clone())
         .unwrap();
     Rc::get_mut(&mut discreteCategoryANumber)
         .unwrap()
-        .add_object(object_3.clone().into())
+        .add_object(object_3.clone())
         .unwrap();
 
     let lower_to_numer_mappings: HashMap<
-        Rc<Morphism<String, DiscreteCategory<String>>>,
-        Rc<Morphism<usize, DiscreteCategory<usize>>>,
+        Rc<Morphism<DiscreteCategory>>,
+        Rc<Morphism<DiscreteCategory>>,
     > = HashMap::from([
         // a to 1
         (
             discreteCategoryALower
-                .get_identity_morphism(&object_a)
+                .get_identity_morphism(&*object_a)
                 .unwrap()
                 .clone(),
             discreteCategoryANumber
-                .get_identity_morphism(&object_1)
+                .get_identity_morphism(&*object_1)
                 .unwrap()
                 .clone(),
         ),
         // b to 2
         (
             discreteCategoryALower
-                .get_identity_morphism(&object_b)
+                .get_identity_morphism(&*object_b)
                 .unwrap()
                 .clone(),
             discreteCategoryANumber
-                .get_identity_morphism(&object_2)
+                .get_identity_morphism(&*object_2)
                 .unwrap()
                 .clone(),
         ),
         // c to 3
         (
             discreteCategoryALower
-                .get_identity_morphism(&object_c)
+                .get_identity_morphism(&*object_c)
                 .unwrap()
                 .clone(),
             discreteCategoryANumber
-                .get_identity_morphism(&object_3)
+                .get_identity_morphism(&*object_3)
                 .unwrap()
                 .clone(),
         ),
@@ -218,39 +222,39 @@ pub fn test_identity_cell_tree() {
     );
 
     let number_to_upper_mappings: HashMap<
-        Rc<Morphism<usize, DiscreteCategoryUsize>>,
-        Rc<Morphism<String, DiscreteCategoryString>>,
+        Rc<Morphism<DiscreteCategory>>,
+        Rc<Morphism<DiscreteCategory>>,
     > = HashMap::from([
         // 1 to a
         (
             discreteCategoryANumber
-                .get_identity_morphism(&object_1)
+                .get_identity_morphism(&*object_1)
                 .unwrap()
                 .clone(),
             discreteCategoryALower
-                .get_identity_morphism(&object_a)
+                .get_identity_morphism(&*object_a)
                 .unwrap()
                 .clone(),
         ),
         // b to 2
         (
             discreteCategoryANumber
-                .get_identity_morphism(&object_2)
+                .get_identity_morphism(&*object_2)
                 .unwrap()
                 .clone(),
             discreteCategoryALower
-                .get_identity_morphism(&object_b)
+                .get_identity_morphism(&*object_b)
                 .unwrap()
                 .clone(),
         ),
         // c to c
         (
             discreteCategoryANumber
-                .get_identity_morphism(&object_3)
+                .get_identity_morphism(&*object_3)
                 .unwrap()
                 .clone(),
             discreteCategoryALower
-                .get_identity_morphism(&object_c)
+                .get_identity_morphism(&*object_c)
                 .unwrap()
                 .clone(),
         ),
@@ -264,39 +268,39 @@ pub fn test_identity_cell_tree() {
 
     // create a functor1 from lower to upper
     let lower_to_upper_mappings: HashMap<
-        Rc<Morphism<String, DiscreteCategoryString>>,
-        Rc<Morphism<String, DiscreteCategoryString>>,
+        Rc<Morphism<DiscreteCategory>>,
+        Rc<Morphism<DiscreteCategory>>,
     > = HashMap::from([
         // a to A
         (
             discreteCategoryALower
-                .get_identity_morphism(&object_a)
+                .get_identity_morphism(&*object_a)
                 .unwrap()
                 .clone(),
             discreteCategoryAUpper
-                .get_identity_morphism(&object_A)
+                .get_identity_morphism(&*object_A)
                 .unwrap()
                 .clone(),
         ),
         // b to B
         (
             discreteCategoryALower
-                .get_identity_morphism(&object_b)
+                .get_identity_morphism(&*object_b)
                 .unwrap()
                 .clone(),
             discreteCategoryAUpper
-                .get_identity_morphism(&object_B)
+                .get_identity_morphism(&*object_B)
                 .unwrap()
                 .clone(),
         ),
         // c to C
         (
             discreteCategoryALower
-                .get_identity_morphism(&object_c)
+                .get_identity_morphism(&*object_c)
                 .unwrap()
                 .clone(),
             discreteCategoryAUpper
-                .get_identity_morphism(&object_C)
+                .get_identity_morphism(&*object_C)
                 .unwrap()
                 .clone(),
         ),
@@ -308,7 +312,7 @@ pub fn test_identity_cell_tree() {
         lower_to_upper_mappings,
     ));
 
-    let mut setCategoryAlphabet = Category::new();
+    let mut setCategoryAlphabet = BaseCategory::new();
 
     // Add the discrete category A as an object in Set category alphabet
     setCategoryAlphabet
@@ -321,10 +325,18 @@ pub fn test_identity_cell_tree() {
         .unwrap();
 
     let identity_cell = setCategoryAlphabet
-        .get_identity_morphism(&discreteCategoryALower)
+        .get_identity_morphism(&*discreteCategoryALower)
         .unwrap();
-    assert_eq!(identity_cell.source_object(), &discreteCategoryALower);
-    assert_eq!(identity_cell.target_object(), &discreteCategoryALower);
+    assert!(
+        identity_cell
+            .source_object()
+            .equal_to(&*discreteCategoryALower)
+    );
+    assert!(
+        identity_cell
+            .target_object()
+            .equal_to(&*discreteCategoryALower)
+    );
 
     // now add morphism from lower to upper
     let morphism = Rc::new(Morphism::new(
@@ -514,55 +526,57 @@ pub fn test_identity_cell_tree() {
 #[test]
 pub fn test_nested_category() {
     // start with discrete category A with a, b, c as objects
-    let mut categoryAlphaLower: Rc<DiscreteCategory<String>> = Rc::new(vec!["a", "b", "c"].into());
+    let mut categoryAlphaLower: Rc<DiscreteCategory> = Rc::new(vec!["a", "b", "c"].into());
 
-    let categoryAlphaUpper: Rc<DiscreteCategory<String>> = Rc::new(vec!["A", "B", "C"].into());
+    let categoryAlphaUpper: Rc<DiscreteCategory> = Rc::new(vec!["A", "B", "C"].into());
 
-    let categoryAlphaNumber: Rc<DiscreteCategory<usize>> = Rc::new(vec![1, 2, 3].into());
+    let categoryAlphaNumber: Rc<DiscreteCategory> = Rc::new(vec![1, 2, 3].into());
 
     Rc::get_mut(&mut categoryAlphaLower)
         .unwrap()
         .add_object(categoryAlphaUpper.clone())
         .unwrap();
 
-    for object in categoryAlphaLower.get_all_objects().unwrap() {
-        println!("Object: {}", object.category_id());
-    }
-
     let lower_to_number_mappings: HashMap<
-        Rc<Morphism<String, DiscreteCategory<String>>>,
-        Rc<Morphism<usize, DiscreteCategory<usize>>>,
+        Rc<Morphism<DiscreteCategory>>,
+        Rc<Morphism<DiscreteCategory>>,
     > = HashMap::from([
         // a to 1
         (
             categoryAlphaLower
-                .get_identity_morphism(&"a".into())
+                .get_identity_morphism(&DiscreteCategory::new_with_id(ObjectId::Str(
+                    "a".to_string(),
+                )))
                 .unwrap()
                 .clone(),
             categoryAlphaNumber
-                .get_identity_morphism(&1.into())
+                .get_identity_morphism(&DiscreteCategory::new_with_id(ObjectId::Int(1)))
                 .unwrap()
                 .clone(),
         ),
         // b to 2
         (
             categoryAlphaLower
-                .get_identity_morphism(&"b".into())
+                .get_identity_morphism(&DiscreteCategory::new_with_id(ObjectId::Str(
+                    "b".to_string(),
+                )))
                 .unwrap()
                 .clone(),
             categoryAlphaNumber
-                .get_identity_morphism(&2.into())
+                .get_identity_morphism(&DiscreteCategory::new_with_id(ObjectId::Int(2)))
                 .unwrap()
                 .clone(),
         ),
         // c to 3
         (
             categoryAlphaLower
-                .get_identity_morphism(&"c".into())
+                .get_identity_morphism(&DiscreteCategory::new_with_id(ObjectId::Str(
+                    "c".to_string(),
+                )))
                 .unwrap()
                 .clone(),
             categoryAlphaNumber
-                .get_identity_morphism(&3.into())
+                .get_identity_morphism(&DiscreteCategory::new_with_id(ObjectId::Int(3)))
                 .unwrap()
                 .clone(),
         ),
@@ -577,39 +591,45 @@ pub fn test_nested_category() {
     ));
 
     let number_to_upper_mappings: HashMap<
-        Rc<Morphism<usize, DiscreteCategory<usize>>>,
-        Rc<Morphism<String, DiscreteCategory<String>>>,
+        Rc<Morphism<DiscreteCategory>>,
+        Rc<Morphism<DiscreteCategory>>,
     > = HashMap::from([
         // 1 to a
         (
             categoryAlphaNumber
-                .get_identity_morphism(&1.into())
+                .get_identity_morphism(&DiscreteCategory::new_with_id(ObjectId::Int(1)))
                 .unwrap()
                 .clone(),
             categoryAlphaLower
-                .get_identity_morphism(&"a".into())
+                .get_identity_morphism(&DiscreteCategory::new_with_id(ObjectId::Str(
+                    "a".to_string(),
+                )))
                 .unwrap()
                 .clone(),
         ),
         // 2 to b
         (
             categoryAlphaNumber
-                .get_identity_morphism(&2.into())
+                .get_identity_morphism(&DiscreteCategory::new_with_id(ObjectId::Int(2)))
                 .unwrap()
                 .clone(),
             categoryAlphaLower
-                .get_identity_morphism(&"b".into())
+                .get_identity_morphism(&DiscreteCategory::new_with_id(ObjectId::Str(
+                    "b".to_string(),
+                )))
                 .unwrap()
                 .clone(),
         ),
         // 3 to c
         (
             categoryAlphaNumber
-                .get_identity_morphism(&3.into())
+                .get_identity_morphism(&DiscreteCategory::new_with_id(ObjectId::Int(3)))
                 .unwrap()
                 .clone(),
             categoryAlphaLower
-                .get_identity_morphism(&"c".into())
+                .get_identity_morphism(&DiscreteCategory::new_with_id(ObjectId::Str(
+                    "c".to_string(),
+                )))
                 .unwrap()
                 .clone(),
         ),
@@ -624,39 +644,51 @@ pub fn test_nested_category() {
 
     // create a functor1 from lower to upper
     let lower_to_upper_mappings: HashMap<
-        Rc<Morphism<String, DiscreteCategory<String>>>,
-        Rc<Morphism<String, DiscreteCategory<String>>>,
+        Rc<Morphism<DiscreteCategory>>,
+        Rc<Morphism<DiscreteCategory>>,
     > = HashMap::from([
         // a to A
         (
             categoryAlphaLower
-                .get_identity_morphism(&"a".into())
+                .get_identity_morphism(&DiscreteCategory::new_with_id(ObjectId::Str(
+                    "a".to_string(),
+                )))
                 .unwrap()
                 .clone(),
             categoryAlphaUpper
-                .get_identity_morphism(&"A".into())
+                .get_identity_morphism(&DiscreteCategory::new_with_id(ObjectId::Str(
+                    "A".to_string(),
+                )))
                 .unwrap()
                 .clone(),
         ),
         // b to B
         (
             categoryAlphaLower
-                .get_identity_morphism(&"b".into())
+                .get_identity_morphism(&DiscreteCategory::new_with_id(ObjectId::Str(
+                    "b".to_string(),
+                )))
                 .unwrap()
                 .clone(),
             categoryAlphaUpper
-                .get_identity_morphism(&"B".into())
+                .get_identity_morphism(&DiscreteCategory::new_with_id(ObjectId::Str(
+                    "B".to_string(),
+                )))
                 .unwrap()
                 .clone(),
         ),
         // c to C
         (
             categoryAlphaLower
-                .get_identity_morphism(&"c".into())
+                .get_identity_morphism(&DiscreteCategory::new_with_id(ObjectId::Str(
+                    "c".to_string(),
+                )))
                 .unwrap()
                 .clone(),
             categoryAlphaUpper
-                .get_identity_morphism(&"C".into())
+                .get_identity_morphism(&DiscreteCategory::new_with_id(ObjectId::Str(
+                    "C".to_string(),
+                )))
                 .unwrap()
                 .clone(),
         ),
@@ -671,39 +703,51 @@ pub fn test_nested_category() {
 
     // functor from lower to upper in reverse
     let lower_to_upper_reverse_mappings: HashMap<
-        Rc<Morphism<String, DiscreteCategory<String>>>,
-        Rc<Morphism<String, DiscreteCategory<String>>>,
+        Rc<Morphism<DiscreteCategory>>,
+        Rc<Morphism<DiscreteCategory>>,
     > = HashMap::from([
         // a to C
         (
             categoryAlphaLower
-                .get_identity_morphism(&"a".into())
+                .get_identity_morphism(&DiscreteCategory::new_with_id(ObjectId::Str(
+                    "a".to_string(),
+                )))
                 .unwrap()
                 .clone(),
             categoryAlphaUpper
-                .get_identity_morphism(&"C".into())
+                .get_identity_morphism(&DiscreteCategory::new_with_id(ObjectId::Str(
+                    "C".to_string(),
+                )))
                 .unwrap()
                 .clone(),
         ),
         // b to B
         (
             categoryAlphaLower
-                .get_identity_morphism(&"b".into())
+                .get_identity_morphism(&DiscreteCategory::new_with_id(ObjectId::Str(
+                    "b".to_string(),
+                )))
                 .unwrap()
                 .clone(),
             categoryAlphaUpper
-                .get_identity_morphism(&"B".into())
+                .get_identity_morphism(&DiscreteCategory::new_with_id(ObjectId::Str(
+                    "B".to_string(),
+                )))
                 .unwrap()
                 .clone(),
         ),
         // c to A
         (
             categoryAlphaLower
-                .get_identity_morphism(&"c".into())
+                .get_identity_morphism(&DiscreteCategory::new_with_id(ObjectId::Str(
+                    "c".to_string(),
+                )))
                 .unwrap()
                 .clone(),
             categoryAlphaUpper
-                .get_identity_morphism(&"A".into())
+                .get_identity_morphism(&DiscreteCategory::new_with_id(ObjectId::Str(
+                    "A".to_string(),
+                )))
                 .unwrap()
                 .clone(),
         ),
@@ -716,7 +760,7 @@ pub fn test_nested_category() {
         lower_to_upper_reverse_mappings,
     ));
 
-    let mut setCategoryAlphabet: Category<String, DiscreteCategory<String>> = Category::new();
+    let mut setCategoryAlphabet: BaseCategory<DiscreteCategory> = BaseCategory::new();
     // Add the discrete category A as an object in Set category alphabet
     setCategoryAlphabet
         .add_object(categoryAlphaLower.clone())
@@ -728,7 +772,7 @@ pub fn test_nested_category() {
     let setCategoryAlphabet = Rc::new(setCategoryAlphabet);
 
     // category of numbers
-    let mut setCategoryNumber: Category<usize, DiscreteCategory<usize>> = Category::new();
+    let mut setCategoryNumber: BaseCategory<DiscreteCategory> = BaseCategory::new();
     // Add the discrete category A as an object in Set category number
     setCategoryNumber
         .add_object(categoryAlphaNumber.clone())
@@ -738,10 +782,7 @@ pub fn test_nested_category() {
 
     // lets create a functor category
     // where objects are functors and morphisms are natural transformations
-    let mut functorCategory: Category<
-        String,
-        Functor<String, DiscreteCategory<String>, DiscreteCategory<String>>,
-    > = Category::new();
+    let mut functorCategory = BaseCategory::new();
 
     functorCategory
         .add_object(functor_lower_to_upper.clone())
@@ -751,10 +792,7 @@ pub fn test_nested_category() {
         .unwrap();
 
     // now creating a morphism from lower to upper functor which is a natural transformation
-    let natural_transformation_morphism: Morphism<
-        String,
-        Functor<String, DiscreteCategory<String>, DiscreteCategory<String>>,
-    > = Morphism::new(
+    let natural_transformation_morphism = Morphism::new(
         "natural_transformation_lower_to_upper".to_string(),
         functor_lower_to_upper.clone(),
         functor_lower_to_upper_reverse.clone(),

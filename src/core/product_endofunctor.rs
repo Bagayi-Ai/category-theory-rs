@@ -11,24 +11,28 @@ For instance if category A has objects {a, b} and morphisms {f: a -> b, g: b -> 
 an endo functor F would map these to a new category B with objects {F(a), F(b)} and morphisms {F(f): F(a) -> F(b), F(g): F(b) -> F(a)}.
 This is useful for creating new categories that are derived from the original category, such as the category of sets or the category of groups.
  */
-use crate::core::discrete_category::DiscreteCategory;
 use crate::core::errors::Errors;
 use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::traits::morphism_trait::MorphismTrait;
 use std::collections::HashMap;
+use std::hash::Hash;
 use std::rc::Rc;
 
-pub fn apply_product(
-    source_category: Rc<DiscreteCategory<String>>,
-    fixed_category: Rc<DiscreteCategory<String>>,
-) -> Result<Rc<Functor<String, DiscreteCategory<String>, DiscreteCategory<String>>>, Errors>
+pub fn apply_product<
+    SourceCategory: CategoryTrait<Object = SourceCategory> + Eq + Hash,
+    FixedCategory: CategoryTrait<Object = FixedCategory>,
+>(
+    source_category: Rc<SourceCategory>,
+    fixed_category: Rc<FixedCategory>,
+) -> Result<Rc<Functor<SourceCategory, SourceCategory>>, Errors>
 where
     // <SourCategory as CategoryTrait>::Object: CategoryTrait<Identifier = String>,
 {
     // we take a product of the source category and the fixed category
     // and map the objects and morphisms of the source category to the target category
-    let mut target_category = DiscreteCategory::new();
+    let mut target_category = source_category.new_instance();
 
     let fixed_objects = fixed_category.get_all_objects()?;
 
@@ -36,16 +40,16 @@ where
 
     // first map the objects from the source category to the target category
     for source_object in source_category.get_all_objects()? {
-        let mut target_object = Rc::new(DiscreteCategory::new_with_id(
-            source_object.category_id().clone(),
-        ));
+        let mut target_object =
+            Rc::new(source_category.new_instance_with_id(source_object.category_id()));
         for fixed_object in &fixed_objects {
             // product object (_) * fixed_object
             let new_value = (*source_object.clone()).category_id().to_owned()
-                + (*fixed_object).clone().category_id();
+                + (*fixed_object).clone().category_id().clone();
+            let new_category = source_category.new_instance_with_id(&new_value);
             Rc::get_mut(&mut target_object)
                 .ok_or(Errors::ObjectNotFound)?
-                .add_object(Rc::new(new_value.into()))?;
+                .add_object(Rc::new(new_category))?;
         }
         target_category.add_object(target_object.clone())?;
 

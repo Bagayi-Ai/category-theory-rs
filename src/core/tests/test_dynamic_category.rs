@@ -1,5 +1,7 @@
-use crate::core::dynamic_category::{DynamicCategory, DynamicFunctor, DynamicMorphism};
+use crate::core::dynamic_category::DynamicCategory;
 use crate::core::functor::Functor;
+use crate::core::morphism::Morphism;
+use crate::core::object_id::ObjectId;
 use crate::core::traits::category_trait::CategoryTrait;
 use std::rc::Rc;
 
@@ -27,9 +29,23 @@ pub fn test_base_scenario() {
     assert!(inner_objects.is_ok());
     let inner_objects = inner_objects.unwrap();
     assert_eq!(inner_objects.len(), 3);
-    assert!(inner_objects.iter().any(|o| o.id() == "a"));
-    assert!(inner_objects.iter().any(|o| o.id() == "b"));
-    assert!(inner_objects.iter().any(|o| o.id() == "c"));
+    assert!(
+        inner_objects
+            .iter()
+            .any(|o| o.equal_to(&DynamicCategory::new_with_id(ObjectId::Str(
+                "a".to_string()
+            ))))
+    );
+    assert!(
+        inner_objects
+            .iter()
+            .any(|o| o.equal_to(&<&str as Into<DynamicCategory>>::into("b")))
+    );
+    assert!(
+        inner_objects
+            .iter()
+            .any(|o| o.equal_to(&<&str as Into<DynamicCategory>>::into("c")))
+    );
     // assert_eq!(object_a.level(), 1);
     let object_a = Rc::new(object_a);
 
@@ -42,8 +58,8 @@ pub fn test_base_scenario() {
     assert_eq!(objects.len(), 1);
     let first_object = objects.iter().next().unwrap();
     // assert_eq!(first_object.level(), 1);
-    assert_eq!(*first_object.id(), object_a.id().clone());
-    assert_eq!(**first_object, object_a);
+    assert!(first_object.equal_to(&*object_a));
+    assert!(first_object.equal_to(&*object_a));
 
     // object with number 1,2,3
     let object_num: DynamicCategory = vec![1, 2, 3].into();
@@ -51,9 +67,21 @@ pub fn test_base_scenario() {
     assert!(inner_objects.is_ok());
     let inner_objects = inner_objects.unwrap();
     assert_eq!(inner_objects.len(), 3);
-    assert!(inner_objects.iter().any(|o| *o.id() == 1));
-    assert!(inner_objects.iter().any(|o| *o.id() == 2));
-    assert!(inner_objects.iter().any(|o| o.id().clone() == 3));
+    assert!(
+        inner_objects
+            .iter()
+            .any(|o| o.equal_to(&DynamicCategory::new_with_id(ObjectId::Int(1))))
+    );
+    assert!(
+        inner_objects
+            .iter()
+            .any(|o| o.equal_to(&DynamicCategory::new_with_id(ObjectId::Int(2))))
+    );
+    assert!(
+        inner_objects
+            .iter()
+            .any(|o| o.equal_to(&DynamicCategory::new_with_id(ObjectId::Int(3))))
+    );
 
     // now add the object_num to the category
     let object_num = Rc::new(object_num);
@@ -63,17 +91,17 @@ pub fn test_base_scenario() {
     let objects = objects.unwrap();
     assert_eq!(objects.len(), 2);
     // get object where id is the same as object_a and confirm they are the same
-    let expected_obj_num = objects.iter().find(|o| o.id() == object_num.id());
+    let expected_obj_num = objects.iter().find(|o| o.equal_to(&*object_num));
     assert!(expected_obj_num.is_some());
     let expected_obj_num = expected_obj_num.unwrap();
-    assert_eq!(***expected_obj_num, *object_num);
+    assert!(expected_obj_num.equal_to(&*object_num));
     // confirm object_a is also in the category
-    let expected_obj_a = objects.iter().find(|o| o.id() == object_a.id());
+    let expected_obj_a = objects.iter().find(|o| o.equal_to(&*object_a));
     assert!(expected_obj_a.is_some());
     let expected_obj_a = expected_obj_a.unwrap();
-    assert_eq!(***expected_obj_a, *object_a);
-    assert!(objects.iter().any(|o| *o.id() == object_a.id().clone()));
-    assert!(objects.iter().any(|o| *o.id() == object_num.id().clone()));
+    assert!(expected_obj_a.equal_to(&*object_a));
+    assert!(objects.iter().any(|o| o.equal_to(&*object_a)));
+    assert!(objects.iter().any(|o| o.equal_to(&*object_num)));
 
     // now add a functor from object_a to object_num
     // a -> 1, b -> 2, c -> 3
@@ -85,31 +113,37 @@ pub fn test_base_scenario() {
         vec![
             (
                 object_a
-                    .get_identity_morphism_reference("a".into())
+                    .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Str(
+                        "a".to_string(),
+                    )))
                     .unwrap()
                     .clone(),
                 object_num
-                    .get_identity_morphism_reference(1.into())
+                    .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Int(1)))
                     .unwrap()
                     .clone(),
             ),
             (
                 object_a
-                    .get_identity_morphism_reference("b".into())
+                    .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Str(
+                        "b".to_string(),
+                    )))
                     .unwrap()
                     .clone(),
                 object_num
-                    .get_identity_morphism_reference(2.into())
+                    .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Int(2)))
                     .unwrap()
                     .clone(),
             ),
             (
                 object_a
-                    .get_identity_morphism_reference("c".into())
+                    .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Str(
+                        "c".to_string(),
+                    )))
                     .unwrap()
                     .clone(),
                 object_num
-                    .get_identity_morphism_reference(3.into())
+                    .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Int(3)))
                     .unwrap()
                     .clone(),
             ),
@@ -122,7 +156,7 @@ pub fn test_base_scenario() {
 
     let functor = Rc::new(functor);
 
-    let morphism_a_num = DynamicMorphism::new(
+    let morphism_a_num = Morphism::new(
         "morphism_a_num".into(),
         object_a.clone(),
         object_num.clone(),
@@ -142,31 +176,37 @@ pub fn test_base_scenario() {
         vec![
             (
                 object_a
-                    .get_identity_morphism_reference("a".into())
+                    .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Str(
+                        "a".to_string(),
+                    )))
                     .unwrap()
                     .clone(),
                 object_num
-                    .get_identity_morphism_reference(3.into())
+                    .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Int(3)))
                     .unwrap()
                     .clone(),
             ),
             (
                 object_a
-                    .get_identity_morphism_reference("b".into())
+                    .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Str(
+                        "b".to_string(),
+                    )))
                     .unwrap()
                     .clone(),
                 object_num
-                    .get_identity_morphism_reference(2.into())
+                    .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Int(2)))
                     .unwrap()
                     .clone(),
             ),
             (
                 object_a
-                    .get_identity_morphism_reference("c".into())
+                    .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Str(
+                        "c".to_string(),
+                    )))
                     .unwrap()
                     .clone(),
                 object_num
-                    .get_identity_morphism_reference(1.into())
+                    .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Int(1)))
                     .unwrap()
                     .clone(),
             ),
@@ -178,7 +218,7 @@ pub fn test_base_scenario() {
     // let functor_2 = functor_2.unwrap();
     let functor_2 = Rc::new(functor_2);
 
-    let morphism_a_num_2 = DynamicMorphism::new(
+    let morphism_a_num_2 = Morphism::new(
         "morphism_a_num_2".into(),
         object_a.clone(),
         object_num.clone(),
@@ -193,9 +233,7 @@ pub fn test_base_scenario() {
     // now create a category of the functor category
     // let functor_category: DynamicCategory = vec![functor, functor_2].into();
     let mut functor_category = DynamicCategory::new_with_id("FunctorCategory".into());
-    functor_category.add_object(
-        DynamicCategory::functor_to_category(functor_2)
-            .expect("Expecting category")
-            .into(),
-    );
+    functor_category.add_object(Rc::new(
+        DynamicCategory::functor_to_category(functor_2).expect("Expecting category"),
+    ));
 }

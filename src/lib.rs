@@ -13,12 +13,12 @@ pub mod core {
 
     pub mod expand_functor;
 
-    pub mod set_category;
-
-    pub mod category;
+    pub mod base_category;
     pub mod dynamic_category;
-    pub mod dynamic_value;
     pub mod epic_monic_category;
+    pub mod object_id;
+
+    pub mod utils;
 
     pub mod traits {
         pub mod arrow_trait;

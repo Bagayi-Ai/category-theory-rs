@@ -1,7 +1,8 @@
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
+use crate::core::morphism::Morphism;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::MorphismAlias;
+use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::functor_trait::FunctorTrait;
 use crate::core::traits::morphism_trait::MorphismTrait;
 use crate::core::unit::unit_category::UnitCategory;
@@ -13,15 +14,12 @@ pub struct UnitMorphism<T: Identifier> {
     _phantom: std::marker::PhantomData<T>,
 }
 
-impl<T: Identifier> ArrowTrait for UnitMorphism<T> {
-    type SourceObject = UnitCategory;
-    type TargetObject = Self::SourceObject;
-
-    fn source_object(&self) -> &Rc<Self::SourceObject> {
+impl<T: Identifier> ArrowTrait<UnitCategory, UnitCategory> for UnitMorphism<T> {
+    fn source_object(&self) -> &Rc<UnitCategory> {
         todo!()
     }
 
-    fn target_object(&self) -> &Rc<Self::TargetObject> {
+    fn target_object(&self) -> &Rc<UnitCategory> {
         todo!()
     }
 
@@ -29,7 +27,10 @@ impl<T: Identifier> ArrowTrait for UnitMorphism<T> {
         todo!()
     }
 
-    fn compose(&self, other: &impl ArrowTrait) -> Result<UnitMorphism<T>, Errors> {
+    fn compose(
+        &self,
+        other: &impl ArrowTrait<UnitCategory, UnitCategory>,
+    ) -> Result<Rc<UnitMorphism<T>>, Errors> {
         todo!()
     }
 
@@ -38,20 +39,17 @@ impl<T: Identifier> ArrowTrait for UnitMorphism<T> {
     }
 }
 
-impl<T: Identifier> MorphismTrait for UnitMorphism<T> {
+impl<T: Identifier> MorphismTrait<UnitCategory> for UnitMorphism<T> {
     fn functor(&self) -> Result<&Rc<UnitMorphism<T>>, Errors> {
         todo!()
     }
 }
 
-impl<Id: Identifier> FunctorTrait for UnitMorphism<Id> {
+impl<Id: Identifier> FunctorTrait<UnitCategory, UnitCategory> for UnitMorphism<Id> {
     fn new(
-        source_category: Rc<Self::SourceObject>,
-        target_category: Rc<Self::TargetObject>,
-        mappings: HashMap<
-            Rc<MorphismAlias<Self::SourceObject>>,
-            Rc<MorphismAlias<Self::TargetObject>>,
-        >,
+        source_category: Rc<UnitCategory>,
+        target_category: Rc<UnitCategory>,
+        mappings: HashMap<Rc<Morphism<UnitCategory>>, Rc<Morphism<UnitCategory>>>,
     ) -> Result<Self, Errors>
     where
         Self: Sized,
@@ -59,10 +57,15 @@ impl<Id: Identifier> FunctorTrait for UnitMorphism<Id> {
         todo!()
     }
 
-    fn arrow_mappings(
-        &self,
-    ) -> &HashMap<Rc<MorphismAlias<Self::SourceObject>>, Rc<MorphismAlias<Self::TargetObject>>>
-    {
+    fn source_category(&self) -> &Rc<UnitCategory> {
+        todo!()
+    }
+
+    fn target_category(&self) -> &Rc<UnitCategory> {
+        todo!()
+    }
+
+    fn arrow_mappings(&self) -> &HashMap<Rc<Morphism<UnitCategory>>, Rc<Morphism<UnitCategory>>> {
         todo!()
     }
 }

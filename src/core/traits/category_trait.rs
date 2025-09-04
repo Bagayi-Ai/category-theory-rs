@@ -1,28 +1,30 @@
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
+use crate::core::morphism::Morphism;
+use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::morphism_trait::MorphismTrait;
+use dyn_clone::DynClone;
+use std::any::Any;
 use std::collections::HashSet;
 use std::fmt::Debug;
 use std::hash::Hash;
 use std::rc::Rc;
 
-pub type MorphismAlias<Category> = <Category as CategoryTrait>::Morphism;
-
-pub enum MorphismCommutationResult<Morphism: MorphismTrait> {
+pub type CategorySubObjectAlias<Category> = <Category as CategoryTrait>::Object;
+pub enum MorphismCommutationResult<Object: CategoryTrait> {
     Commutative,
-    NonCommutative(HashSet<Morphism>),
+    NonCommutative(HashSet<Morphism<Object>>),
 }
 
-pub trait CategoryTrait: Debug {
-    type Id: Identifier;
-    type Object: CategoryTrait + Debug + Eq + Hash;
-    type Morphism: MorphismTrait<SourceObject = Self::Object, TargetObject = Self::Object>
-        + Debug
-        + Eq
-        + Hash;
+pub trait CategoryTrait: Debug + DynClone + Any {
+    type Object: CategoryTrait + Debug + DynClone + Eq + Hash;
 
     fn new() -> Self
+    where
+        Self: Sized;
+
+    fn new_with_id(id: &ObjectId) -> Self
     where
         Self: Sized;
 
@@ -40,14 +42,30 @@ pub trait CategoryTrait: Debug {
         Self::new()
     }
 
-    fn category_id(&self) -> &Self::Id;
+    fn new_instance_with_id(&self, id: &ObjectId) -> Self
+    where
+        Self: Sized,
+    {
+        Self::new_with_id(id)
+    }
+
+    fn category_id(&self) -> &ObjectId;
+
+    fn equal_to(&self, other: &Self::Object) -> bool {
+        self.category_id() == other.category_id()
+    }
 
     fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors>;
 
-    fn add_morphism(&mut self, morphism: Rc<Self::Morphism>)
-    -> Result<&Rc<Self::Morphism>, Errors>;
+    fn add_morphism(
+        &mut self,
+        morphism: Rc<Morphism<Self::Object>>,
+    ) -> Result<&Rc<Morphism<Self::Object>>, Errors>;
 
-    fn get_identity_morphism(&self, object: &Self::Object) -> Result<&Rc<Self::Morphism>, Errors> {
+    fn get_identity_morphism(
+        &self,
+        object: &Self::Object,
+    ) -> Result<&Rc<Morphism<Self::Object>>, Errors> {
         let hom_set = self.get_hom_set(object, object)?;
         // get the identity morphism
         for morphism in hom_set {
@@ -58,17 +76,10 @@ pub trait CategoryTrait: Debug {
         Err(Errors::IdentityMorphismNotFound)
     }
 
-    fn get_identity_morphism_reference(
-        &self,
-        object: Self::Object,
-    ) -> Result<&Rc<Self::Morphism>, Errors> {
-        self.get_identity_morphism(&object)
-    }
-
-    fn get_all_identity_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
+    fn get_all_identity_morphisms(&self) -> Result<HashSet<&Rc<Morphism<Self::Object>>>, Errors> {
         let mut identity_morphisms = HashSet::new();
         for object in self.get_all_objects()? {
-            match self.get_identity_morphism(object) {
+            match self.get_identity_morphism(&**object) {
                 Ok(identity_morphism) => {
                     identity_morphisms.insert(identity_morphism);
                 }
@@ -80,24 +91,20 @@ pub trait CategoryTrait: Debug {
 
     fn get_object(&self, object: &Self::Object) -> Result<&Rc<Self::Object>, Errors>;
 
-    fn get_object_reference(&self, object: Self::Object) -> Result<&Rc<Self::Object>, Errors> {
-        self.get_object(&object)
-    }
-
     fn get_all_objects(&self) -> Result<HashSet<&Rc<Self::Object>>, Errors>;
 
-    fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors>;
+    fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Morphism<Self::Object>>>, Errors>;
 
     fn get_hom_set_x(
         &self,
         source_object: &Self::Object,
-    ) -> Result<HashSet<&Rc<Self::Morphism>>, Errors>;
+    ) -> Result<HashSet<&Rc<Morphism<Self::Object>>>, Errors>;
 
     fn get_hom_set(
         &self,
         source_object: &Self::Object,
         target_object: &Self::Object,
-    ) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
+    ) -> Result<HashSet<&Rc<Morphism<Self::Object>>>, Errors> {
         Ok(self
             .get_hom_set_x(source_object)?
             .iter()
@@ -109,21 +116,21 @@ pub trait CategoryTrait: Debug {
     fn get_object_morphisms(
         &self,
         object: &Self::Object,
-    ) -> Result<Vec<&Rc<Self::Morphism>>, Errors>;
+    ) -> Result<Vec<&Rc<Morphism<Self::Object>>>, Errors>;
 
     fn morphism_commute(
         &self,
-        left_morphisms: Vec<&Self::Morphism>,
-        right_morphisms: Vec<&Self::Morphism>,
-    ) -> Result<MorphismCommutationResult<MorphismAlias<Self::Object>>, Errors> {
+        left_morphisms: Vec<&Morphism<Self::Object>>,
+        right_morphisms: Vec<&Morphism<Self::Object>>,
+    ) -> Result<MorphismCommutationResult<Self::Object>, Errors> {
         self.validate_morphisms_commutation(left_morphisms, right_morphisms)?;
         Ok(MorphismCommutationResult::Commutative)
     }
 
     fn validate_morphisms_commutation(
         &self,
-        left_morphisms: Vec<&Self::Morphism>,
-        right_morphisms: Vec<&Self::Morphism>,
+        left_morphisms: Vec<&Morphism<Self::Object>>,
+        right_morphisms: Vec<&Morphism<Self::Object>>,
     ) -> Result<(), Errors> {
         // // source and target of left cells id should be same with right cells
         // let left_source_object = left_morphisms
@@ -160,7 +167,10 @@ pub trait CategoryTrait: Debug {
         // todo!()
     }
 
-    fn validate_morphisms_composition(&self, morphims: Vec<&Self::Morphism>) -> Result<(), Errors> {
+    fn validate_morphisms_composition(
+        &self,
+        morphims: Vec<&Morphism<Self::Object>>,
+    ) -> Result<(), Errors> {
         // if morphims.is_empty() {
         //     return Err(NCategoryError::InvalidMorphismComposition);
         // }
@@ -193,6 +203,7 @@ pub trait CategoryTrait: Debug {
     where
         Self: Sized,
     {
-        1 + <Self::Object as CategoryTrait>::nested_level()
+        todo!()
+        // 1 + <Self::Object as CategoryTrait>::nested_level()
     }
 }

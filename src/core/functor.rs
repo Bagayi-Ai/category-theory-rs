@@ -1,66 +1,107 @@
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
+use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::{CategoryTrait, MorphismAlias};
+use crate::core::traits::category_trait::{CategorySubObjectAlias, CategoryTrait};
 use crate::core::traits::functor_trait::FunctorTrait;
+use std::any::Any;
 use std::collections::{HashMap, HashSet};
+use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
-use std::rc::Rc;
+use std::rc::{Rc, Weak};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Functor<Id, SourceCategory, TargetCategory>
-where
-    Id: Identifier,
-    SourceCategory: CategoryTrait,
-    TargetCategory: CategoryTrait,
-{
-    id: Id,
+#[derive(Clone)]
+pub struct Functor<SourceCategory: CategoryTrait, TargetCategory: CategoryTrait> {
+    id: ObjectId,
     source_category: Rc<SourceCategory>,
     target_category: Rc<TargetCategory>,
-    mappings: HashMap<Rc<SourceCategory::Morphism>, Rc<TargetCategory::Morphism>>,
+    mappings: HashMap<String, String>,
+    source_morphisms: HashMap<String, Weak<Morphism<CategorySubObjectAlias<SourceCategory>>>>,
+    target_morphisms: HashMap<String, Weak<Morphism<CategorySubObjectAlias<TargetCategory>>>>,
 }
 
-impl<Id, SourceCategory, TargetCategory> Functor<Id, SourceCategory, TargetCategory>
-where
-    Id: Identifier,
-    SourceCategory: CategoryTrait,
-    TargetCategory: CategoryTrait,
+impl<SourceCategory: CategoryTrait, TargetCategory: CategoryTrait> Debug
+    for Functor<SourceCategory, TargetCategory>
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        todo!()
+        // write!(f, "Functor {{ id: {}, source_category: {:?}, target_category: {:?}, mappings: {:?} }}", self.id, self.source_category.category_id(), self.target_category.category_id(), self.mappings)
+    }
+}
+
+impl<SourceCategory: CategoryTrait, TargetCategory: CategoryTrait> PartialEq
+    for Functor<SourceCategory, TargetCategory>
+{
+    fn eq(&self, other: &Self) -> bool {
+        todo!()
+    }
+}
+
+impl<SourceCategory: CategoryTrait, TargetCategory: CategoryTrait> Eq
+    for Functor<SourceCategory, TargetCategory>
+{
+}
+
+impl<SourceCategory: CategoryTrait, TargetCategory: CategoryTrait> Hash
+    for Functor<SourceCategory, TargetCategory>
+{
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
+    }
+}
+
+impl<SourceCategory: CategoryTrait, TargetCategory: CategoryTrait>
+    Functor<SourceCategory, TargetCategory>
 {
     pub fn new(
-        id: Id,
+        id: String,
         source_category: Rc<SourceCategory>,
         target_category: Rc<TargetCategory>,
-        mappings: HashMap<Rc<SourceCategory::Morphism>, Rc<TargetCategory::Morphism>>,
+        morphism_mapping: HashMap<
+            Rc<Morphism<CategorySubObjectAlias<SourceCategory>>>,
+            Rc<Morphism<CategorySubObjectAlias<TargetCategory>>>,
+        >,
     ) -> Self {
+        let mut mappings = HashMap::new();
+        let mut source_morphisms = HashMap::new();
+        let mut target_morphisms = HashMap::new();
+
+        for (source_morphism, target_morphism) in morphism_mapping.iter() {
+            mappings.insert(source_morphism.id().clone(), target_morphism.id().clone());
+            source_morphisms.insert(source_morphism.id().clone(), Rc::downgrade(source_morphism));
+            target_morphisms.insert(target_morphism.id().clone(), Rc::downgrade(target_morphism));
+        }
+
         Functor {
-            id,
+            id: ObjectId::Str(id),
             source_category,
             target_category,
             mappings,
+            source_morphisms,
+            target_morphisms,
         }
     }
 
-    pub fn id(&self) -> &Id {
-        &self.id
+    pub fn id(&self) -> &String {
+        let s = match &self.id {
+            ObjectId::Str(v) => v,
+            _ => unreachable!(),
+        };
+        s
     }
 }
 
-impl<'a, Id, SourceCategory, TargetCategory> ArrowTrait
-    for Functor<Id, SourceCategory, TargetCategory>
+impl<SourceCategory: CategoryTrait, TargetCategory: CategoryTrait>
+    ArrowTrait<SourceCategory, TargetCategory> for Functor<SourceCategory, TargetCategory>
 where
-    Id: Identifier,
-    SourceCategory: CategoryTrait,
-    TargetCategory: CategoryTrait,
+    Morphism<SourceCategory>: ArrowTrait<SourceCategory, TargetCategory>,
 {
-    type SourceObject = SourceCategory;
-    type TargetObject = TargetCategory;
-
-    fn source_object(&self) -> &Rc<Self::SourceObject> {
+    fn source_object(&self) -> &Rc<SourceCategory> {
         &self.source_category
     }
 
-    fn target_object(&self) -> &Rc<Self::TargetObject> {
+    fn target_object(&self) -> &Rc<TargetCategory> {
         &self.target_category
     }
 
@@ -70,29 +111,31 @@ where
 
     fn compose(
         &self,
-        other: &impl ArrowTrait,
-    ) -> Result<Functor<Id, Self::SourceObject, Self::TargetObject>, Errors> {
+        other: &impl ArrowTrait<SourceCategory, TargetCategory>,
+    ) -> Result<Rc<Morphism<SourceCategory>>, Errors> {
         todo!()
     }
 
-    fn arrows(&self) -> Vec<&Functor<Id, Self::SourceObject, Self::TargetObject>> {
+    fn arrows(&self) -> Vec<&Morphism<SourceCategory>> {
         todo!()
     }
 }
 
-impl<Id, SourceCategory, TargetCategory> FunctorTrait
-    for Functor<Id, SourceCategory, TargetCategory>
+impl<SourceCategory: CategoryTrait, TargetCategory: CategoryTrait>
+    FunctorTrait<SourceCategory, TargetCategory> for Functor<SourceCategory, TargetCategory>
 where
-    Id: Identifier,
-    SourceCategory: CategoryTrait,
-    TargetCategory: CategoryTrait,
+    Morphism<<TargetCategory as CategoryTrait>::Object>: ArrowTrait<
+            <SourceCategory as CategoryTrait>::Object,
+            <SourceCategory as CategoryTrait>::Object,
+        >,
+    Morphism<SourceCategory>: ArrowTrait<SourceCategory, TargetCategory>,
 {
     fn new(
-        source_category: Rc<Self::SourceObject>,
-        target_category: Rc<Self::TargetObject>,
+        source_category: Rc<SourceCategory>,
+        target_category: Rc<TargetCategory>,
         mappings: HashMap<
-            Rc<MorphismAlias<Self::SourceObject>>,
-            Rc<MorphismAlias<Self::TargetObject>>,
+            Rc<Morphism<CategorySubObjectAlias<SourceCategory>>>,
+            Rc<Morphism<CategorySubObjectAlias<TargetCategory>>>,
         >,
     ) -> Result<Self, Errors>
     where
@@ -101,29 +144,47 @@ where
         todo!()
     }
 
-    fn arrow_mappings(
-        &self,
-    ) -> &HashMap<Rc<SourceCategory::Morphism>, Rc<TargetCategory::Morphism>> {
-        &self.mappings
-    }
-}
-
-impl<Id, SourceCategory, TargetCategory> CategoryTrait
-    for Functor<Id, SourceCategory, TargetCategory>
-where
-    Id: Identifier,
-    SourceCategory: CategoryTrait + Hash + Eq,
-    TargetCategory: CategoryTrait + Hash + Eq,
-{
-    type Id = Id;
-    type Object = TargetCategory;
-    type Morphism = Morphism<Id, Self::Object>;
-
-    fn new() -> Self {
+    fn source_category(&self) -> &Rc<SourceCategory> {
         todo!()
     }
 
-    fn category_id(&self) -> &Self::Id {
+    fn target_category(&self) -> &Rc<TargetCategory> {
+        todo!()
+    }
+
+    fn arrow_mappings(
+        &self,
+    ) -> &HashMap<
+        Rc<Morphism<CategorySubObjectAlias<SourceCategory>>>,
+        Rc<Morphism<CategorySubObjectAlias<TargetCategory>>>,
+    > {
+        todo!()
+        // &self.mappings
+    }
+}
+
+impl<
+    SourceCategory: CategoryTrait + Clone,
+    TargetCategory: CategoryTrait + Clone + Eq + Hash + Debug,
+> CategoryTrait for Functor<SourceCategory, TargetCategory>
+{
+    type Object = TargetCategory;
+
+    fn new() -> Self
+    where
+        Self: Sized,
+    {
+        todo!()
+    }
+
+    fn new_with_id(id: &ObjectId) -> Self
+    where
+        Self: Sized,
+    {
+        todo!()
+    }
+
+    fn category_id(&self) -> &ObjectId {
         &self.id
     }
 
@@ -133,8 +194,8 @@ where
 
     fn add_morphism(
         &mut self,
-        morphism: Rc<Self::Morphism>,
-    ) -> Result<&Rc<Self::Morphism>, Errors> {
+        morphism: Rc<Morphism<Self::Object>>,
+    ) -> Result<&Rc<Morphism<Self::Object>>, Errors> {
         todo!()
     }
 
@@ -146,34 +207,21 @@ where
         todo!()
     }
 
-    fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
+    fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Morphism<Self::Object>>>, Errors> {
         todo!()
     }
 
     fn get_hom_set_x(
         &self,
         source_object: &Self::Object,
-    ) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
+    ) -> Result<HashSet<&Rc<Morphism<Self::Object>>>, Errors> {
         todo!()
     }
 
     fn get_object_morphisms(
         &self,
-        object_id: &Self::Object,
-    ) -> Result<Vec<&Rc<Self::Morphism>>, Errors> {
+        object: &Self::Object,
+    ) -> Result<Vec<&Rc<Morphism<Self::Object>>>, Errors> {
         todo!()
-    }
-}
-
-impl<Id, SourceCategory, TargetCategory> Hash for Functor<Id, SourceCategory, TargetCategory>
-where
-    Id: Identifier,
-    SourceCategory: CategoryTrait + Hash + Eq,
-    TargetCategory: CategoryTrait + Hash + Eq,
-{
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.source_category.hash(state);
-        self.target_category.hash(state);
-        self.id.hash(state);
     }
 }

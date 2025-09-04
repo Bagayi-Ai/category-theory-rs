@@ -1,6 +1,7 @@
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
+use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
 use std::collections::{HashMap, HashSet};
@@ -8,24 +9,15 @@ use std::fmt::{Debug, Display};
 use std::hash::{Hash, Hasher};
 use std::rc::Rc;
 
-pub type DiscreteCategoryString = DiscreteCategory<String>;
-pub type DiscreteCategoryUsize = DiscreteCategory<usize>;
-
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct DiscreteCategory<T: Identifier> {
-    category_id: T,
+pub struct DiscreteCategory {
+    category_id: ObjectId,
     // TODO: Find a way of avoiding storing identity cells
     // as we could derive them from the objects.
-    cells: Option<HashMap<T, Rc<Morphism<T, Self>>>>,
+    cells: Option<HashMap<ObjectId, Rc<Morphism<Self>>>>,
 }
 
-impl<T: Identifier + Display> Display for DiscreteCategory<T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.category_id)
-    }
-}
-
-impl<T: Identifier> Hash for DiscreteCategory<T> {
+impl Hash for DiscreteCategory {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.category_id.hash(state);
         if let Some(cells) = &self.cells {
@@ -36,21 +28,21 @@ impl<T: Identifier> Hash for DiscreteCategory<T> {
     }
 }
 
-impl<T: Eq + Clone + Debug + Hash + Identifier> Default for DiscreteCategory<T> {
+impl Default for DiscreteCategory {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T: Eq + Clone + Debug + Hash + Identifier> DiscreteCategory<T> {
+impl DiscreteCategory {
     pub fn new() -> Self {
         DiscreteCategory {
-            category_id: T::generate(),
+            category_id: ObjectId::Str(String::generate()),
             cells: Some(HashMap::new()),
         }
     }
 
-    pub fn new_with_id(category_id: T) -> Self {
+    pub fn new_with_id(category_id: ObjectId) -> Self {
         DiscreteCategory {
             category_id,
             cells: None,
@@ -59,58 +51,64 @@ impl<T: Eq + Clone + Debug + Hash + Identifier> DiscreteCategory<T> {
 
     pub fn clone_with_new_id(&self) -> Self {
         Self {
-            category_id: T::generate(),
+            category_id: ObjectId::Str(String::generate()),
             cells: self.cells.clone(),
         }
     }
-    pub fn category_id(&self) -> &T {
+    pub fn category_id(&self) -> &ObjectId {
         &self.category_id
     }
 }
 
-impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTrait
-    for DiscreteCategory<T>
-{
-    type Id = T;
+impl CategoryTrait for DiscreteCategory {
     type Object = Self;
-    type Morphism = Morphism<T, Self::Object>;
 
     fn new() -> Self {
         DiscreteCategory::new()
     }
 
-    fn category_id(&self) -> &Self::Id {
+    fn new_with_id(id: &ObjectId) -> Self
+    where
+        Self: Sized,
+    {
+        DiscreteCategory::new_with_id(id.clone())
+    }
+
+    fn category_id(&self) -> &ObjectId {
         &self.category_id
     }
 
     fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors> {
         let identity_morphism = Morphism::new_identity_morphism(object.clone());
         if let Some(cells) = &mut self.cells {
-            if cells.contains_key(&object.category_id) {
+            if cells.contains_key(&object.category_id()) {
                 return Err(Errors::ObjectAlreadyExists);
             }
-            cells.insert(object.category_id.clone(), identity_morphism);
+            cells.insert(object.category_id().clone(), identity_morphism);
             Ok(())
         } else {
             self.cells = Some(HashMap::new());
             self.cells
                 .as_mut()
                 .unwrap()
-                .insert(object.category_id.clone(), identity_morphism);
+                .insert(object.category_id().clone(), identity_morphism);
             Ok(())
         }
     }
 
     fn add_morphism(
         &mut self,
-        morphism: Rc<Self::Morphism>,
-    ) -> Result<&Rc<Self::Morphism>, Errors> {
+        morphism: Rc<Morphism<Self::Object>>,
+    ) -> Result<&Rc<Morphism<Self::Object>>, Errors> {
         Err(Errors::CannotAddMorphismToDiscreteCategory)
     }
 
-    fn get_identity_morphism(&self, object: &Self::Object) -> Result<&Rc<Self::Morphism>, Errors> {
+    fn get_identity_morphism(
+        &self,
+        object: &Self::Object,
+    ) -> Result<&Rc<Morphism<Self::Object>>, Errors> {
         if let Some(cells) = &self.cells {
-            if let Some(cell) = cells.get(&object.category_id) {
+            if let Some(cell) = cells.get(&object.category_id()) {
                 return Ok(cell);
             }
         }
@@ -118,24 +116,35 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTra
     }
 
     fn get_object(&self, object: &Self::Object) -> Result<&Rc<Self::Object>, Errors> {
-        if let Some(cells) = &self.cells {
-            if let Some(cell) = cells.get(&object.category_id) {
-                return Ok(cell.source_object());
-            }
-        }
-        Err(Errors::ObjectNotFound)
+        // if let Some(cells) = &self.cells {
+        //     if let Some(cell) = cells.get(&object.category_id()) {
+        //         return Ok(cell.source_object());
+        //     }
+        // }
+        // Err(Errors::ObjectNotFound)
+        todo!()
     }
 
+    // fn get_all_objects(&self) -> Result<HashSet<&Rc<DiscreteCategory>>, Errors> {
+    //     let result = if let Some(cells) = &self.cells {
+    //         cells.values().map(|item| item.source_object()).collect()
+    //     } else {
+    //         HashSet::new()
+    //     };
+    //     Ok(result)
+    // }
+    // Rust
     fn get_all_objects(&self) -> Result<HashSet<&Rc<Self::Object>>, Errors> {
-        let result = if let Some(cells) = &self.cells {
-            cells.values().map(|item| item.source_object()).collect()
-        } else {
-            HashSet::new()
-        };
-        Ok(result)
+        // let result = if let Some(cells) = &self.cells {
+        //     cells.values().map(|item| item.source_object()).collect()
+        // } else {
+        //     Vec::new()
+        // };
+        // Ok(result)
+        todo!()
     }
 
-    fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
+    fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Morphism<Self::Object>>>, Errors> {
         let result = if let Some(cells) = &self.cells {
             cells.values().collect()
         } else {
@@ -147,7 +156,7 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTra
     fn get_hom_set_x(
         &self,
         source_object: &Self::Object,
-    ) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
+    ) -> Result<HashSet<&Rc<Morphism<Self::Object>>>, Errors> {
         // only one morphism in discrete category, the identity morphism.
         Ok(HashSet::from([self.get_identity_morphism(source_object)?]))
     }
@@ -155,7 +164,7 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTra
     fn get_object_morphisms(
         &self,
         object: &Self::Object,
-    ) -> Result<Vec<&Rc<Self::Morphism>>, Errors> {
+    ) -> Result<Vec<&Rc<Morphism<Self::Object>>>, Errors> {
         // only cell in discrete category is the identity cell.
         Ok(vec![self.get_identity_morphism(object)?])
     }
@@ -165,14 +174,14 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + ToString + Display> CategoryTra
     }
 }
 
-impl<T: Eq + Clone + Hash + Debug + Identifier + Display> From<T> for DiscreteCategory<T> {
-    fn from(object: T) -> Self {
+impl From<ObjectId> for DiscreteCategory {
+    fn from(object: ObjectId) -> Self {
         DiscreteCategory::new_with_id(object)
     }
 }
 
-impl<T: Eq + Clone + Hash + Debug + Identifier + Display> From<Vec<T>> for DiscreteCategory<T> {
-    fn from(objects: Vec<T>) -> Self {
+impl From<Vec<ObjectId>> for DiscreteCategory {
+    fn from(objects: Vec<ObjectId>) -> Self {
         let mut category = DiscreteCategory::new();
         for object in objects {
             let object = DiscreteCategory::new_with_id(object);
@@ -181,17 +190,34 @@ impl<T: Eq + Clone + Hash + Debug + Identifier + Display> From<Vec<T>> for Discr
         category
     }
 }
-impl From<&str> for DiscreteCategory<String> {
-    fn from(object: &str) -> Self {
-        DiscreteCategory::new_with_id(object.to_string())
+
+impl From<i32> for DiscreteCategory {
+    fn from(object: i32) -> Self {
+        DiscreteCategory::new_with_id(ObjectId::Int(object))
     }
 }
 
-impl From<Vec<&str>> for DiscreteCategory<String> {
+impl From<Vec<i32>> for DiscreteCategory {
+    fn from(objects: Vec<i32>) -> Self {
+        let mut category = DiscreteCategory::new();
+        for object in objects {
+            let object = DiscreteCategory::new_with_id(object.into());
+            category.add_object(Rc::new(object)).unwrap();
+        }
+        category
+    }
+}
+impl From<&str> for DiscreteCategory {
+    fn from(object: &str) -> Self {
+        DiscreteCategory::new_with_id(object.into())
+    }
+}
+
+impl From<Vec<&str>> for DiscreteCategory {
     fn from(objects: Vec<&str>) -> Self {
         let mut category = DiscreteCategory::new();
         for object in objects {
-            let object = DiscreteCategory::new_with_id(object.to_string());
+            let object = DiscreteCategory::new_with_id(object.into());
             category.add_object(Rc::new(object)).unwrap();
         }
         category
@@ -203,8 +229,10 @@ mod tests {
     use super::*;
     use crate::core::tests::ncategory_test_helper::*;
 
-    fn generate_morphism() -> Rc<DiscreteCategory<String>> {
-        Rc::new(DiscreteCategory::new_with_id(random_string(5)))
+    fn generate_morphism() -> Rc<DiscreteCategory> {
+        Rc::new(DiscreteCategory::new_with_id(ObjectId::Str(random_string(
+            5,
+        ))))
     }
 
     fn generate_identifier() -> String {
@@ -219,22 +247,22 @@ mod tests {
 
         category.add_object(object1.clone()).unwrap();
         // check identity morphism
-        let cell = category.get_object_morphisms(&object1);
+        let cell = category.get_object_morphisms(&*object1);
         assert!(cell.is_ok());
         let cell = cell.unwrap();
         assert_eq!(cell.len(), 1);
         let cell = cell.first().unwrap();
-        assert_eq!(cell.source_object(), &object1);
-        assert_eq!(cell.target_object(), &object1);
+        assert!(cell.source_object().equal_to(&*object1));
+        assert!(cell.target_object().equal_to(&*object1));
 
         // check identity morphism
-        let cell = category.get_object_morphisms(&object1);
+        let cell = category.get_object_morphisms(&*object1);
         assert!(cell.is_ok());
         let cell = cell.unwrap();
         assert_eq!(cell.len(), 1);
         let cell = cell.first().unwrap();
-        assert_eq!(cell.source_object(), &object1);
-        assert_eq!(cell.target_object(), &object1);
+        assert!(cell.source_object().equal_to(&*object1));
+        assert!(cell.target_object().equal_to(&*object1));
 
         // TODO: implement comparison of the object assert_eq!(category.get_object(&object1_id).unwrap(), &object);
 
@@ -243,25 +271,25 @@ mod tests {
         assert!(category.add_object(object2.clone()).is_ok());
 
         // check identity morphism
-        let cells = category.get_object_morphisms(&object2);
+        let cells = category.get_object_morphisms(&*object2);
         assert!(cells.is_ok());
         let cells = cells.unwrap();
         assert_eq!(cells.len(), 1);
         let cell = cells.first().unwrap();
-        assert_eq!(cell.source_object(), &object2);
-        assert_eq!(cell.target_object(), &object2);
+        assert!(cell.source_object().equal_to(&*object2));
+        assert!(cell.target_object().equal_to(&*object2));
 
         // add object 3 without id
         let object3 = generate_morphism();
         assert!(category.add_object(object3.clone()).is_ok());
 
         // check identity morphism
-        let cells = category.get_object_morphisms(&object3);
+        let cells = category.get_object_morphisms(&*object3);
         assert!(cells.is_ok());
         let cells = cells.unwrap();
         assert_eq!(cells.len(), 1);
         let cell = cells.first().unwrap();
-        assert_eq!(cell.source_object(), &object3);
-        assert_eq!(cell.target_object(), &object3);
+        assert!(cell.source_object().equal_to(&*object3));
+        assert!(cell.target_object().equal_to(&*object3));
     }
 }

@@ -1,21 +1,33 @@
 use crate::core::errors::Errors;
+use crate::core::morphism::Morphism;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::CategoryTrait;
-use crate::core::traits::category_trait::MorphismAlias;
+use crate::core::traits::category_trait::{CategorySubObjectAlias, CategoryTrait};
+use crate::core::traits::morphism_trait::MorphismTrait;
 use std::collections::HashMap;
 use std::rc::Rc;
 
-pub trait FunctorTrait: ArrowTrait {
+pub trait FunctorTrait<SourceCategory: CategoryTrait, TargetCategory: CategoryTrait>:
+    ArrowTrait<SourceCategory, TargetCategory>
+where
+    Morphism<<TargetCategory as CategoryTrait>::Object>: ArrowTrait<
+            <SourceCategory as CategoryTrait>::Object,
+            <SourceCategory as CategoryTrait>::Object,
+        >,
+{
     fn new(
-        source_category: Rc<Self::SourceObject>,
-        target_category: Rc<Self::TargetObject>,
+        source_category: Rc<SourceCategory>,
+        target_category: Rc<TargetCategory>,
         mappings: HashMap<
-            Rc<MorphismAlias<Self::SourceObject>>,
-            Rc<MorphismAlias<Self::TargetObject>>,
+            Rc<Morphism<CategorySubObjectAlias<SourceCategory>>>,
+            Rc<Morphism<CategorySubObjectAlias<TargetCategory>>>,
         >,
     ) -> Result<Self, Errors>
     where
         Self: Sized;
+
+    fn source_category(&self) -> &Rc<SourceCategory>;
+
+    fn target_category(&self) -> &Rc<TargetCategory>;
 
     fn validate_mappings(&self) -> Result<(), Errors> {
         /*
@@ -31,8 +43,10 @@ pub trait FunctorTrait: ArrowTrait {
 
         // start with checking if all objects in the source category have a corresponding object in the target category
         let mapping = self.arrow_mappings();
-        for source_object in self.source_object().get_all_objects()? {
-            let identity_morphism = self.source_object().get_identity_morphism(source_object)?;
+        for source_object in self.source_category().get_all_objects()? {
+            let identity_morphism = self
+                .source_category()
+                .get_identity_morphism(&**source_object)?;
 
             // a -> F(a)
             let mapped_identity_morphism =
@@ -43,7 +57,7 @@ pub trait FunctorTrait: ArrowTrait {
                     ))?;
 
             // now get the hom-set for the source object
-            let hom_set_x = self.source_object().get_hom_set_x(source_object)?;
+            let hom_set_x = self.source_category().get_hom_set_x(&**source_object)?;
 
             for morphism in hom_set_x {
                 if morphism.is_identity() {
@@ -76,7 +90,7 @@ pub trait FunctorTrait: ArrowTrait {
                     // a -> b -> F(b)
                     let second_path = morphism.compose(&**mapped_identity_target_morphism)?;
 
-                    first_path.validate_commutation(&second_path)?;
+                    first_path.validate_commutation(&*second_path)?;
                 }
             }
         }
@@ -85,5 +99,8 @@ pub trait FunctorTrait: ArrowTrait {
 
     fn arrow_mappings(
         &self,
-    ) -> &HashMap<Rc<MorphismAlias<Self::SourceObject>>, Rc<MorphismAlias<Self::TargetObject>>>;
+    ) -> &HashMap<
+        Rc<Morphism<CategorySubObjectAlias<SourceCategory>>>,
+        Rc<Morphism<CategorySubObjectAlias<TargetCategory>>>,
+    >;
 }

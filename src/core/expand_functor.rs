@@ -1,24 +1,24 @@
-use crate::core::discrete_category::DiscreteCategory;
 use crate::core::errors::Errors;
 use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::traits::category_trait::CategoryTrait;
 use std::collections::{HashMap, HashSet};
+use std::hash::Hash;
 use std::rc::Rc;
 
-pub fn expand_functor(
-    category: &Rc<DiscreteCategory<String>>,
-) -> Result<HashSet<Functor<String, DiscreteCategory<String>, DiscreteCategory<String>>>, Errors> {
+pub fn expand_functor<T: CategoryTrait<Object = T> + Eq + Hash>(
+    category: &Rc<T>,
+) -> Result<HashSet<Functor<T, T>>, Errors> {
     /*
     This expands each object in a category to its own object.
      */
-    let mut expanded_category = DiscreteCategory::new();
+    let mut expanded_category = category.new_instance();
     let mut object_mappings = HashMap::new();
     let mut max_functor = 0;
     for (index, object) in category.get_all_objects()?.into_iter().enumerate() {
         for sub_object in object.get_all_objects()? {
             let current_mapping = object_mappings.entry(object).or_insert_with(Vec::new);
-            match expanded_category.get_object(sub_object) {
+            match expanded_category.get_object(&**sub_object) {
                 Ok(_) => continue, // object already exists
                 Err(Errors::ObjectNotFound) => {
                     // object does not exist, we can add it

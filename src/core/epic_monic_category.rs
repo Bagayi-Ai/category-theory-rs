@@ -1,57 +1,65 @@
-use crate::core::category::Category;
 use crate::core::errors::Errors;
-use crate::core::identifier::Identifier;
 use crate::core::morphism::Morphism;
+use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::factorization_system_trait::FactorizationSystemTrait;
 use crate::core::traits::functor_trait::FunctorTrait;
 use crate::core::traits::morphism_trait::MorphismTrait;
+use crate::core::utils;
 use std::collections::{HashMap, HashSet};
 use std::hash::Hash;
 use std::rc::Rc;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct EpicMonicCategory<Id, Obj>
+pub struct EpicMonicCategory<InnerCategory>
 where
-    Id: Identifier<Id = Id>,
-    Obj: CategoryTrait<Object = Obj> + Hash + Eq,
+    InnerCategory: CategoryTrait + Hash + Eq,
 {
-    category: Category<Id, Obj>,
-    morphism_factors:
-        HashMap<Rc<Morphism<Id, Obj>>, (Rc<Morphism<Id, Obj>>, Rc<Morphism<Id, Obj>>)>,
+    category: InnerCategory,
+    morphism_factors: HashMap<
+        Rc<Morphism<InnerCategory::Object>>,
+        (
+            Rc<Morphism<InnerCategory::Object>>,
+            Rc<Morphism<InnerCategory::Object>>,
+        ),
+    >,
 }
 
-impl<Id, Obj> Default for EpicMonicCategory<Id, Obj>
+impl<InnerCategory> Default for EpicMonicCategory<InnerCategory>
 where
-    Id: Identifier<Id = Id>,
-    Obj: CategoryTrait<Object = Obj> + Hash + Eq,
+    InnerCategory: CategoryTrait + Hash + Eq + 'static,
 {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<Id, Obj> EpicMonicCategory<Id, Obj>
+impl<InnerCategory> EpicMonicCategory<InnerCategory>
 where
-    Id: Identifier<Id = Id>,
-    Obj: CategoryTrait<Object = Obj> + Hash + Eq,
+    InnerCategory: CategoryTrait + Hash + Eq + 'static,
 {
     pub fn new() -> Self {
         EpicMonicCategory {
-            category: Category::new(),
+            category: InnerCategory::new(),
             morphism_factors: HashMap::new(),
         }
     }
 
-    pub fn category(&self) -> &Category<Id, Obj> {
+    pub fn category(&self) -> &InnerCategory {
         &self.category
     }
 
     fn factorize(
         &mut self,
-        morphism: &Morphism<Id, Obj>,
-    ) -> Result<(Morphism<Id, Obj>, Morphism<Id, Obj>), Errors> {
+        morphism: &Morphism<InnerCategory::Object>,
+    ) -> Result<
+        (
+            Morphism<InnerCategory::Object>,
+            Morphism<InnerCategory::Object>,
+        ),
+        Errors,
+    > {
         // we factorize to image of f and from image of f to target object
         let source_object = morphism.source_object();
         let target_object = morphism.target_object();
@@ -59,7 +67,7 @@ where
 
         let mut all_target_objects = target_object.get_all_objects()?.clone();
 
-        let mut image_object = Obj::new();
+        let mut image_object = InnerCategory::Object::new();
         let mut image_mapping = HashMap::new();
         // possibility the target object is the image of source object
         let mut target_as_image = false;
@@ -79,8 +87,8 @@ where
                 }
 
                 // if object has already been added to image_object
-                if let Ok(object) = image_object.get_object(target_morphism.target_object()) {
-                    let target_morphism = image_object.get_identity_morphism(object)?;
+                if let Ok(object) = image_object.get_object(&**target_morphism.target_object()) {
+                    let target_morphism = image_object.get_identity_morphism(&**object)?;
                     image_mapping.insert((*source_morphism).clone(), target_morphism.clone());
                 } else {
                     image_object.add_object(target_morphism.target_object().clone())?;
@@ -90,14 +98,17 @@ where
                 panic!("to implement later")
             }
         }
-        let image_object = if target_as_image && !all_target_objects.is_empty() {
-            target_object.clone()
-        } else {
-            let result = Rc::new(image_object);
-            self.category.add_object(result.clone())?;
-            result
-        };
+        // let image_object = if target_as_image && !all_target_objects.is_empty() {
+        //     target_object.clone()
+        // } else {
+        //     let result = Rc::new(image_object);
+        //     self.category.add_object(result.clone())?;
+        //     result
+        // };
 
+        // add the image object to the category
+        let image_object = Rc::new(image_object);
+        self.category.add_object(image_object.clone())?;
         let epic_morphism =
             Morphism::new_with_mappings(source_object.clone(), image_object.clone(), image_mapping);
 
@@ -105,8 +116,8 @@ where
         let monic_mapping = {
             let mut monic_mapping = HashMap::new();
             for obj in image_object.get_all_objects()? {
-                let source_morphism = image_object.get_identity_morphism(obj)?;
-                let target_morphism = target_object.get_identity_morphism(obj)?;
+                let source_morphism = image_object.get_identity_morphism(&**obj)?;
+                let target_morphism = target_object.get_identity_morphism(&**obj)?;
                 monic_mapping.insert(source_morphism.clone(), target_morphism.clone());
             }
             monic_mapping
@@ -118,20 +129,25 @@ where
     }
 }
 
-impl<Id, Obj> CategoryTrait for EpicMonicCategory<Id, Obj>
+impl<InnerCategory> CategoryTrait for EpicMonicCategory<InnerCategory>
 where
-    Id: Identifier<Id = Id>,
-    Obj: CategoryTrait<Object = Obj> + Hash + Eq,
+    InnerCategory: CategoryTrait + Hash + Eq + Clone + 'static,
+    <InnerCategory as CategoryTrait>::Object: Clone,
 {
-    type Id = Id;
-    type Object = Obj;
-    type Morphism = Morphism<Id, Obj>;
+    type Object = InnerCategory::Object;
 
     fn new() -> Self {
         todo!()
     }
 
-    fn category_id(&self) -> &Self::Id {
+    fn new_with_id(id: &ObjectId) -> Self
+    where
+        Self: Sized,
+    {
+        todo!()
+    }
+
+    fn category_id(&self) -> &ObjectId {
         self.category.category_id()
     }
 
@@ -141,8 +157,8 @@ where
 
     fn add_morphism(
         &mut self,
-        morphism: Rc<Self::Morphism>,
-    ) -> Result<&Rc<Self::Morphism>, Errors> {
+        morphism: Rc<Morphism<InnerCategory::Object>>,
+    ) -> Result<&Rc<Morphism<InnerCategory::Object>>, Errors> {
         // here we need to factor it to epic and monic morphisms
         let (epic, monic) = self.factorize(&morphism)?;
         // self.hash_map.insert(morphism.id().clone(), (epic, monic));
@@ -159,43 +175,47 @@ where
         self.category.get_all_objects()
     }
 
-    fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
+    fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Morphism<InnerCategory::Object>>>, Errors> {
         self.category.get_all_morphisms()
     }
 
     fn get_hom_set_x(
         &self,
         source_object: &Self::Object,
-    ) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
+    ) -> Result<HashSet<&Rc<Morphism<InnerCategory::Object>>>, Errors> {
         self.category.get_hom_set_x(source_object)
     }
 
     fn get_object_morphisms(
         &self,
         object_id: &Self::Object,
-    ) -> Result<Vec<&Rc<Self::Morphism>>, Errors> {
+    ) -> Result<Vec<&Rc<Morphism<InnerCategory::Object>>>, Errors> {
         self.category.get_object_morphisms(object_id)
     }
 }
 
-impl<Id, Obj> FactorizationSystemTrait for EpicMonicCategory<Id, Obj>
+impl<InnerCategory> FactorizationSystemTrait for EpicMonicCategory<InnerCategory>
 where
-    Id: Identifier<Id = Id>,
-    Obj: CategoryTrait<Object = Obj> + Hash + Eq,
+    InnerCategory: CategoryTrait + Hash + Eq + Clone + 'static,
+    <InnerCategory as CategoryTrait>::Object: Clone,
 {
     fn morphism_factors(
         &self,
-        morphism: &Self::Morphism,
-    ) -> Result<&(Rc<Self::Morphism>, Rc<Self::Morphism>), Errors> {
+        morphism: &Morphism<InnerCategory::Object>,
+    ) -> Result<
+        &(
+            Rc<Morphism<InnerCategory::Object>>,
+            Rc<Morphism<InnerCategory::Object>>,
+        ),
+        Errors,
+    > {
         self.morphism_factors
             .get(morphism)
             .ok_or(Errors::InvalidFactorization)
     }
 }
 
-impl<Id: Identifier<Id = Id>, Object: CategoryTrait<Object = Object> + Hash + Eq> Hash
-    for EpicMonicCategory<Id, Object>
-{
+impl<Object: CategoryTrait + Hash + Eq> Hash for EpicMonicCategory<Object> {
     fn hash<H>(&self, state: &mut H)
     where
         H: std::hash::Hasher,

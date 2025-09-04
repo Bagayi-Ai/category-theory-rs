@@ -1,4 +1,6 @@
 use crate::core::errors::Errors;
+use crate::core::morphism::Morphism;
+use crate::core::object_id::ObjectId;
 use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::unit::unit_identifier::UnitIdentifier;
 use crate::core::unit::unit_morphism::UnitMorphism;
@@ -11,16 +13,23 @@ use std::rc::Rc;
 pub struct UnitCategory {}
 
 impl CategoryTrait for UnitCategory {
-    type Id = UnitIdentifier;
-    type Object = Self;
+    type Object = UnitCategory;
 
-    type Morphism = UnitMorphism<UnitIdentifier>;
-
-    fn new() -> Self {
-        UnitCategory {}
+    fn new() -> Self
+    where
+        Self: Sized,
+    {
+        todo!()
     }
 
-    fn category_id(&self) -> &Self::Id {
+    fn new_with_id(id: &ObjectId) -> Self
+    where
+        Self: Sized,
+    {
+        todo!()
+    }
+
+    fn category_id(&self) -> &ObjectId {
         todo!()
     }
 
@@ -28,14 +37,10 @@ impl CategoryTrait for UnitCategory {
         todo!()
     }
 
-    fn add_morphism(&mut self, cell: Rc<Self::Morphism>) -> Result<&Rc<Self::Morphism>, Errors> {
-        todo!()
-    }
-
-    fn get_identity_morphism(
-        &self,
-        object_id: &Self::Object,
-    ) -> Result<&Rc<Self::Morphism>, Errors> {
+    fn add_morphism(
+        &mut self,
+        morphism: Rc<Morphism<Self::Object>>,
+    ) -> Result<&Rc<Morphism<Self::Object>>, Errors> {
         todo!()
     }
 
@@ -47,21 +52,21 @@ impl CategoryTrait for UnitCategory {
         todo!()
     }
 
-    fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
+    fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Morphism<Self::Object>>>, Errors> {
         todo!()
     }
 
     fn get_hom_set_x(
         &self,
         source_object: &Self::Object,
-    ) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
+    ) -> Result<HashSet<&Rc<Morphism<Self::Object>>>, Errors> {
         todo!()
     }
 
     fn get_object_morphisms(
         &self,
-        object_id: &Self::Object,
-    ) -> Result<Vec<&Rc<Self::Morphism>>, Errors> {
+        object: &Self::Object,
+    ) -> Result<Vec<&Rc<Morphism<Self::Object>>>, Errors> {
         todo!()
     }
 

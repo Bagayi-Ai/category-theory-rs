@@ -24,4 +24,5 @@ pub enum Errors {
     IdentityMorphismNotFound,
     CategoryNotInitialized,
     InvalidDynamicType(String),
+    InvalidMorphismCoercion,
 }

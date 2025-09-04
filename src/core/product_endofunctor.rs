@@ -21,8 +21,8 @@ use std::hash::Hash;
 use std::rc::Rc;
 
 pub fn apply_product<
-    SourceCategory: CategoryTrait<Object = SourceCategory> + Eq + Hash,
-    FixedCategory: CategoryTrait<Object = FixedCategory>,
+    SourceCategory: CategoryTrait + Eq + Hash,
+    FixedCategory: CategoryTrait,
 >(
     source_category: Rc<SourceCategory>,
     fixed_category: Rc<FixedCategory>,
@@ -32,7 +32,7 @@ where
 {
     // we take a product of the source category and the fixed category
     // and map the objects and morphisms of the source category to the target category
-    let mut target_category = source_category.new_instance();
+    let mut target_category = SourceCategory::new();
 
     let fixed_objects = fixed_category.get_all_objects()?;
 
@@ -41,12 +41,12 @@ where
     // first map the objects from the source category to the target category
     for source_object in source_category.get_all_objects()? {
         let mut target_object =
-            Rc::new(source_category.new_instance_with_id(source_object.category_id()));
+            Rc::new(SourceCategory::Object::new_with_id(source_object.category_id()));
         for fixed_object in &fixed_objects {
             // product object (_) * fixed_object
             let new_value = (*source_object.clone()).category_id().to_owned()
                 + (*fixed_object).clone().category_id().clone();
-            let new_category = source_category.new_instance_with_id(&new_value);
+            let new_category = <SourceCategory::Object as CategoryTrait>::Object::new_with_id(&new_value);
             Rc::get_mut(&mut target_object)
                 .ok_or(Errors::ObjectNotFound)?
                 .add_object(Rc::new(new_category))?;

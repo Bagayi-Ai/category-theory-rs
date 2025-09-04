@@ -12,9 +12,9 @@ use std::hash::Hash;
 use std::rc::Rc;
 
 pub type CategorySubObjectAlias<Category> = <Category as CategoryTrait>::Object;
-pub enum MorphismCommutationResult<Object: CategoryTrait> {
+pub enum MorphismCommutationResult<Category: CategoryTrait> {
     Commutative,
-    NonCommutative(HashSet<Morphism<Object>>),
+    NonCommutative(HashSet<Morphism<Category::Object>>),
 }
 
 pub trait CategoryTrait: Debug + DynClone + Any {

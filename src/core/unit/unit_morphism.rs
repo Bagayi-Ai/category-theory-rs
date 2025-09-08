@@ -27,20 +27,17 @@ impl<T: Identifier> ArrowTrait<UnitCategory, UnitCategory> for UnitMorphism<T> {
         todo!()
     }
 
-    fn compose(
-        &self,
-        other: &impl ArrowTrait<UnitCategory, UnitCategory>,
-    ) -> Result<Rc<UnitMorphism<T>>, Errors> {
+    fn compose(&self, other: &dyn ArrowTrait<UnitCategory, UnitCategory>) -> Result<Rc<dyn ArrowTrait<UnitCategory, UnitCategory>>, Errors> {
         todo!()
     }
 
-    fn arrows(&self) -> Vec<&UnitMorphism<T>> {
+    fn arrows(&self) -> Vec<&dyn ArrowTrait<UnitCategory, UnitCategory>> {
         todo!()
     }
 }
 
 impl<T: Identifier> MorphismTrait<UnitCategory> for UnitMorphism<T> {
-    fn functor(&self) -> Result<&Rc<UnitMorphism<T>>, Errors> {
+    fn functor(&self) -> Result<&Rc<dyn FunctorTrait<UnitCategory, UnitCategory>>, Errors> {
         todo!()
     }
 }

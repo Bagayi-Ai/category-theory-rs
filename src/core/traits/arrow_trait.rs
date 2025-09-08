@@ -9,14 +9,18 @@ pub trait ArrowTrait<SourceObject: CategoryTrait, TargetObject: CategoryTrait> {
 
     fn is_identity(&self) -> bool;
 
+    fn arrow_id(&self) -> String {
+        todo!()
+    }
+
     fn compose(
         &self,
-        other: &impl ArrowTrait<SourceObject, TargetObject>,
-    ) -> Result<Rc<impl ArrowTrait<SourceObject, TargetObject>>, Errors>;
+        other: &dyn ArrowTrait<SourceObject, TargetObject>,
+    ) -> Result<Rc<dyn ArrowTrait<SourceObject, TargetObject>>, Errors>;
 
     // for handling composition of arrows
     // for single arrow just return itself
-    fn arrows(&self) -> Vec<&impl ArrowTrait<SourceObject, TargetObject>>;
+    fn arrows(&self) -> Vec<&dyn ArrowTrait<SourceObject, TargetObject>>;
 
     fn validate_composition(&self) -> Result<(), Errors> {
         todo!()
@@ -24,7 +28,7 @@ pub trait ArrowTrait<SourceObject: CategoryTrait, TargetObject: CategoryTrait> {
 
     fn validate_commutation(
         &self,
-        other: &impl ArrowTrait<SourceObject, TargetObject>,
+        other: &dyn ArrowTrait<SourceObject, TargetObject>,
     ) -> Result<(), Errors> {
         todo!()
     }

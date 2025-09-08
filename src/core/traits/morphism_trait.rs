@@ -5,5 +5,5 @@ use crate::core::traits::functor_trait::FunctorTrait;
 use std::rc::Rc;
 
 pub trait MorphismTrait<Object: CategoryTrait>: ArrowTrait<Object, Object> {
-    fn functor(&self) -> Result<&Rc<impl FunctorTrait<Object, Object>>, Errors>;
+    fn functor(&self) -> Result<&Rc<dyn FunctorTrait<Object, Object>>, Errors>;
 }

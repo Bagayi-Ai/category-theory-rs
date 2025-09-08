@@ -16,9 +16,9 @@ pub struct Functor<SourceCategory: CategoryTrait, TargetCategory: CategoryTrait>
     id: ObjectId,
     source_category: Rc<SourceCategory>,
     target_category: Rc<TargetCategory>,
-    mappings: HashMap<String, String>,
-    source_morphisms: HashMap<String, Weak<Morphism<CategorySubObjectAlias<SourceCategory>>>>,
-    target_morphisms: HashMap<String, Weak<Morphism<CategorySubObjectAlias<TargetCategory>>>>,
+    mappings: HashMap<
+        Rc<Morphism<CategorySubObjectAlias<SourceCategory>>>,
+        Rc<Morphism<CategorySubObjectAlias<TargetCategory>>>>,
 }
 
 impl<SourceCategory: CategoryTrait, TargetCategory: CategoryTrait> Debug
@@ -64,28 +64,16 @@ impl<SourceCategory: CategoryTrait, TargetCategory: CategoryTrait>
         id: String,
         source_category: Rc<SourceCategory>,
         target_category: Rc<TargetCategory>,
-        morphism_mapping: HashMap<
+        mappings: HashMap<
             Rc<Morphism<CategorySubObjectAlias<SourceCategory>>>,
             Rc<Morphism<CategorySubObjectAlias<TargetCategory>>>,
         >,
     ) -> Self {
-        let mut mappings = HashMap::new();
-        let mut source_morphisms = HashMap::new();
-        let mut target_morphisms = HashMap::new();
-
-        for (source_morphism, target_morphism) in morphism_mapping.iter() {
-            mappings.insert(source_morphism.id().clone(), target_morphism.id().clone());
-            source_morphisms.insert(source_morphism.id().clone(), Rc::downgrade(source_morphism));
-            target_morphisms.insert(target_morphism.id().clone(), Rc::downgrade(target_morphism));
-        }
-
         Functor {
             id: ObjectId::Str(id),
             source_category,
             target_category,
             mappings,
-            source_morphisms,
-            target_morphisms,
         }
     }
 
@@ -117,12 +105,12 @@ where
 
     fn compose(
         &self,
-        other: &impl ArrowTrait<SourceCategory, TargetCategory>,
-    ) -> Result<Rc<Morphism<SourceCategory>>, Errors> {
+        other: &dyn ArrowTrait<SourceCategory, TargetCategory>,
+    ) -> Result<Rc<dyn ArrowTrait<SourceCategory, TargetCategory>>, Errors> {
         todo!()
     }
 
-    fn arrows(&self) -> Vec<&Morphism<SourceCategory>> {
+    fn arrows(&self) -> Vec<&dyn ArrowTrait<SourceCategory, TargetCategory>> {
         todo!()
     }
 }
@@ -164,20 +152,7 @@ where
         Rc<Morphism<CategorySubObjectAlias<SourceCategory>>>,
         Rc<Morphism<CategorySubObjectAlias<TargetCategory>>>,
     > {
-        // self.mappings.iter().map(|item| {
-        //     let source_morphism = self
-        //         .source_morphisms
-        //         .get(item.0)
-        //         .and_then(|weak| weak.upgrade())
-        //         .or_else(self.source_category)
-        //     let target_morphism = self
-        //         .target_morphisms
-        //         .get(item.1)
-        //         .and_then(|weak| weak.upgrade())
-        //         .expect("Target morphism not found");
-        //     (source_morphism, target_morphism)
-        // }).collect()
-        todo!()
+        &self.mappings
     }
 }
 

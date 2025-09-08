@@ -25,4 +25,5 @@ pub enum Errors {
     CategoryNotInitialized,
     InvalidDynamicType(String),
     InvalidMorphismCoercion,
+    ConversionError,
 }

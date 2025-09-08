@@ -20,10 +20,7 @@ use std::collections::HashMap;
 use std::hash::Hash;
 use std::rc::Rc;
 
-pub fn apply_product<
-    SourceCategory: CategoryTrait + Eq + Hash,
-    FixedCategory: CategoryTrait,
->(
+pub fn apply_product<SourceCategory: CategoryTrait + Eq + Hash, FixedCategory: CategoryTrait>(
     source_category: Rc<SourceCategory>,
     fixed_category: Rc<FixedCategory>,
 ) -> Result<Rc<Functor<SourceCategory, SourceCategory>>, Errors>
@@ -40,13 +37,15 @@ where
 
     // first map the objects from the source category to the target category
     for source_object in source_category.get_all_objects()? {
-        let mut target_object =
-            Rc::new(SourceCategory::Object::new_with_id(source_object.category_id()));
+        let mut target_object = Rc::new(SourceCategory::Object::new_with_id(
+            source_object.category_id(),
+        ));
         for fixed_object in &fixed_objects {
             // product object (_) * fixed_object
             let new_value = (*source_object.clone()).category_id().to_owned()
                 + (*fixed_object).clone().category_id().clone();
-            let new_category = <SourceCategory::Object as CategoryTrait>::Object::new_with_id(&new_value);
+            let new_category =
+                <SourceCategory::Object as CategoryTrait>::Object::new_with_id(&new_value);
             Rc::get_mut(&mut target_object)
                 .ok_or(Errors::ObjectNotFound)?
                 .add_object(Rc::new(new_category))?;

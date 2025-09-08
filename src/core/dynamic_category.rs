@@ -251,6 +251,12 @@ where
     }
 }
 
+impl From<Rc<DynamicCategory>> for DynamicCategory {
+    fn from(rc: Rc<DynamicCategory>) -> Self {
+        (*rc).clone()
+    }
+}
+
 impl From<Vec<Rc<DynamicCategory>>> for DynamicCategory {
     fn from(value: Vec<Rc<DynamicCategory>>) -> Self {
         let mut category = DynamicCategory::new();

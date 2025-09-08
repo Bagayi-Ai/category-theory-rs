@@ -25,8 +25,14 @@ impl<SourceCategory: CategoryTrait, TargetCategory: CategoryTrait> Debug
     for Functor<SourceCategory, TargetCategory>
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        todo!()
-        // write!(f, "Functor {{ id: {}, source_category: {:?}, target_category: {:?}, mappings: {:?} }}", self.id, self.source_category.category_id(), self.target_category.category_id(), self.mappings)
+        write!(
+            f,
+            "Functor {{ id: {}, source_category: {:?}, target_category: {:?}, mappings: {:?} }}",
+            self.id,
+            self.source_category.category_id(),
+            self.target_category.category_id(),
+            self.mappings
+        )
     }
 }
 
@@ -158,8 +164,20 @@ where
         Rc<Morphism<CategorySubObjectAlias<SourceCategory>>>,
         Rc<Morphism<CategorySubObjectAlias<TargetCategory>>>,
     > {
+        // self.mappings.iter().map(|item| {
+        //     let source_morphism = self
+        //         .source_morphisms
+        //         .get(item.0)
+        //         .and_then(|weak| weak.upgrade())
+        //         .or_else(self.source_category)
+        //     let target_morphism = self
+        //         .target_morphisms
+        //         .get(item.1)
+        //         .and_then(|weak| weak.upgrade())
+        //         .expect("Target morphism not found");
+        //     (source_morphism, target_morphism)
+        // }).collect()
         todo!()
-        // &self.mappings
     }
 }
 

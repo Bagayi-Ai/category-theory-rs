@@ -1,3 +1,4 @@
+use crate::core::arrow::{Arrow, Morphism};
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::object_id::ObjectId;
@@ -8,7 +9,6 @@ use std::collections::HashSet;
 use std::fmt::Debug;
 use std::hash::Hash;
 use std::rc::Rc;
-use crate::core::arrow::{Arrow, Morphism};
 
 pub type CategorySubObjectAlias<Category> = <Category as CategoryTrait>::Object;
 pub enum MorphismCommutationResult<Category: CategoryTrait> {
@@ -58,15 +58,10 @@ pub trait CategoryTrait: Debug + Any + DynClone {
 
     fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors>;
 
-    fn add_morphism(
-        &mut self,
-        morphism: Rc<Self::Morphism>,
-    ) -> Result<&Rc<Self::Morphism>, Errors>;
+    fn add_morphism(&mut self, morphism: Rc<Self::Morphism>)
+    -> Result<&Rc<Self::Morphism>, Errors>;
 
-    fn get_identity_morphism(
-        &self,
-        object: &Self::Object,
-    ) -> Result<&Rc<Self::Morphism>, Errors> {
+    fn get_identity_morphism(&self, object: &Self::Object) -> Result<&Rc<Self::Morphism>, Errors> {
         let hom_set = self.get_hom_set(object, object)?;
         // get the identity morphism
         for morphism in hom_set {
@@ -168,10 +163,7 @@ pub trait CategoryTrait: Debug + Any + DynClone {
         // todo!()
     }
 
-    fn validate_morphisms_composition(
-        &self,
-        morphims: Vec<&Self::Morphism>,
-    ) -> Result<(), Errors> {
+    fn validate_morphisms_composition(&self, morphims: Vec<&Self::Morphism>) -> Result<(), Errors> {
         // if morphims.is_empty() {
         //     return Err(NCategoryError::InvalidMorphismComposition);
         // }

@@ -1,13 +1,12 @@
+use crate::core::errors::Errors;
+use crate::core::traits::category_trait::{CategorySubObjectAlias, CategoryTrait};
 use std::borrow::Borrow;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::hash::Hash;
-use crate::core::errors::Errors;
-use crate::core::traits::category_trait::{CategorySubObjectAlias, CategoryTrait};
 use std::rc::Rc;
 
-pub trait ArrowTrait<SourceObject: CategoryTrait, TargetObject: CategoryTrait>: Eq + Hash
-{
+pub trait ArrowTrait<SourceObject: CategoryTrait, TargetObject: CategoryTrait>: Eq + Hash {
     fn source_object(&self) -> &Rc<SourceObject>;
 
     fn target_object(&self) -> &Rc<TargetObject>;
@@ -25,12 +24,7 @@ pub trait ArrowTrait<SourceObject: CategoryTrait, TargetObject: CategoryTrait>: 
     // for single arrow just return itself
     fn arrows(&self) -> Vec<&impl ArrowTrait<SourceObject, TargetObject>>;
 
-    fn arrow_mappings(
-        &self,
-    ) -> &HashMap<
-        Rc<SourceObject::Morphism>,
-        Rc<TargetObject::Morphism>,
-    >;
+    fn arrow_mappings(&self) -> &HashMap<Rc<SourceObject::Morphism>, Rc<TargetObject::Morphism>>;
 
     fn validate_composition(&self) -> Result<(), Errors> {
         todo!()
@@ -49,4 +43,3 @@ pub trait ArrowTrait<SourceObject: CategoryTrait, TargetObject: CategoryTrait>: 
         todo!()
     }
 }
-

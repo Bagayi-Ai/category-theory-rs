@@ -1,7 +1,7 @@
+use crate::core::arrow::{Arrow, Functor, Morphism};
 use crate::core::base_category::*;
 use crate::core::discrete_category::DiscreteCategory;
 use crate::core::dynamic_category::DynamicCategory;
-use crate::core::arrow::{Arrow, Morphism, Functor};
 use crate::core::identifier::Identifier;
 use crate::core::object_id::ObjectId;
 use crate::core::tests::ncategory_test_helper::*;

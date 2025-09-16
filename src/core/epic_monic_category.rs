@@ -1,5 +1,5 @@
+use crate::core::arrow::{Arrow, Functor, Morphism};
 use crate::core::errors::Errors;
-use crate::core::arrow::{Arrow, Morphism, Functor};
 use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
@@ -130,7 +130,15 @@ where
 
 impl<InnerCategory> CategoryTrait for EpicMonicCategory<InnerCategory>
 where
-    InnerCategory: CategoryTrait<Morphism = Arrow<<InnerCategory as CategoryTrait>::Object, <InnerCategory as CategoryTrait>::Object>> + Hash + Eq + Clone + 'static,
+    InnerCategory: CategoryTrait<
+            Morphism = Arrow<
+                <InnerCategory as CategoryTrait>::Object,
+                <InnerCategory as CategoryTrait>::Object,
+            >,
+        > + Hash
+        + Eq
+        + Clone
+        + 'static,
     <InnerCategory as CategoryTrait>::Object: Clone,
 {
     type Object = InnerCategory::Object;
@@ -197,7 +205,15 @@ where
 
 impl<InnerCategory> FactorizationSystemTrait for EpicMonicCategory<InnerCategory>
 where
-    InnerCategory: CategoryTrait<Morphism = Arrow<<InnerCategory as CategoryTrait>::Object, <InnerCategory as CategoryTrait>::Object>> + Hash + Eq + Clone + 'static,
+    InnerCategory: CategoryTrait<
+            Morphism = Arrow<
+                <InnerCategory as CategoryTrait>::Object,
+                <InnerCategory as CategoryTrait>::Object,
+            >,
+        > + Hash
+        + Eq
+        + Clone
+        + 'static,
     <InnerCategory as CategoryTrait>::Object: Clone,
 {
     fn morphism_factors(
@@ -225,17 +241,15 @@ impl<Object: CategoryTrait + Hash + Eq> Hash for EpicMonicCategory<Object> {
     }
 }
 
-
 mod tests {
     use super::*;
     use crate::core::base_category::BaseCategory;
-    use std::rc::Rc;
     use crate::core::dynamic_category::DynamicCategory;
+    use std::rc::Rc;
 
     #[test]
     fn test_epic_monic_category() {
-        let mut epic_monic_category =
-            EpicMonicCategory::<DynamicCategory>::new();
+        let mut epic_monic_category = EpicMonicCategory::<DynamicCategory>::new();
 
         let object_ab: Rc<DynamicCategory> = Rc::new(vec!["a", "b"].into());
 

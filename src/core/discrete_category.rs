@@ -1,9 +1,9 @@
+use crate::core::arrow::{Arrow, Functor, Morphism};
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
-use crate::core::arrow::{Arrow, Morphism, Functor};
 use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Display};
 use std::hash::{Hash, Hasher};

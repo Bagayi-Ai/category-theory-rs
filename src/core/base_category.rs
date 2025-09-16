@@ -1,15 +1,15 @@
+use crate::core::arrow::{Arrow, Functor, Morphism};
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
-use crate::core::arrow::{Arrow, Morphism, Functor};
 use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
+use dyn_clone::DynClone;
 use std::borrow::Borrow;
 use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Formatter};
 use std::hash::Hash;
 use std::rc::Rc;
-use dyn_clone::DynClone;
 
 #[derive(Clone, PartialEq, Eq)]
 pub struct BaseCategory<Object: CategoryTrait> {
@@ -59,7 +59,9 @@ impl<Object: CategoryTrait> BaseCategory<Object> {
     }
 }
 
-impl<Object: CategoryTrait + Hash + Eq + DynClone + std::clone::Clone> CategoryTrait for BaseCategory<Object> {
+impl<Object: CategoryTrait + Hash + Eq + DynClone + std::clone::Clone> CategoryTrait
+    for BaseCategory<Object>
+{
     type Object = Object;
 
     type Morphism = Morphism<Self::Object>;

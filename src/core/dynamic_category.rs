@@ -1,9 +1,10 @@
+use crate::core::arrow::{Arrow, Functor, Morphism};
 use crate::core::base_category::BaseCategory;
 use crate::core::epic_monic_category::EpicMonicCategory;
 use crate::core::errors::Errors;
-use crate::core::arrow::{Arrow, Morphism, Functor};
 use crate::core::identifier::Identifier;
 use crate::core::object_id::ObjectId;
+use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::{CategorySubObjectAlias, CategoryTrait};
 use crate::core::traits::factorization_system_trait::FactorizationSystemTrait;
 use std::any::Any;
@@ -11,7 +12,6 @@ use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Formatter};
 use std::hash::{Hash, Hasher};
 use std::rc::Rc;
-use crate::core::traits::arrow_trait::ArrowTrait;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DynamicType {
@@ -21,8 +21,17 @@ pub enum DynamicType {
 }
 
 pub enum DynamicCategoryEnum {
-    Category(Box<dyn CategoryTrait<Object = DynamicCategory, Morphism = Morphism<DynamicCategory>>>),
-    EpicMonicCategory(Box<dyn FactorizationSystemTrait<Object = DynamicCategory, Morphism = Morphism<DynamicCategory>>>),
+    Category(
+        Box<dyn CategoryTrait<Object = DynamicCategory, Morphism = Morphism<DynamicCategory>>>,
+    ),
+    EpicMonicCategory(
+        Box<
+            dyn FactorizationSystemTrait<
+                    Object = DynamicCategory,
+                    Morphism = Morphism<DynamicCategory>,
+                >,
+        >,
+    ),
 }
 
 impl Clone for DynamicCategoryEnum {
@@ -112,14 +121,19 @@ impl DynamicCategory {
         &self.dynamic_type
     }
 
-    pub fn inner_category(&self) -> &dyn CategoryTrait<Object = DynamicCategory, Morphism = Morphism<DynamicCategory>> {
+    pub fn inner_category(
+        &self,
+    ) -> &dyn CategoryTrait<Object = DynamicCategory, Morphism = Morphism<DynamicCategory>> {
         match &self.inner_category {
             DynamicCategoryEnum::Category(cat) => cat.as_ref(),
             DynamicCategoryEnum::EpicMonicCategory(cat) => cat.as_ref(),
         }
     }
 
-    pub fn inner_category_mut(&mut self) -> &mut dyn CategoryTrait<Object = DynamicCategory, Morphism = Morphism<DynamicCategory>> {
+    pub fn inner_category_mut(
+        &mut self,
+    ) -> &mut dyn CategoryTrait<Object = DynamicCategory, Morphism = Morphism<DynamicCategory>>
+    {
         match &mut self.inner_category {
             DynamicCategoryEnum::Category(cat) => cat.as_mut(),
             DynamicCategoryEnum::EpicMonicCategory(cat) => cat.as_mut(),
@@ -128,7 +142,12 @@ impl DynamicCategory {
 
     pub fn inner_factorization_system(
         &self,
-    ) -> Option<&dyn FactorizationSystemTrait<Object = DynamicCategory, Morphism = Morphism<DynamicCategory>>> {
+    ) -> Option<
+        &dyn FactorizationSystemTrait<
+            Object = DynamicCategory,
+            Morphism = Morphism<DynamicCategory>,
+        >,
+    > {
         match &self.inner_category {
             DynamicCategoryEnum::EpicMonicCategory(cat) => Some(cat.as_ref()),
             _ => None,

@@ -1,8 +1,8 @@
-use std::collections::HashMap;
+use crate::core::arrow::{Arrow, Functor, Morphism};
 use crate::core::dynamic_category::DynamicCategory;
-use crate::core::arrow::{Arrow, Morphism, Functor};
 use crate::core::object_id::ObjectId;
 use crate::core::traits::category_trait::CategoryTrait;
+use std::collections::HashMap;
 use std::rc::Rc;
 
 #[test]
@@ -198,7 +198,7 @@ pub fn test_base_scenario() {
                 .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Int(1)))
                 .unwrap()
                 .clone(),
-        )
+        ),
     ]);
 
     let morphism_a_num_2 = Morphism::new(

@@ -1,9 +1,9 @@
+use crate::core::arrow::{Arrow, Functor, Morphism};
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::unit::unit_category::UnitCategory;
-use crate::core::arrow::{Arrow, Morphism, Functor};
 use std::collections::HashMap;
 use std::rc::Rc;
 
@@ -29,7 +29,10 @@ impl<T: Identifier> ArrowTrait<UnitCategory, UnitCategory> for UnitMorphism<T> {
         todo!()
     }
 
-    fn compose(&self, other: &impl ArrowTrait<UnitCategory, UnitCategory>) -> Result<Rc<UnitMorphism<T>>, Errors> {
+    fn compose(
+        &self,
+        other: &impl ArrowTrait<UnitCategory, UnitCategory>,
+    ) -> Result<Rc<UnitMorphism<T>>, Errors> {
         todo!()
     }
 
@@ -37,7 +40,12 @@ impl<T: Identifier> ArrowTrait<UnitCategory, UnitCategory> for UnitMorphism<T> {
         todo!()
     }
 
-    fn arrow_mappings(&self) -> &HashMap<Rc<<UnitCategory as CategoryTrait>::Morphism>, Rc<<UnitCategory as CategoryTrait>::Morphism>> {
+    fn arrow_mappings(
+        &self,
+    ) -> &HashMap<
+        Rc<<UnitCategory as CategoryTrait>::Morphism>,
+        Rc<<UnitCategory as CategoryTrait>::Morphism>,
+    > {
         todo!()
     }
 

@@ -1,18 +1,17 @@
+use crate::core::errors::Errors;
+use crate::core::identifier::Identifier;
+use crate::core::object_id::ObjectId;
+use crate::core::traits::arrow_trait::ArrowTrait;
+use crate::core::traits::category_trait::{CategorySubObjectAlias, CategoryTrait};
+use dyn_clone::DynClone;
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 use std::rc::Rc;
-use dyn_clone::DynClone;
-use crate::core::errors::Errors;
-use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::{CategorySubObjectAlias, CategoryTrait};
-use crate::core::identifier::Identifier;
-use crate::core::object_id::ObjectId;
 
 pub type Morphism<Object: CategoryTrait> = Arrow<Object, Object>;
 
-pub type Functor<SourceCategory, TargetCategory> =
-    Arrow<SourceCategory, TargetCategory>;
+pub type Functor<SourceCategory, TargetCategory> = Arrow<SourceCategory, TargetCategory>;
 
 #[derive(Clone)]
 pub struct Arrow<SourceObject: CategoryTrait, TargetObject: CategoryTrait> {
@@ -27,7 +26,9 @@ pub struct Arrow<SourceObject: CategoryTrait, TargetObject: CategoryTrait> {
     is_identity: bool,
 }
 
-impl <SourceObject: CategoryTrait, TargetObject: CategoryTrait> Debug for Arrow<SourceObject, TargetObject> {
+impl<SourceObject: CategoryTrait, TargetObject: CategoryTrait> Debug
+    for Arrow<SourceObject, TargetObject>
+{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Arrow")
             .field("id", &self.id)
@@ -36,10 +37,11 @@ impl <SourceObject: CategoryTrait, TargetObject: CategoryTrait> Debug for Arrow<
             .field("is_identity", &self.is_identity)
             .finish()
     }
-
 }
 
-impl <SourceObject: CategoryTrait, TargetObject: CategoryTrait> Hash for Arrow<SourceObject, TargetObject>{
+impl<SourceObject: CategoryTrait, TargetObject: CategoryTrait> Hash
+    for Arrow<SourceObject, TargetObject>
+{
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.id.hash(state);
         Rc::as_ptr(&self.source_object).hash(state);
@@ -49,8 +51,9 @@ impl <SourceObject: CategoryTrait, TargetObject: CategoryTrait> Hash for Arrow<S
     }
 }
 
-
-impl <SourceObject: CategoryTrait, TargetObject: CategoryTrait> PartialEq for Arrow<SourceObject, TargetObject>{
+impl<SourceObject: CategoryTrait, TargetObject: CategoryTrait> PartialEq
+    for Arrow<SourceObject, TargetObject>
+{
     fn eq(&self, other: &Self) -> bool {
         self.id == other.id
             && Rc::ptr_eq(&self.source_object, &other.source_object)
@@ -60,16 +63,15 @@ impl <SourceObject: CategoryTrait, TargetObject: CategoryTrait> PartialEq for Ar
     }
 }
 
-impl <SourceObject: CategoryTrait, TargetObject: CategoryTrait> Eq for Arrow<SourceObject, TargetObject>{}
+impl<SourceObject: CategoryTrait, TargetObject: CategoryTrait> Eq
+    for Arrow<SourceObject, TargetObject>
+{
+}
 
-
-impl <Object: CategoryTrait> Arrow<Object, Object> {
-    pub fn new_identity(
-        object: Rc<Object>,
-    ) -> Rc<Self> {
-        Rc::new(
-            Arrow {
-                id: String::generate(),
+impl<Object: CategoryTrait> Arrow<Object, Object> {
+    pub fn new_identity(object: Rc<Object>) -> Rc<Self> {
+        Rc::new(Arrow {
+            id: String::generate(),
             source_object: object.clone(),
             target_object: object,
             mappings: HashMap::new(),
@@ -77,15 +79,12 @@ impl <Object: CategoryTrait> Arrow<Object, Object> {
         })
     }
 }
-impl <SourceObject: CategoryTrait, TargetObject: CategoryTrait> Arrow<SourceObject, TargetObject> {
+impl<SourceObject: CategoryTrait, TargetObject: CategoryTrait> Arrow<SourceObject, TargetObject> {
     pub fn new(
         id: String,
         source_object: Rc<SourceObject>,
         target_object: Rc<TargetObject>,
-        mappings: HashMap<
-            Rc<SourceObject::Morphism>,
-            Rc<TargetObject::Morphism>,
-        >,
+        mappings: HashMap<Rc<SourceObject::Morphism>, Rc<TargetObject::Morphism>>,
     ) -> Self {
         Arrow {
             id,
@@ -99,10 +98,7 @@ impl <SourceObject: CategoryTrait, TargetObject: CategoryTrait> Arrow<SourceObje
     pub fn new_with_mappings(
         source_object: Rc<SourceObject>,
         target_object: Rc<TargetObject>,
-        mappings: HashMap<
-            Rc<SourceObject::Morphism>,
-            Rc<TargetObject::Morphism>,
-        >,
+        mappings: HashMap<Rc<SourceObject::Morphism>, Rc<TargetObject::Morphism>>,
     ) -> Self {
         Arrow {
             id: String::generate(),
@@ -114,8 +110,8 @@ impl <SourceObject: CategoryTrait, TargetObject: CategoryTrait> Arrow<SourceObje
     }
 }
 
-impl <SourceObject,TargetObject> ArrowTrait<SourceObject, TargetObject>
-for Arrow<SourceObject, TargetObject>
+impl<SourceObject, TargetObject> ArrowTrait<SourceObject, TargetObject>
+    for Arrow<SourceObject, TargetObject>
 where
     SourceObject: CategoryTrait,
     TargetObject: CategoryTrait,
@@ -143,16 +139,11 @@ where
         todo!()
     }
 
-    fn arrows(&self) -> Vec<&Arrow<SourceObject, TargetObject>>{
+    fn arrows(&self) -> Vec<&Arrow<SourceObject, TargetObject>> {
         todo!()
     }
 
-    fn arrow_mappings(
-        &self,
-    ) -> &HashMap<
-        Rc<SourceObject::Morphism>,
-        Rc<TargetObject::Morphism>,
-    > {
+    fn arrow_mappings(&self) -> &HashMap<Rc<SourceObject::Morphism>, Rc<TargetObject::Morphism>> {
         // This is a bit tricky because we need to convert the HashMap types
         // We can do this by creating a new HashMap and copying the values over
         // but this is not very efficient
@@ -161,8 +152,7 @@ where
         &self.mappings
     }
 
-    fn validate_mappings(&self) -> Result<(), Errors>
-    {
+    fn validate_mappings(&self) -> Result<(), Errors> {
         /*
         Functor should validate that all objects in the source category
         have a corresponding object in the target category.
@@ -231,26 +221,26 @@ where
     }
 }
 
-impl <SourceObject,TargetObject> CategoryTrait for Arrow<SourceObject, TargetObject>
+impl<SourceObject, TargetObject> CategoryTrait for Arrow<SourceObject, TargetObject>
 where
     SourceObject: CategoryTrait + Clone,
     TargetObject: CategoryTrait + Eq + Hash + Clone,
     <SourceObject as CategoryTrait>::Morphism: Clone,
-    <TargetObject as CategoryTrait>::Morphism: Clone
+    <TargetObject as CategoryTrait>::Morphism: Clone,
 {
     type Object = TargetObject;
     type Morphism = Morphism<Self::Object>;
 
     fn new() -> Self
     where
-        Self: Sized
+        Self: Sized,
     {
         todo!()
     }
 
     fn new_with_id(id: &ObjectId) -> Self
     where
-        Self: Sized
+        Self: Sized,
     {
         todo!()
     }
@@ -263,7 +253,10 @@ where
         todo!()
     }
 
-    fn add_morphism(&mut self, morphism: Rc<Self::Morphism>) -> Result<&Rc<Self::Morphism>, Errors> {
+    fn add_morphism(
+        &mut self,
+        morphism: Rc<Self::Morphism>,
+    ) -> Result<&Rc<Self::Morphism>, Errors> {
         todo!()
     }
 
@@ -279,11 +272,17 @@ where
         todo!()
     }
 
-    fn get_hom_set_x(&self, source_object: &Self::Object) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
+    fn get_hom_set_x(
+        &self,
+        source_object: &Self::Object,
+    ) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
         todo!()
     }
 
-    fn get_object_morphisms(&self, object: &Self::Object) -> Result<Vec<&Rc<Self::Morphism>>, Errors> {
+    fn get_object_morphisms(
+        &self,
+        object: &Self::Object,
+    ) -> Result<Vec<&Rc<Self::Morphism>>, Errors> {
         todo!()
     }
 }

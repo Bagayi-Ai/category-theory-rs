@@ -27,15 +27,14 @@ pub enum DynamicCategoryEnum {
 
 impl Clone for DynamicCategoryEnum {
     fn clone(&self) -> Self {
-        // match self {
-        //     DynamicCategoryEnum::Category(cat) => {
-        //         DynamicCategoryEnum::Category(dyn_clone::clone_box(&**cat))
-        //     }
-        //     DynamicCategoryEnum::EpicMonicCategory(cat) => {
-        //         DynamicCategoryEnum::EpicMonicCategory(dyn_clone::clone_box(&**cat))
-        //     }
-        // }
-        todo!()
+        match self {
+            DynamicCategoryEnum::Category(cat) => {
+                DynamicCategoryEnum::Category(dyn_clone::clone_box(&**cat))
+            }
+            DynamicCategoryEnum::EpicMonicCategory(cat) => {
+                DynamicCategoryEnum::EpicMonicCategory(dyn_clone::clone_box(&**cat))
+            }
+        }
     }
 }
 

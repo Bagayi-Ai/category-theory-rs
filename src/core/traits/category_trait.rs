@@ -16,8 +16,8 @@ pub enum MorphismCommutationResult<Category: CategoryTrait> {
     NonCommutative(HashSet<Rc<Category::Morphism>>),
 }
 
-pub trait CategoryTrait: Debug + Any {
-    type Object: CategoryTrait + Debug + Eq + Hash;
+pub trait CategoryTrait: Debug + Any + DynClone {
+    type Object: CategoryTrait + Debug + Eq + Hash + DynClone;
 
     type Morphism: ArrowTrait<Self::Object, Self::Object> + Debug;
 

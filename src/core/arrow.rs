@@ -233,8 +233,10 @@ where
 
 impl <SourceObject,TargetObject> CategoryTrait for Arrow<SourceObject, TargetObject>
 where
-    SourceObject: CategoryTrait,
-    TargetObject: CategoryTrait + Eq + Hash,
+    SourceObject: CategoryTrait + Clone,
+    TargetObject: CategoryTrait + Eq + Hash + Clone,
+    <SourceObject as CategoryTrait>::Morphism: Clone,
+    <TargetObject as CategoryTrait>::Morphism: Clone
 {
     type Object = TargetObject;
     type Morphism = Morphism<Self::Object>;

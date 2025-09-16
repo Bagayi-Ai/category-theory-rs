@@ -49,3 +49,4 @@ pub trait ArrowTrait<SourceObject: CategoryTrait, TargetObject: CategoryTrait>: 
         todo!()
     }
 }
+

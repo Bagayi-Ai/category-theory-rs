@@ -762,11 +762,11 @@ pub fn test_nested_category() {
 
     // lets create a functor category
     // where objects are functors and morphisms are natural transformations
-    let mut functorCategory = BaseCategory::new();
-
-    functorCategory
-        .add_object(functor_lower_to_upper.clone())
-        .unwrap();
+    // let mut functorCategory = BaseCategory::new();
+    //
+    // functorCategory
+    //     .add_object(functor_lower_to_upper.clone())
+    //     .unwrap();
     // functorCategory
     //     .add_object(functor_lower_to_upper_reverse.clone())
     //     .unwrap();

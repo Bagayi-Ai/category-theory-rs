@@ -1,5 +1,4 @@
 use crate::core::errors::Errors;
-use crate::core::morphism::Morphism;
 use crate::core::object_id::ObjectId;
 use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::unit::unit_identifier::UnitIdentifier;
@@ -8,12 +7,15 @@ use std::collections::HashSet;
 use std::fmt::Debug;
 use std::hash::Hash;
 use std::rc::Rc;
+use crate::core::arrow::Morphism;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UnitCategory {}
 
 impl CategoryTrait for UnitCategory {
     type Object = UnitCategory;
+    
+    type Morphism = Morphism<Self::Object>;
 
     fn new() -> Self
     where

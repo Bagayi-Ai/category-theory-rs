@@ -1,6 +1,6 @@
+use std::collections::HashMap;
 use crate::core::dynamic_category::DynamicCategory;
-use crate::core::functor::Functor;
-use crate::core::morphism::Morphism;
+use crate::core::arrow::{Arrow, Morphism, Functor};
 use crate::core::object_id::ObjectId;
 use crate::core::traits::category_trait::CategoryTrait;
 use std::rc::Rc;
@@ -106,55 +106,48 @@ pub fn test_base_scenario() {
     // now add a functor from object_a to object_num
     // a -> 1, b -> 2, c -> 3
     // then use it to create a morphism in the category
-    let functor = Functor::new(
-        "functor_1".into(),
-        object_a.clone(),
-        object_num.clone(),
-        vec![
-            (
-                object_a
-                    .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Str(
-                        "a".to_string(),
-                    )))
-                    .unwrap()
-                    .clone(),
-                object_num
-                    .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Int(1)))
-                    .unwrap()
-                    .clone(),
-            ),
-            (
-                object_a
-                    .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Str(
-                        "b".to_string(),
-                    )))
-                    .unwrap()
-                    .clone(),
-                object_num
-                    .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Int(2)))
-                    .unwrap()
-                    .clone(),
-            ),
-            (
-                object_a
-                    .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Str(
-                        "c".to_string(),
-                    )))
-                    .unwrap()
-                    .clone(),
-                object_num
-                    .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Int(3)))
-                    .unwrap()
-                    .clone(),
-            ),
-        ]
-        .into_iter()
-        .collect(),
-    );
+    let functor = HashMap::from([
+        (
+            object_a
+                .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Str(
+                    "a".to_string(),
+                )))
+                .unwrap()
+                .clone(),
+            object_num
+                .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Int(1)))
+                .unwrap()
+                .clone(),
+        ),
+        (
+            object_a
+                .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Str(
+                    "b".to_string(),
+                )))
+                .unwrap()
+                .clone(),
+            object_num
+                .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Int(2)))
+                .unwrap()
+                .clone(),
+        ),
+        (
+            object_a
+                .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Str(
+                    "c".to_string(),
+                )))
+                .unwrap()
+                .clone(),
+            object_num
+                .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Int(3)))
+                .unwrap()
+                .clone(),
+        ),
+    ]);
     // assert!(functor.is_ok());
     // let functor = functor.unwrap();
 
-    let functor = Rc::new(functor);
+    // let functor = Rc::new(functor);
 
     let morphism_a_num = Morphism::new(
         "morphism_a_num".into(),
@@ -169,54 +162,44 @@ pub fn test_base_scenario() {
 
     // create another functor from object_a to object_num
     // a -> 3, b -> 2, c -> 1
-    let functor_2 = Functor::new(
-        "functor_2".into(),
-        object_a.clone(),
-        object_num.clone(),
-        vec![
-            (
-                object_a
-                    .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Str(
-                        "a".to_string(),
-                    )))
-                    .unwrap()
-                    .clone(),
-                object_num
-                    .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Int(3)))
-                    .unwrap()
-                    .clone(),
-            ),
-            (
-                object_a
-                    .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Str(
-                        "b".to_string(),
-                    )))
-                    .unwrap()
-                    .clone(),
-                object_num
-                    .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Int(2)))
-                    .unwrap()
-                    .clone(),
-            ),
-            (
-                object_a
-                    .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Str(
-                        "c".to_string(),
-                    )))
-                    .unwrap()
-                    .clone(),
-                object_num
-                    .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Int(1)))
-                    .unwrap()
-                    .clone(),
-            ),
-        ]
-        .into_iter()
-        .collect(),
-    );
-    // assert!(functor_2.is_ok());
-    // let functor_2 = functor_2.unwrap();
-    let functor_2 = Rc::new(functor_2);
+    let functor_2 = HashMap::from([
+        (
+            object_a
+                .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Str(
+                    "a".to_string(),
+                )))
+                .unwrap()
+                .clone(),
+            object_num
+                .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Int(3)))
+                .unwrap()
+                .clone(),
+        ),
+        (
+            object_a
+                .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Str(
+                    "b".to_string(),
+                )))
+                .unwrap()
+                .clone(),
+            object_num
+                .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Int(2)))
+                .unwrap()
+                .clone(),
+        ),
+        (
+            object_a
+                .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Str(
+                    "c".to_string(),
+                )))
+                .unwrap()
+                .clone(),
+            object_num
+                .get_identity_morphism(&DynamicCategory::new_with_id(ObjectId::Int(1)))
+                .unwrap()
+                .clone(),
+        )
+    ]);
 
     let morphism_a_num_2 = Morphism::new(
         "morphism_a_num_2".into(),
@@ -232,8 +215,8 @@ pub fn test_base_scenario() {
 
     // now create a category of the functor category
     // let functor_category: DynamicCategory = vec![functor, functor_2].into();
-    let mut functor_category = DynamicCategory::new_with_id("FunctorCategory".into());
-    functor_category.add_object(Rc::new(
-        DynamicCategory::functor_to_category(functor_2).expect("Expecting category"),
-    ));
+    // let mut functor_category = DynamicCategory::new_with_id("FunctorCategory".into());
+    // functor_category.add_object(Rc::new(
+    //     DynamicCategory::functor_to_category(functor_2).expect("Expecting category"),
+    // ));
 }

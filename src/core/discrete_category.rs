@@ -1,9 +1,9 @@
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
-use crate::core::morphism::Morphism;
 use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::arrow::{Arrow, Morphism, Functor};
 use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Display};
 use std::hash::{Hash, Hasher};
@@ -63,6 +63,8 @@ impl DiscreteCategory {
 impl CategoryTrait for DiscreteCategory {
     type Object = Self;
 
+    type Morphism = Morphism<Self::Object>;
+
     fn new() -> Self {
         DiscreteCategory::new()
     }
@@ -79,7 +81,7 @@ impl CategoryTrait for DiscreteCategory {
     }
 
     fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors> {
-        let identity_morphism = Morphism::new_identity_morphism(object.clone());
+        let identity_morphism = Morphism::new_identity(object.clone());
         if let Some(cells) = &mut self.cells {
             if cells.contains_key(&object.category_id()) {
                 return Err(Errors::ObjectAlreadyExists);

@@ -1,13 +1,12 @@
 use crate::core::errors::Errors;
-use crate::core::morphism::Morphism;
+use crate::core::arrow::{Arrow, Morphism, Functor};
 use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::factorization_system_trait::FactorizationSystemTrait;
-use crate::core::traits::functor_trait::FunctorTrait;
-use crate::core::traits::morphism_trait::MorphismTrait;
 use crate::core::utils;
 use std::collections::{HashMap, HashSet};
+use std::fmt::Debug;
 use std::hash::Hash;
 use std::rc::Rc;
 
@@ -63,7 +62,7 @@ where
         // we factorize to image of f and from image of f to target object
         let source_object = morphism.source_object();
         let target_object = morphism.target_object();
-        let mappings = morphism.functor()?.arrow_mappings();
+        let mappings = morphism.arrow_mappings();
 
         let mut all_target_objects = target_object.get_all_objects()?.clone();
 
@@ -131,10 +130,12 @@ where
 
 impl<InnerCategory> CategoryTrait for EpicMonicCategory<InnerCategory>
 where
-    InnerCategory: CategoryTrait + Hash + Eq + Clone + 'static,
+    InnerCategory: CategoryTrait<Morphism = Arrow<<InnerCategory as CategoryTrait>::Object, <InnerCategory as CategoryTrait>::Object>> + Hash + Eq + Clone + 'static,
     <InnerCategory as CategoryTrait>::Object: Clone,
 {
     type Object = InnerCategory::Object;
+
+    type Morphism = Morphism<Self::Object>;
 
     fn new() -> Self {
         todo!()
@@ -196,7 +197,7 @@ where
 
 impl<InnerCategory> FactorizationSystemTrait for EpicMonicCategory<InnerCategory>
 where
-    InnerCategory: CategoryTrait + Hash + Eq + Clone + 'static,
+    InnerCategory: CategoryTrait<Morphism = Arrow<<InnerCategory as CategoryTrait>::Object, <InnerCategory as CategoryTrait>::Object>> + Hash + Eq + Clone + 'static,
     <InnerCategory as CategoryTrait>::Object: Clone,
 {
     fn morphism_factors(
@@ -221,5 +222,25 @@ impl<Object: CategoryTrait + Hash + Eq> Hash for EpicMonicCategory<Object> {
         H: std::hash::Hasher,
     {
         self.category.hash(state);
+    }
+}
+
+
+mod tests {
+    use super::*;
+    use crate::core::base_category::BaseCategory;
+    use std::rc::Rc;
+    use crate::core::dynamic_category::DynamicCategory;
+
+    #[test]
+    fn test_epic_monic_category() {
+        let mut epic_monic_category =
+            EpicMonicCategory::<DynamicCategory>::new();
+
+        let object_ab: Rc<DynamicCategory> = Rc::new(vec!["a", "b"].into());
+
+        epic_monic_category
+            .add_object(object_ab.clone())
+            .expect("Failed to add object A");
     }
 }

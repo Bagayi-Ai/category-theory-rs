@@ -1,24 +1,25 @@
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
-use crate::core::morphism::Morphism;
 use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::morphism_trait::MorphismTrait;
 use dyn_clone::DynClone;
 use std::any::Any;
 use std::collections::HashSet;
 use std::fmt::Debug;
 use std::hash::Hash;
 use std::rc::Rc;
+use crate::core::arrow::{Arrow, Morphism};
 
 pub type CategorySubObjectAlias<Category> = <Category as CategoryTrait>::Object;
 pub enum MorphismCommutationResult<Category: CategoryTrait> {
     Commutative,
-    NonCommutative(HashSet<Morphism<Category::Object>>),
+    NonCommutative(HashSet<Rc<Category::Morphism>>),
 }
 
-pub trait CategoryTrait: Debug + DynClone + Any {
-    type Object: CategoryTrait + Debug + DynClone + Eq + Hash;
+pub trait CategoryTrait: Debug + Any {
+    type Object: CategoryTrait + Debug + Eq + Hash;
+
+    type Morphism: ArrowTrait<Self::Object, Self::Object> + Debug;
 
     fn new() -> Self
     where
@@ -59,13 +60,13 @@ pub trait CategoryTrait: Debug + DynClone + Any {
 
     fn add_morphism(
         &mut self,
-        morphism: Rc<Morphism<Self::Object>>,
-    ) -> Result<&Rc<Morphism<Self::Object>>, Errors>;
+        morphism: Rc<Self::Morphism>,
+    ) -> Result<&Rc<Self::Morphism>, Errors>;
 
     fn get_identity_morphism(
         &self,
         object: &Self::Object,
-    ) -> Result<&Rc<Morphism<Self::Object>>, Errors> {
+    ) -> Result<&Rc<Self::Morphism>, Errors> {
         let hom_set = self.get_hom_set(object, object)?;
         // get the identity morphism
         for morphism in hom_set {
@@ -76,7 +77,7 @@ pub trait CategoryTrait: Debug + DynClone + Any {
         Err(Errors::IdentityMorphismNotFound)
     }
 
-    fn get_all_identity_morphisms(&self) -> Result<HashSet<&Rc<Morphism<Self::Object>>>, Errors> {
+    fn get_all_identity_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
         let mut identity_morphisms = HashSet::new();
         for object in self.get_all_objects()? {
             match self.get_identity_morphism(&**object) {
@@ -93,18 +94,18 @@ pub trait CategoryTrait: Debug + DynClone + Any {
 
     fn get_all_objects(&self) -> Result<HashSet<&Rc<Self::Object>>, Errors>;
 
-    fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Morphism<Self::Object>>>, Errors>;
+    fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors>;
 
     fn get_hom_set_x(
         &self,
         source_object: &Self::Object,
-    ) -> Result<HashSet<&Rc<Morphism<Self::Object>>>, Errors>;
+    ) -> Result<HashSet<&Rc<Self::Morphism>>, Errors>;
 
     fn get_hom_set(
         &self,
         source_object: &Self::Object,
         target_object: &Self::Object,
-    ) -> Result<HashSet<&Rc<Morphism<Self::Object>>>, Errors> {
+    ) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
         Ok(self
             .get_hom_set_x(source_object)?
             .iter()
@@ -116,12 +117,12 @@ pub trait CategoryTrait: Debug + DynClone + Any {
     fn get_object_morphisms(
         &self,
         object: &Self::Object,
-    ) -> Result<Vec<&Rc<Morphism<Self::Object>>>, Errors>;
+    ) -> Result<Vec<&Rc<Self::Morphism>>, Errors>;
 
     fn morphism_commute(
         &self,
-        left_morphisms: Vec<&Morphism<Self::Object>>,
-        right_morphisms: Vec<&Morphism<Self::Object>>,
+        left_morphisms: Vec<&Self::Morphism>,
+        right_morphisms: Vec<&Self::Morphism>,
     ) -> Result<MorphismCommutationResult<Self::Object>, Errors> {
         self.validate_morphisms_commutation(left_morphisms, right_morphisms)?;
         Ok(MorphismCommutationResult::Commutative)
@@ -129,8 +130,8 @@ pub trait CategoryTrait: Debug + DynClone + Any {
 
     fn validate_morphisms_commutation(
         &self,
-        left_morphisms: Vec<&Morphism<Self::Object>>,
-        right_morphisms: Vec<&Morphism<Self::Object>>,
+        left_morphisms: Vec<&Self::Morphism>,
+        right_morphisms: Vec<&Self::Morphism>,
     ) -> Result<(), Errors> {
         // // source and target of left cells id should be same with right cells
         // let left_source_object = left_morphisms
@@ -169,7 +170,7 @@ pub trait CategoryTrait: Debug + DynClone + Any {
 
     fn validate_morphisms_composition(
         &self,
-        morphims: Vec<&Morphism<Self::Object>>,
+        morphims: Vec<&Self::Morphism>,
     ) -> Result<(), Errors> {
         // if morphims.is_empty() {
         //     return Err(NCategoryError::InvalidMorphismComposition);

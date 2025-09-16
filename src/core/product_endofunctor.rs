@@ -12,10 +12,9 @@ an endo functor F would map these to a new category B with objects {F(a), F(b)} 
 This is useful for creating new categories that are derived from the original category, such as the category of sets or the category of groups.
  */
 use crate::core::errors::Errors;
-use crate::core::functor::Functor;
+use crate::core::arrow::{Arrow, Morphism, Functor};
 use crate::core::identifier::Identifier;
 use crate::core::traits::category_trait::CategoryTrait;
-use crate::core::traits::morphism_trait::MorphismTrait;
 use std::collections::HashMap;
 use std::hash::Hash;
 use std::rc::Rc;

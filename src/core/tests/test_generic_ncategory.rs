@@ -1,9 +1,8 @@
 use crate::core::base_category::*;
 use crate::core::discrete_category::DiscreteCategory;
 use crate::core::dynamic_category::DynamicCategory;
-use crate::core::functor::Functor;
+use crate::core::arrow::{Arrow, Morphism, Functor};
 use crate::core::identifier::Identifier;
-use crate::core::morphism::Morphism;
 use crate::core::object_id::ObjectId;
 use crate::core::tests::ncategory_test_helper::*;
 use crate::core::traits::arrow_trait::ArrowTrait;
@@ -259,12 +258,6 @@ pub fn test_identity_cell_tree() {
                 .clone(),
         ),
     ]);
-    let functor_number_to_upper = Functor::new(
-        "functor_lower_to_number".to_string(),
-        discreteCategoryANumber.clone(),
-        discreteCategoryAUpper.clone(),
-        number_to_upper_mappings,
-    );
 
     // create a functor1 from lower to upper
     let lower_to_upper_mappings: HashMap<
@@ -305,12 +298,6 @@ pub fn test_identity_cell_tree() {
                 .clone(),
         ),
     ]);
-    let functor_lower_to_upper = Rc::new(Functor::new(
-        "functor_1".to_string(),
-        discreteCategoryALower.clone(),
-        discreteCategoryAUpper.clone(),
-        lower_to_upper_mappings,
-    ));
 
     let mut setCategoryAlphabet = BaseCategory::new();
 
@@ -343,7 +330,7 @@ pub fn test_identity_cell_tree() {
         "lower_to_upper".to_string(),
         discreteCategoryALower.clone(),
         discreteCategoryAUpper.clone(),
-        functor_lower_to_upper,
+        lower_to_upper_mappings,
     ));
     setCategoryAlphabet.add_morphism(morphism).unwrap();
 
@@ -753,13 +740,6 @@ pub fn test_nested_category() {
         ),
     ]);
 
-    let functor_lower_to_upper_reverse = Rc::new(Functor::new(
-        "functor_1_reverse".to_string(),
-        categoryAlphaLower.clone(),
-        categoryAlphaUpper.clone(),
-        lower_to_upper_reverse_mappings,
-    ));
-
     let mut setCategoryAlphabet: BaseCategory<DiscreteCategory> = BaseCategory::new();
     // Add the discrete category A as an object in Set category alphabet
     setCategoryAlphabet
@@ -787,25 +767,25 @@ pub fn test_nested_category() {
     functorCategory
         .add_object(functor_lower_to_upper.clone())
         .unwrap();
-    functorCategory
-        .add_object(functor_lower_to_upper_reverse.clone())
-        .unwrap();
-
-    // now creating a morphism from lower to upper functor which is a natural transformation
-    let natural_transformation_morphism = Morphism::new(
-        "natural_transformation_lower_to_upper".to_string(),
-        functor_lower_to_upper.clone(),
-        functor_lower_to_upper_reverse.clone(),
-        Rc::new(Functor::new(
-            "natural_transformation_lower_to_upper".to_string(),
-            functor_lower_to_upper.clone(),
-            functor_lower_to_upper_reverse.clone(),
-            HashMap::new(),
-        )),
-    );
-    let natural_transformation_morphism = Rc::new(natural_transformation_morphism);
-
-    functorCategory
-        .add_morphism(natural_transformation_morphism)
-        .unwrap();
+    // functorCategory
+    //     .add_object(functor_lower_to_upper_reverse.clone())
+    //     .unwrap();
+    //
+    // // now creating a morphism from lower to upper functor which is a natural transformation
+    // let natural_transformation_morphism = Morphism::new(
+    //     "natural_transformation_lower_to_upper".to_string(),
+    //     functor_lower_to_upper.clone(),
+    //     functor_lower_to_upper_reverse.clone(),
+    //     Rc::new(Functor::new(
+    //         "natural_transformation_lower_to_upper".to_string(),
+    //         functor_lower_to_upper.clone(),
+    //         functor_lower_to_upper_reverse.clone(),
+    //         HashMap::new(),
+    //     )),
+    // );
+    // let natural_transformation_morphism = Rc::new(natural_transformation_morphism);
+    //
+    // functorCategory
+    //     .add_morphism(natural_transformation_morphism)
+    //     .unwrap();
 }

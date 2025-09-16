@@ -1,11 +1,9 @@
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
-use crate::core::morphism::Morphism;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
-use crate::core::traits::functor_trait::FunctorTrait;
-use crate::core::traits::morphism_trait::MorphismTrait;
 use crate::core::unit::unit_category::UnitCategory;
+use crate::core::arrow::{Arrow, Morphism, Functor};
 use std::collections::HashMap;
 use std::rc::Rc;
 
@@ -27,42 +25,23 @@ impl<T: Identifier> ArrowTrait<UnitCategory, UnitCategory> for UnitMorphism<T> {
         todo!()
     }
 
-    fn compose(&self, other: &dyn ArrowTrait<UnitCategory, UnitCategory>) -> Result<Rc<dyn ArrowTrait<UnitCategory, UnitCategory>>, Errors> {
+    fn arrow_id(&self) -> &String {
         todo!()
     }
 
-    fn arrows(&self) -> Vec<&dyn ArrowTrait<UnitCategory, UnitCategory>> {
-        todo!()
-    }
-}
-
-impl<T: Identifier> MorphismTrait<UnitCategory> for UnitMorphism<T> {
-    fn functor(&self) -> Result<&Rc<dyn FunctorTrait<UnitCategory, UnitCategory>>, Errors> {
-        todo!()
-    }
-}
-
-impl<Id: Identifier> FunctorTrait<UnitCategory, UnitCategory> for UnitMorphism<Id> {
-    fn new(
-        source_category: Rc<UnitCategory>,
-        target_category: Rc<UnitCategory>,
-        mappings: HashMap<Rc<Morphism<UnitCategory>>, Rc<Morphism<UnitCategory>>>,
-    ) -> Result<Self, Errors>
-    where
-        Self: Sized,
-    {
+    fn compose(&self, other: &impl ArrowTrait<UnitCategory, UnitCategory>) -> Result<Rc<UnitMorphism<T>>, Errors> {
         todo!()
     }
 
-    fn source_category(&self) -> &Rc<UnitCategory> {
+    fn arrows(&self) -> Vec<&UnitMorphism<T>> {
         todo!()
     }
 
-    fn target_category(&self) -> &Rc<UnitCategory> {
+    fn arrow_mappings(&self) -> &HashMap<Rc<<UnitCategory as CategoryTrait>::Morphism>, Rc<<UnitCategory as CategoryTrait>::Morphism>> {
         todo!()
     }
 
-    fn arrow_mappings(&self) -> &HashMap<Rc<Morphism<UnitCategory>>, Rc<Morphism<UnitCategory>>> {
+    fn validate_mappings(&self) -> Result<(), Errors> {
         todo!()
     }
 }

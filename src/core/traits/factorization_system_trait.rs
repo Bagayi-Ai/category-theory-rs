@@ -1,5 +1,4 @@
 use crate::core::errors::Errors;
-use crate::core::morphism::Morphism;
 use crate::core::traits::category_trait::CategoryTrait;
 use std::rc::Rc;
 
@@ -10,6 +9,6 @@ pub trait FactorizationSystemTrait: CategoryTrait {
     // this means that
     fn morphism_factors(
         &self,
-        morphism: &Morphism<Self::Object>,
-    ) -> Result<&(Rc<Morphism<Self::Object>>, Rc<Morphism<Self::Object>>), Errors>;
+        morphism: &Self::Morphism,
+    ) -> Result<&(Rc<Self::Morphism>, Rc<Self::Morphism>), Errors>;
 }

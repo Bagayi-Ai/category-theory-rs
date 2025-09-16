@@ -1,5 +1,5 @@
 use crate::core::errors::Errors;
-use crate::core::functor::Functor;
+use crate::core::arrow::{Arrow, Morphism, Functor};
 use crate::core::identifier::Identifier;
 use crate::core::traits::category_trait::CategoryTrait;
 use std::borrow::Borrow;

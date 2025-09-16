@@ -1,6 +1,6 @@
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
-use crate::core::morphism::Morphism;
+use crate::core::arrow::{Arrow, Morphism, Functor};
 use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
@@ -11,14 +11,14 @@ use std::hash::Hash;
 use std::rc::Rc;
 
 #[derive(Clone, PartialEq, Eq)]
-pub struct BaseCategory<Object: CategoryTrait + Clone> {
+pub struct BaseCategory<Object: CategoryTrait> {
     id: ObjectId,
     objects: HashMap<ObjectId, Rc<Object>>,
     object_mappings: HashMap<ObjectId, HashSet<String>>,
     morphism: HashMap<String, Rc<Morphism<Object>>>,
 }
 
-impl<Object: CategoryTrait + Clone> Debug for BaseCategory<Object> {
+impl<Object: CategoryTrait> Debug for BaseCategory<Object> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         todo!()
     }
@@ -39,7 +39,7 @@ impl<Object: CategoryTrait + Clone> Default for BaseCategory<Object> {
     }
 }
 
-impl<Object: CategoryTrait + Clone> BaseCategory<Object> {
+impl<Object: CategoryTrait> BaseCategory<Object> {
     pub fn new() -> Self {
         Self::new_with_id(ObjectId::generate())
     }
@@ -58,8 +58,10 @@ impl<Object: CategoryTrait + Clone> BaseCategory<Object> {
     }
 }
 
-impl<Object: CategoryTrait + Clone + Hash + Eq> CategoryTrait for BaseCategory<Object> {
+impl<Object: CategoryTrait + Hash + Eq> CategoryTrait for BaseCategory<Object> {
     type Object = Object;
+
+    type Morphism = Morphism<Self::Object>;
 
     fn new() -> Self {
         BaseCategory::new()
@@ -82,11 +84,11 @@ impl<Object: CategoryTrait + Clone + Hash + Eq> CategoryTrait for BaseCategory<O
         }
         let object_id = object.category_id();
         self.objects.insert(object_id.clone(), object.clone());
-        let identity_cell = Morphism::new_identity_morphism(object.clone());
+        let identity_cell = Morphism::new_identity(object.clone());
         self.object_mappings
             .entry(object_id.clone())
             .or_default()
-            .insert(identity_cell.id().to_string());
+            .insert(identity_cell.arrow_id().to_string());
         self.add_morphism(identity_cell)?;
         Ok(())
     }
@@ -95,7 +97,7 @@ impl<Object: CategoryTrait + Clone + Hash + Eq> CategoryTrait for BaseCategory<O
         &mut self,
         morphism: Rc<Morphism<Self::Object>>,
     ) -> Result<&Rc<Morphism<Self::Object>>, Errors> {
-        if self.morphism.contains_key(morphism.id()) {
+        if self.morphism.contains_key(morphism.arrow_id()) {
             return Err(Errors::MorphismAlreadyExists);
         }
         // validate target object is part of the category
@@ -111,12 +113,12 @@ impl<Object: CategoryTrait + Clone + Hash + Eq> CategoryTrait for BaseCategory<O
             self.object_mappings
                 .get_mut(&morphism.source_object().category_id())
                 .ok_or(Errors::ObjectNotFound)?
-                .insert(morphism.id().to_string());
+                .insert(morphism.arrow_id().to_string());
         }
 
         let cell = self
             .morphism
-            .entry(morphism.id().clone())
+            .entry(morphism.arrow_id().clone())
             .or_insert(morphism);
         Ok(cell)
     }

@@ -3,11 +3,7 @@ pub mod core {
 
     pub mod identifier;
 
-    pub mod functor;
-
     pub mod errors;
-
-    pub mod morphism;
 
     pub mod product_endofunctor;
 
@@ -20,12 +16,11 @@ pub mod core {
 
     pub mod utils;
 
+    pub mod arrow;
+
     pub mod traits {
         pub mod arrow_trait;
         pub mod category_trait;
-        pub mod functor_trait;
-
-        pub mod morphism_trait;
 
         pub mod factorization_system_trait;
     }

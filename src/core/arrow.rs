@@ -13,9 +13,8 @@ pub type Morphism<Object: CategoryTrait> = Arrow<Object, Object>;
 
 pub type Functor<SourceCategory, TargetCategory> = Arrow<SourceCategory, TargetCategory>;
 
-#[derive(Clone)]
 pub struct Arrow<SourceObject: CategoryTrait, TargetObject: CategoryTrait> {
-    id: String,
+    id: ObjectId,
     source_object: Rc<SourceObject>,
     target_object: Rc<TargetObject>,
     // map arrows in source category to arrows in target category
@@ -24,6 +23,14 @@ pub struct Arrow<SourceObject: CategoryTrait, TargetObject: CategoryTrait> {
         Rc<TargetObject::Morphism>,
     >,
     is_identity: bool,
+}
+
+impl<SourceObject: CategoryTrait, TargetObject: CategoryTrait> Clone
+    for Arrow<SourceObject, TargetObject>
+{
+    fn clone(&self) -> Self {
+        todo!()
+    }
 }
 
 impl<SourceObject: CategoryTrait, TargetObject: CategoryTrait> Debug
@@ -71,7 +78,7 @@ impl<SourceObject: CategoryTrait, TargetObject: CategoryTrait> Eq
 impl<Object: CategoryTrait> Arrow<Object, Object> {
     pub fn new_identity(object: Rc<Object>) -> Rc<Self> {
         Rc::new(Arrow {
-            id: String::generate(),
+            id: ObjectId::Str(String::generate()),
             source_object: object.clone(),
             target_object: object,
             mappings: HashMap::new(),
@@ -87,7 +94,7 @@ impl<SourceObject: CategoryTrait, TargetObject: CategoryTrait> Arrow<SourceObjec
         mappings: HashMap<Rc<SourceObject::Morphism>, Rc<TargetObject::Morphism>>,
     ) -> Self {
         Arrow {
-            id,
+            id: ObjectId::Str(id),
             source_object,
             target_object,
             mappings,
@@ -101,7 +108,7 @@ impl<SourceObject: CategoryTrait, TargetObject: CategoryTrait> Arrow<SourceObjec
         mappings: HashMap<Rc<SourceObject::Morphism>, Rc<TargetObject::Morphism>>,
     ) -> Self {
         Arrow {
-            id: String::generate(),
+            id: ObjectId::Str(String::generate()),
             source_object,
             target_object,
             mappings,
@@ -124,12 +131,45 @@ where
         &self.target_object
     }
 
+    fn new_instance(
+        source: Rc<SourceObject>,
+        target: Rc<TargetObject>,
+        id: &str,
+        mappings: HashMap<Rc<SourceObject::Morphism>, Rc<TargetObject::Morphism>>,
+    ) -> Self
+    where
+        Self: Sized,
+    {
+        todo!()
+    }
+
+    fn new(
+        id: String,
+        source: Rc<SourceObject>,
+        target: Rc<TargetObject>,
+        mappings: HashMap<Rc<SourceObject::Morphism>, Rc<TargetObject::Morphism>>,
+    ) -> Self
+    where
+        Self: Sized,
+    {
+        Arrow {
+            id: ObjectId::Str(String::generate()),
+            source_object: source,
+            target_object: target,
+            mappings,
+            is_identity: false,
+        }
+    }
+
     fn is_identity(&self) -> bool {
         self.is_identity
     }
 
     fn arrow_id(&self) -> &String {
-        &self.id
+        match &self.id {
+            ObjectId::Str(s) => s,
+            _ => panic!("Arrow ID is not a string"),
+        }
     }
 
     fn compose(
@@ -246,10 +286,10 @@ where
     }
 
     fn category_id(&self) -> &ObjectId {
-        self.target_object.category_id()
+        &self.id
     }
 
-    fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors> {
+    fn add_object(&mut self, object: Rc<Self::Object>) -> Result<Rc<Self::Morphism>, Errors> {
         todo!()
     }
 

@@ -51,7 +51,7 @@ impl Clone for DynamicCategoryEnum {
 pub struct DynamicCategory {
     inner_category: DynamicCategoryEnum,
     dynamic_type: DynamicType,
-    // functor: Option<Rc<Arrow<DynamicCategory, DynamicCategory>>>,
+    functor: Option<Rc<Arrow<DynamicCategory, DynamicCategory>>>,
 }
 
 impl Debug for DynamicCategory {
@@ -87,7 +87,7 @@ impl DynamicCategory {
                 id.clone(),
             ))),
             dynamic_type: DynamicType::Category,
-            // functor: None,
+            functor: None,
         }
     }
 
@@ -109,7 +109,7 @@ impl DynamicCategory {
     ) -> Result<Self, Errors> {
         let mut result = DynamicCategory::new_with_id(functor.arrow_id().clone().into());
         result.dynamic_type = DynamicType::Functor;
-        // result.functor = Some(functor);
+        result.functor = Some(functor);
         Ok(result)
     }
 
@@ -186,7 +186,7 @@ impl CategoryTrait for DynamicCategory {
         self.id()
     }
 
-    fn add_object(&mut self, object: Rc<DynamicCategory>) -> Result<(), Errors> {
+    fn add_object(&mut self, object: Rc<DynamicCategory>) -> Result<Rc<Self::Morphism>, Errors> {
         self.inner_category_mut().add_object(object)
     }
 

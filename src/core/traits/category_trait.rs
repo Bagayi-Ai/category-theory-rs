@@ -56,7 +56,7 @@ pub trait CategoryTrait: Debug + Any + DynClone {
         self.category_id() == other.category_id()
     }
 
-    fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors>;
+    fn add_object(&mut self, object: Rc<Self::Object>) -> Result<Rc<Self::Morphism>, Errors>;
 
     fn add_morphism(&mut self, morphism: Rc<Self::Morphism>)
     -> Result<&Rc<Self::Morphism>, Errors>;

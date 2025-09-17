@@ -740,6 +740,13 @@ pub fn test_nested_category() {
         ),
     ]);
 
+    let functor_lower_to_upper_reverse = Rc::new(Functor::new(
+        "functor_1_reverse".to_string(),
+        categoryAlphaLower.clone(),
+        categoryAlphaUpper.clone(),
+        lower_to_upper_reverse_mappings,
+    ));
+
     let mut setCategoryAlphabet: BaseCategory<DiscreteCategory> = BaseCategory::new();
     // Add the discrete category A as an object in Set category alphabet
     setCategoryAlphabet
@@ -762,30 +769,25 @@ pub fn test_nested_category() {
 
     // lets create a functor category
     // where objects are functors and morphisms are natural transformations
-    // let mut functorCategory = BaseCategory::new();
-    //
-    // functorCategory
-    //     .add_object(functor_lower_to_upper.clone())
-    //     .unwrap();
-    // functorCategory
-    //     .add_object(functor_lower_to_upper_reverse.clone())
-    //     .unwrap();
-    //
-    // // now creating a morphism from lower to upper functor which is a natural transformation
-    // let natural_transformation_morphism = Morphism::new(
-    //     "natural_transformation_lower_to_upper".to_string(),
-    //     functor_lower_to_upper.clone(),
-    //     functor_lower_to_upper_reverse.clone(),
-    //     Rc::new(Functor::new(
-    //         "natural_transformation_lower_to_upper".to_string(),
-    //         functor_lower_to_upper.clone(),
-    //         functor_lower_to_upper_reverse.clone(),
-    //         HashMap::new(),
-    //     )),
-    // );
-    // let natural_transformation_morphism = Rc::new(natural_transformation_morphism);
-    //
-    // functorCategory
-    //     .add_morphism(natural_transformation_morphism)
-    //     .unwrap();
+    let mut functorCategory = BaseCategory::new();
+
+    functorCategory
+        .add_object(functor_lower_to_upper.clone())
+        .unwrap();
+    functorCategory
+        .add_object(functor_lower_to_upper_reverse.clone())
+        .unwrap();
+
+    // now creating a morphism from lower to upper functor which is a natural transformation
+    let natural_transformation_morphism = Morphism::new(
+        "natural_transformation_lower_to_upper".to_string(),
+        functor_lower_to_upper.clone(),
+        functor_lower_to_upper_reverse.clone(),
+        HashMap::new(),
+    );
+    let natural_transformation_morphism = Rc::new(natural_transformation_morphism);
+
+    functorCategory
+        .add_morphism(natural_transformation_morphism)
+        .unwrap();
 }

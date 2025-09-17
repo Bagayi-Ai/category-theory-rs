@@ -1,4 +1,5 @@
 use crate::core::errors::Errors;
+use crate::core::identifier::Identifier;
 use crate::core::traits::category_trait::{CategorySubObjectAlias, CategoryTrait};
 use std::borrow::Borrow;
 use std::collections::HashMap;
@@ -10,6 +11,35 @@ pub trait ArrowTrait<SourceObject: CategoryTrait, TargetObject: CategoryTrait>: 
     fn source_object(&self) -> &Rc<SourceObject>;
 
     fn target_object(&self) -> &Rc<TargetObject>;
+
+    fn new_instance(
+        source: Rc<SourceObject>,
+        target: Rc<TargetObject>,
+        id: &str,
+        mappings: HashMap<Rc<SourceObject::Morphism>, Rc<TargetObject::Morphism>>,
+    ) -> Self
+    where
+        Self: Sized;
+
+    fn new(
+        id: String,
+        source: Rc<SourceObject>,
+        target: Rc<TargetObject>,
+        mappings: HashMap<Rc<SourceObject::Morphism>, Rc<TargetObject::Morphism>>,
+    ) -> Self
+    where
+        Self: Sized;
+
+    fn new_with_mappings(
+        source_object: Rc<SourceObject>,
+        target_object: Rc<TargetObject>,
+        mappings: HashMap<Rc<SourceObject::Morphism>, Rc<TargetObject::Morphism>>,
+    ) -> Self
+    where
+        Self: Sized,
+    {
+        Self::new(String::generate(), source_object, target_object, mappings)
+    }
 
     fn is_identity(&self) -> bool;
 

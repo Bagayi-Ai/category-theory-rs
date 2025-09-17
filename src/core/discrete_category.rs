@@ -1,4 +1,5 @@
 use crate::core::arrow::{Arrow, Functor, Morphism};
+use crate::core::dynamic_category::DynamicCategory;
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::object_id::ObjectId;
@@ -80,22 +81,21 @@ impl CategoryTrait for DiscreteCategory {
         &self.category_id
     }
 
-    fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors> {
+    fn add_object(&mut self, object: Rc<Self::Object>) -> Result<Rc<Self::Morphism>, Errors> {
         let identity_morphism = Morphism::new_identity(object.clone());
         if let Some(cells) = &mut self.cells {
             if cells.contains_key(&object.category_id()) {
                 return Err(Errors::ObjectAlreadyExists);
             }
-            cells.insert(object.category_id().clone(), identity_morphism);
-            Ok(())
+            cells.insert(object.category_id().clone(), identity_morphism.clone());
         } else {
             self.cells = Some(HashMap::new());
             self.cells
                 .as_mut()
                 .unwrap()
-                .insert(object.category_id().clone(), identity_morphism);
-            Ok(())
+                .insert(object.category_id().clone(), identity_morphism.clone());
         }
+        Ok(identity_morphism)
     }
 
     fn add_morphism(
@@ -118,13 +118,12 @@ impl CategoryTrait for DiscreteCategory {
     }
 
     fn get_object(&self, object: &Self::Object) -> Result<&Rc<Self::Object>, Errors> {
-        // if let Some(cells) = &self.cells {
-        //     if let Some(cell) = cells.get(&object.category_id()) {
-        //         return Ok(cell.source_object());
-        //     }
-        // }
-        // Err(Errors::ObjectNotFound)
-        todo!()
+        if let Some(cells) = &self.cells {
+            if let Some(cell) = cells.get(&object.category_id()) {
+                return Ok(cell.source_object());
+            }
+        }
+        Err(Errors::ObjectNotFound)
     }
 
     // fn get_all_objects(&self) -> Result<HashSet<&Rc<DiscreteCategory>>, Errors> {
@@ -137,13 +136,12 @@ impl CategoryTrait for DiscreteCategory {
     // }
     // Rust
     fn get_all_objects(&self) -> Result<HashSet<&Rc<Self::Object>>, Errors> {
-        // let result = if let Some(cells) = &self.cells {
-        //     cells.values().map(|item| item.source_object()).collect()
-        // } else {
-        //     Vec::new()
-        // };
-        // Ok(result)
-        todo!()
+        let result = if let Some(cells) = &self.cells {
+            cells.values().map(|item| item.source_object()).collect()
+        } else {
+            HashSet::new()
+        };
+        Ok(result)
     }
 
     fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Morphism<Self::Object>>>, Errors> {
@@ -215,6 +213,12 @@ impl From<&str> for DiscreteCategory {
     }
 }
 
+impl From<String> for DiscreteCategory {
+    fn from(object: String) -> Self {
+        DiscreteCategory::new_with_id(object.into())
+    }
+}
+
 impl From<Vec<&str>> for DiscreteCategory {
     fn from(objects: Vec<&str>) -> Self {
         let mut category = DiscreteCategory::new();
@@ -223,6 +227,12 @@ impl From<Vec<&str>> for DiscreteCategory {
             category.add_object(Rc::new(object)).unwrap();
         }
         category
+    }
+}
+
+impl From<Rc<DiscreteCategory>> for DiscreteCategory {
+    fn from(rc: Rc<DiscreteCategory>) -> Self {
+        (*rc).clone()
     }
 }
 

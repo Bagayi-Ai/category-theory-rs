@@ -35,7 +35,7 @@ impl CategoryTrait for UnitCategory {
         todo!()
     }
 
-    fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors> {
+    fn add_object(&mut self, object: Rc<Self::Object>) -> Result<Rc<Self::Morphism>, Errors> {
         todo!()
     }
 

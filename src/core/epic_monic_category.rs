@@ -52,13 +52,7 @@ where
     fn factorize(
         &mut self,
         morphism: &Morphism<InnerCategory::Object>,
-    ) -> Result<
-        (
-            Morphism<InnerCategory::Object>,
-            Morphism<InnerCategory::Object>,
-        ),
-        Errors,
-    > {
+    ) -> Result<(Rc<InnerCategory::Morphism>, Rc<InnerCategory::Morphism>), Errors> {
         // we factorize to image of f and from image of f to target object
         let source_object = morphism.source_object();
         let target_object = morphism.target_object();
@@ -108,8 +102,11 @@ where
         // add the image object to the category
         let image_object = Rc::new(image_object);
         self.category.add_object(image_object.clone())?;
-        let epic_morphism =
-            Morphism::new_with_mappings(source_object.clone(), image_object.clone(), image_mapping);
+        let epic_morphism = Rc::new(InnerCategory::Morphism::new_with_mappings(
+            source_object.clone(),
+            image_object.clone(),
+            image_mapping,
+        ));
 
         // now mapping from image to target object
         let monic_mapping = {
@@ -122,8 +119,13 @@ where
             monic_mapping
         };
 
-        let monic_morphism =
-            Morphism::new_with_mappings(image_object.clone(), target_object.clone(), monic_mapping);
+        let monic_morphism = Rc::new(InnerCategory::Morphism::new_with_mappings(
+            image_object.clone(),
+            target_object.clone(),
+            monic_mapping,
+        ));
+        self.category.add_morphism(epic_morphism.clone());
+        self.category.add_morphism(monic_morphism.clone());
         Ok((epic_morphism, monic_morphism))
     }
 }
@@ -160,7 +162,7 @@ where
         self.category.category_id()
     }
 
-    fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors> {
+    fn add_object(&mut self, object: Rc<Self::Object>) -> Result<Rc<Self::Morphism>, Errors> {
         self.category.add_object(object)
     }
 

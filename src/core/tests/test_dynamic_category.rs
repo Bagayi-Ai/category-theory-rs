@@ -149,16 +149,16 @@ pub fn test_base_scenario() {
 
     // let functor = Rc::new(functor);
 
-    let morphism_a_num = Morphism::new(
+    let morphism_a_num = Rc::new(Morphism::new(
         "morphism_a_num".into(),
         object_a.clone(),
         object_num.clone(),
         functor,
-    );
+    ));
     // assert!(morphism_a_num.is_ok());
     // let morphism_a_num = morphism_a_num.unwrap();
 
-    category.add_morphism(Rc::new(morphism_a_num)).unwrap();
+    category.add_morphism(morphism_a_num.clone()).unwrap();
 
     // create another functor from object_a to object_num
     // a -> 3, b -> 2, c -> 1
@@ -201,22 +201,21 @@ pub fn test_base_scenario() {
         ),
     ]);
 
-    let morphism_a_num_2 = Morphism::new(
+    let morphism_a_num_2 = Rc::new(Morphism::new(
         "morphism_a_num_2".into(),
         object_a.clone(),
         object_num.clone(),
         functor_2.clone(),
-    );
+    ));
     // assert!(morphism_a_num_2.is_ok());
     // let morphism_a_num_2 = morphism_a_num_2.unwrap();
-    category.add_morphism(Rc::new(morphism_a_num_2)).unwrap();
+    category.add_morphism(morphism_a_num_2).unwrap();
 
     let category = Rc::new(category);
 
     // now create a category of the functor category
-    // let functor_category: DynamicCategory = vec![functor, functor_2].into();
-    // let mut functor_category = DynamicCategory::new_with_id("FunctorCategory".into());
-    // functor_category.add_object(Rc::new(
-    //     DynamicCategory::functor_to_category(functor_2).expect("Expecting category"),
-    // ));
+    let mut functor_category = DynamicCategory::new_with_id("FunctorCategory".into());
+    functor_category.add_object(Rc::new(
+        DynamicCategory::functor_to_category(morphism_a_num).expect("Expecting category"),
+    ));
 }

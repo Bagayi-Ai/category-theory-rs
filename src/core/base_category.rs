@@ -1,4 +1,7 @@
 use crate::core::arrow::{Arrow, Functor, Morphism};
+use crate::core::discrete_category;
+use crate::core::discrete_category::DiscreteCategory;
+use crate::core::dynamic_category::DynamicCategory;
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::object_id::ObjectId;
@@ -81,7 +84,7 @@ impl<Object: CategoryTrait + Hash + Eq + DynClone + std::clone::Clone> CategoryT
         &self.id
     }
 
-    fn add_object(&mut self, object: Rc<Self::Object>) -> Result<(), Errors> {
+    fn add_object(&mut self, object: Rc<Self::Object>) -> Result<Rc<Self::Morphism>, Errors> {
         if self.objects.contains_key(object.category_id()) {
             return Err(Errors::ObjectAlreadyExists);
         }
@@ -92,8 +95,8 @@ impl<Object: CategoryTrait + Hash + Eq + DynClone + std::clone::Clone> CategoryT
             .entry(object_id.clone())
             .or_default()
             .insert(identity_cell.arrow_id().to_string());
-        self.add_morphism(identity_cell)?;
-        Ok(())
+        self.add_morphism(identity_cell.clone())?;
+        Ok(identity_cell)
     }
 
     fn add_morphism(
@@ -173,5 +176,28 @@ impl<Object: CategoryTrait + Hash + Eq + DynClone + std::clone::Clone> CategoryT
             .map(|item| self.morphism.get(item).ok_or(Errors::MorphismNotFound))
             .collect::<Result<Vec<&Rc<Morphism<Self::Object>>>, Errors>>()?;
         Ok(result)
+    }
+}
+
+impl<T: Eq + Clone + Hash + Debug> From<Vec<T>> for BaseCategory<DiscreteCategory>
+where
+    T: Into<ObjectId>,
+{
+    fn from(objects: Vec<T>) -> Self {
+        let mut category = BaseCategory::new();
+        for object in objects {
+            let object = DiscreteCategory::new_with_id(object.into());
+            category.add_object(Rc::new(object)).unwrap();
+        }
+        category
+    }
+}
+
+impl From<String> for BaseCategory<DiscreteCategory> {
+    fn from(object: String) -> Self {
+        let discrete_category = DiscreteCategory::new_with_id(object.into());
+        let mut category = BaseCategory::new();
+        category.add_object(Rc::new(discrete_category)).unwrap();
+        category
     }
 }

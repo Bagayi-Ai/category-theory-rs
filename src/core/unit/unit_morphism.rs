@@ -21,6 +21,36 @@ impl<T: Identifier> ArrowTrait<UnitCategory, UnitCategory> for UnitMorphism<T> {
         todo!()
     }
 
+    fn new_instance(
+        source: Rc<UnitCategory>,
+        target: Rc<UnitCategory>,
+        id: &str,
+        mappings: HashMap<
+            std::rc::Rc<Arrow<UnitCategory, UnitCategory>>,
+            std::rc::Rc<Arrow<UnitCategory, UnitCategory>>,
+        >,
+    ) -> Self
+    where
+        Self: Sized,
+    {
+        todo!()
+    }
+
+    fn new(
+        id: String,
+        source: Rc<UnitCategory>,
+        target: Rc<UnitCategory>,
+        mappings: HashMap<
+            std::rc::Rc<Arrow<UnitCategory, UnitCategory>>,
+            std::rc::Rc<Arrow<UnitCategory, UnitCategory>>,
+        >,
+    ) -> Self
+    where
+        Self: Sized,
+    {
+        todo!()
+    }
+
     fn is_identity(&self) -> bool {
         todo!()
     }

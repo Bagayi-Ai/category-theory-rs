@@ -84,6 +84,10 @@ impl<Object: CategoryTrait + Hash + Eq + DynClone + std::clone::Clone> CategoryT
         &self.id
     }
 
+    fn update_category_id(&mut self, new_id: ObjectId) {
+        self.id = new_id;
+    }
+
     fn add_object(&mut self, object: Rc<Self::Object>) -> Result<Rc<Self::Morphism>, Errors> {
         if self.objects.contains_key(object.category_id()) {
             return Err(Errors::ObjectAlreadyExists);

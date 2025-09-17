@@ -162,6 +162,10 @@ where
         self.category.category_id()
     }
 
+    fn update_category_id(&mut self, new_id: ObjectId) {
+        self.category.update_category_id(new_id);
+    }
+
     fn add_object(&mut self, object: Rc<Self::Object>) -> Result<Rc<Self::Morphism>, Errors> {
         self.category.add_object(object)
     }

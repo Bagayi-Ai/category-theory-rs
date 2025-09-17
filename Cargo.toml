@@ -1,7 +1,9 @@
 [package]
-name = "CategoryTheory"
+name = "category_theory"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
 uuid = { version = "1.17.0", features = ["v4"] }
+rand = "0.8.5"
+dyn-clone = "1.0.20"

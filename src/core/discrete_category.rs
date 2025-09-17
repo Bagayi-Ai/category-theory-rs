@@ -81,6 +81,10 @@ impl CategoryTrait for DiscreteCategory {
         &self.category_id
     }
 
+    fn update_category_id(&mut self, new_id: ObjectId) {
+        self.category_id = new_id;
+    }
+
     fn add_object(&mut self, object: Rc<Self::Object>) -> Result<Rc<Self::Morphism>, Errors> {
         let identity_morphism = Morphism::new_identity(object.clone());
         if let Some(cells) = &mut self.cells {

@@ -186,6 +186,10 @@ impl CategoryTrait for DynamicCategory {
         self.id()
     }
 
+    fn update_category_id(&mut self, new_id: ObjectId) {
+        self.inner_category_mut().update_category_id(new_id);
+    }
+
     fn add_object(&mut self, object: Rc<DynamicCategory>) -> Result<Rc<Self::Morphism>, Errors> {
         self.inner_category_mut().add_object(object)
     }

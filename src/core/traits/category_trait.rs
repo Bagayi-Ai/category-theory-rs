@@ -52,6 +52,15 @@ pub trait CategoryTrait: Debug + Any + DynClone {
 
     fn category_id(&self) -> &ObjectId;
 
+    /*
+    This should be used very carefully, as changing the category ID might lead to inconsistencies
+    it should only be used in scenarios of creating a new category based on an existing
+     */
+    fn update_category_id(&mut self, new_id: ObjectId);
+    fn update_category_id_generate(&mut self) {
+        self.update_category_id(ObjectId::generate())
+    }
+
     fn equal_to(&self, other: &Self::Object) -> bool {
         self.category_id() == other.category_id()
     }

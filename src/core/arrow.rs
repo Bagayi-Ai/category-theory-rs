@@ -289,6 +289,10 @@ where
         &self.id
     }
 
+    fn update_category_id(&mut self, new_id: ObjectId) {
+        todo!()
+    }
+
     fn add_object(&mut self, object: Rc<Self::Object>) -> Result<Rc<Self::Morphism>, Errors> {
         todo!()
     }

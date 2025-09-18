@@ -1,0 +1,11 @@
+services:
+  surreal:
+    image: surrealdb/surrealdb:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      - surrealdb_data:/mydb
+    command: start -u root -p root surrealkv+versioned://mydb
+    user: root
+volumes:
+  surrealdb_data:

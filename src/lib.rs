@@ -7,8 +7,6 @@ pub mod core {
 
     pub mod product_endofunctor;
 
-    pub mod expand_functor;
-
     pub mod base_category;
     pub mod dynamic_category;
     pub mod epic_monic_category;
@@ -18,20 +16,13 @@ pub mod core {
 
     pub mod arrow;
 
+    pub mod persistable_category;
+
     pub mod traits {
         pub mod arrow_trait;
         pub mod category_trait;
 
         pub mod factorization_system_trait;
-    }
-
-    pub mod concrete_category {}
-
-    pub mod unit {
-        pub mod unit_category;
-        pub mod unit_morphism;
-
-        pub mod unit_identifier;
     }
 
     #[cfg(test)]

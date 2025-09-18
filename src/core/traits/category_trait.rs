@@ -3,23 +3,25 @@ use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
+use async_trait::async_trait;
 use dyn_clone::DynClone;
 use std::any::Any;
 use std::collections::HashSet;
 use std::fmt::Debug;
 use std::hash::Hash;
-use std::rc::Rc;
+use std::sync::Arc;
 
 pub type CategorySubObjectAlias<Category> = <Category as CategoryTrait>::Object;
 pub enum MorphismCommutationResult<Category: CategoryTrait> {
     Commutative,
-    NonCommutative(HashSet<Rc<Category::Morphism>>),
+    NonCommutative(HashSet<Arc<Category::Morphism>>),
 }
 
-pub trait CategoryTrait: Debug + Any + DynClone {
-    type Object: CategoryTrait + Debug + Eq + Hash + DynClone;
+#[async_trait]
+pub trait CategoryTrait: Debug + Any + DynClone + Send + Sync {
+    type Object: CategoryTrait + Debug + Eq + Hash + DynClone + Send + Sync;
 
-    type Morphism: ArrowTrait<Self::Object, Self::Object> + Debug;
+    type Morphism: ArrowTrait<Self::Object, Self::Object> + Debug + Send + Sync;
 
     fn new() -> Self
     where
@@ -65,13 +67,21 @@ pub trait CategoryTrait: Debug + Any + DynClone {
         self.category_id() == other.category_id()
     }
 
-    fn add_object(&mut self, object: Rc<Self::Object>) -> Result<Rc<Self::Morphism>, Errors>;
+    async fn add_object(
+        &mut self,
+        object: Arc<Self::Object>,
+    ) -> Result<Arc<Self::Morphism>, Errors>;
 
-    fn add_morphism(&mut self, morphism: Rc<Self::Morphism>)
-    -> Result<&Rc<Self::Morphism>, Errors>;
+    async fn add_morphism(
+        &mut self,
+        morphism: Arc<Self::Morphism>,
+    ) -> Result<&Arc<Self::Morphism>, Errors>;
 
-    fn get_identity_morphism(&self, object: &Self::Object) -> Result<&Rc<Self::Morphism>, Errors> {
-        let hom_set = self.get_hom_set(object, object)?;
+    async fn get_identity_morphism(
+        &self,
+        object: &Self::Object,
+    ) -> Result<&Arc<Self::Morphism>, Errors> {
+        let hom_set = self.get_hom_set(object, object).await?;
         // get the identity morphism
         for morphism in hom_set {
             if morphism.is_identity() {
@@ -81,10 +91,10 @@ pub trait CategoryTrait: Debug + Any + DynClone {
         Err(Errors::IdentityMorphismNotFound)
     }
 
-    fn get_all_identity_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
+    async fn get_all_identity_morphisms(&self) -> Result<HashSet<&Arc<Self::Morphism>>, Errors> {
         let mut identity_morphisms = HashSet::new();
-        for object in self.get_all_objects()? {
-            match self.get_identity_morphism(&**object) {
+        for object in self.get_all_objects().await? {
+            match self.get_identity_morphism(&**object).await {
                 Ok(identity_morphism) => {
                     identity_morphisms.insert(identity_morphism);
                 }
@@ -94,45 +104,47 @@ pub trait CategoryTrait: Debug + Any + DynClone {
         Ok(identity_morphisms)
     }
 
-    fn get_object(&self, object: &Self::Object) -> Result<&Rc<Self::Object>, Errors>;
+    async fn get_object(&self, object: &Self::Object) -> Result<&Arc<Self::Object>, Errors>;
 
-    fn get_all_objects(&self) -> Result<HashSet<&Rc<Self::Object>>, Errors>;
+    async fn get_all_objects(&self) -> Result<HashSet<&Arc<Self::Object>>, Errors>;
 
-    fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Self::Morphism>>, Errors>;
+    async fn get_all_morphisms(&self) -> Result<HashSet<&Arc<Self::Morphism>>, Errors>;
 
-    fn get_hom_set_x(
+    async fn get_hom_set_x(
         &self,
         source_object: &Self::Object,
-    ) -> Result<HashSet<&Rc<Self::Morphism>>, Errors>;
+    ) -> Result<HashSet<&Arc<Self::Morphism>>, Errors>;
 
-    fn get_hom_set(
+    async fn get_hom_set(
         &self,
         source_object: &Self::Object,
         target_object: &Self::Object,
-    ) -> Result<HashSet<&Rc<Self::Morphism>>, Errors> {
+    ) -> Result<HashSet<&Arc<Self::Morphism>>, Errors> {
         Ok(self
-            .get_hom_set_x(source_object)?
+            .get_hom_set_x(source_object)
+            .await?
             .iter()
             .filter(|item| &**item.target_object() == target_object)
             .copied()
             .collect::<HashSet<_>>())
     }
 
-    fn get_object_morphisms(
+    async fn get_object_morphisms(
         &self,
         object: &Self::Object,
-    ) -> Result<Vec<&Rc<Self::Morphism>>, Errors>;
+    ) -> Result<Vec<&Arc<Self::Morphism>>, Errors>;
 
-    fn morphism_commute(
+    async fn morphism_commute(
         &self,
         left_morphisms: Vec<&Self::Morphism>,
         right_morphisms: Vec<&Self::Morphism>,
     ) -> Result<MorphismCommutationResult<Self::Object>, Errors> {
-        self.validate_morphisms_commutation(left_morphisms, right_morphisms)?;
+        self.validate_morphisms_commutation(left_morphisms, right_morphisms)
+            .await?;
         Ok(MorphismCommutationResult::Commutative)
     }
 
-    fn validate_morphisms_commutation(
+    async fn validate_morphisms_commutation(
         &self,
         left_morphisms: Vec<&Self::Morphism>,
         right_morphisms: Vec<&Self::Morphism>,
@@ -172,7 +184,10 @@ pub trait CategoryTrait: Debug + Any + DynClone {
         // todo!()
     }
 
-    fn validate_morphisms_composition(&self, morphims: Vec<&Self::Morphism>) -> Result<(), Errors> {
+    async fn validate_morphisms_composition(
+        &self,
+        morphims: Vec<&Self::Morphism>,
+    ) -> Result<(), Errors> {
         // if morphims.is_empty() {
         //     return Err(NCategoryError::InvalidMorphismComposition);
         // }
@@ -207,5 +222,30 @@ pub trait CategoryTrait: Debug + Any + DynClone {
     {
         todo!()
         // 1 + <Self::Object as CategoryTrait>::nested_level()
+    }
+}
+
+#[async_trait]
+pub trait CategoryFromObjects: CategoryTrait {
+    async fn from_objects<T>(objects: Vec<T>) -> Result<Self, Errors>
+    where
+        T: Into<Self::Object> + Send,
+        Self: Sized;
+}
+
+#[async_trait]
+impl<C> CategoryFromObjects for C
+where
+    C: CategoryTrait + Sized,
+{
+    async fn from_objects<T>(objects: Vec<T>) -> Result<Self, Errors>
+    where
+        T: Into<C::Object> + Send,
+    {
+        let mut category = Self::new();
+        for object in objects {
+            category.add_object(Arc::new(object.into())).await?;
+        }
+        Ok(category)
     }
 }

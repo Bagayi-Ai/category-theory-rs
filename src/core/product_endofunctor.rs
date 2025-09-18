@@ -18,13 +18,13 @@ use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
 use std::collections::HashMap;
 use std::hash::Hash;
-use std::rc::Rc;
+use std::sync::Arc;
 
-pub fn apply_product<Category: CategoryTrait + Eq + Hash>(
+pub async fn apply_product<Category: CategoryTrait + Eq + Hash>(
     category: &mut Category,
-    source_object: &Rc<Category::Object>,
-    fixed_object: Rc<Category::Object>,
-) -> Result<HashMap<Rc<Category::Morphism>, Rc<Category::Morphism>>, Errors>
+    source_object: &Arc<Category::Object>,
+    fixed_object: Arc<Category::Object>,
+) -> Result<HashMap<Arc<Category::Morphism>, Arc<Category::Morphism>>, Errors>
 where
     // <SourCategory as CategoryTrait>::Object: CategoryTrait<Identifier = String>,
 {
@@ -32,12 +32,12 @@ where
     // and map the objects and morphisms of the source category to the target category
     let mut target_object = Category::Object::new();
 
-    let fixed_objects = fixed_object.get_all_objects()?;
+    let fixed_objects = fixed_object.get_all_objects().await?;
 
     let mut source_object_mapping = HashMap::new();
 
     // first map the objects from the source category to the target category
-    for source_sub_identity_morphism in source_object.get_all_identity_morphisms()? {
+    for source_sub_identity_morphism in source_object.get_all_identity_morphisms().await? {
         for fixed_sub_object in &fixed_objects {
             // product object (_) * fixed_object
             let new_value = (*source_sub_identity_morphism.source_object().clone())
@@ -45,9 +45,10 @@ where
                 .to_owned()
                 + (*fixed_sub_object).clone().category_id().clone();
             let new_category = <Category::Object as CategoryTrait>::Object::new_with_id(&new_value);
-            let new_category_rc = Rc::new(new_category);
+            let new_category_rc = Arc::new(new_category);
 
-            let target_sub_identity_morphism = target_object.add_object(new_category_rc.clone())?;
+            let target_sub_identity_morphism =
+                target_object.add_object(new_category_rc.clone()).await?;
             source_object_mapping
                 .entry(source_sub_identity_morphism)
                 .or_insert_with(Vec::new)
@@ -55,22 +56,26 @@ where
         }
     }
 
-    let source_object_mapped_product = Rc::new(target_object);
-    category.add_object(source_object_mapped_product.clone())?;
+    let source_object_mapped_product = Arc::new(target_object);
+    category
+        .add_object(source_object_mapped_product.clone())
+        .await?;
 
     // should map other related object
     let mut morphism_mapping = HashMap::new();
 
     let object_morphisms = category
-        .get_object_morphisms(&*source_object)?
+        .get_object_morphisms(&*source_object)
+        .await?
         .into_iter()
         .map(|m| m.clone())
         .collect::<Vec<_>>();
 
     for morphism in object_morphisms {
         if morphism.is_identity() {
-            let identity_mapped_object =
-                category.get_identity_morphism(&*source_object_mapped_product)?;
+            let identity_mapped_object = category
+                .get_identity_morphism(&*source_object_mapped_product)
+                .await?;
             morphism_mapping.insert(morphism.clone(), identity_mapped_object.clone());
             continue;
         }
@@ -87,9 +92,11 @@ where
                     + (*fixed_sub_object).clone().category_id().clone();
                 let new_category =
                     <Category::Object as CategoryTrait>::Object::new_with_id(&new_value);
-                let new_category_rc = Rc::new(new_category);
-                target_object.add_object(new_category_rc.clone())?;
-                let mapped_morphism = target_object.get_identity_morphism(&*new_category_rc)?;
+                let new_category_rc = Arc::new(new_category);
+                target_object.add_object(new_category_rc.clone()).await?;
+                let mapped_morphism = target_object
+                    .get_identity_morphism(&*new_category_rc)
+                    .await?;
                 mapped_objects.push(mapped_morphism.clone());
             }
 
@@ -105,17 +112,17 @@ where
                 return Err(Errors::InvalidFunctor("Invalid mapping".to_string()));
             }
         }
-        let target_object = Rc::new(target_object);
+        let target_object = Arc::new(target_object);
 
-        category.add_object(target_object.clone())?;
+        category.add_object(target_object.clone()).await?;
 
-        let new_morphism = Rc::new(Category::Morphism::new(
+        let new_morphism = Arc::new(Category::Morphism::new(
             String::generate(),
             source_object_mapped_product.clone(),
             target_object.clone(),
             new_mapping,
         ));
-        category.add_morphism(new_morphism.clone())?;
+        category.add_morphism(new_morphism.clone()).await?;
 
         morphism_mapping.insert(morphism.clone(), new_morphism.clone());
     }

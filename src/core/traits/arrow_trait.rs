@@ -5,35 +5,35 @@ use std::borrow::Borrow;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::hash::Hash;
-use std::rc::Rc;
+use std::sync::Arc;
 
 pub trait ArrowTrait<SourceObject: CategoryTrait, TargetObject: CategoryTrait>: Eq + Hash {
-    fn source_object(&self) -> &Rc<SourceObject>;
+    fn source_object(&self) -> &Arc<SourceObject>;
 
-    fn target_object(&self) -> &Rc<TargetObject>;
+    fn target_object(&self) -> &Arc<TargetObject>;
 
     fn new_instance(
-        source: Rc<SourceObject>,
-        target: Rc<TargetObject>,
+        source: Arc<SourceObject>,
+        target: Arc<TargetObject>,
         id: &str,
-        mappings: HashMap<Rc<SourceObject::Morphism>, Rc<TargetObject::Morphism>>,
+        mappings: HashMap<Arc<SourceObject::Morphism>, Arc<TargetObject::Morphism>>,
     ) -> Self
     where
         Self: Sized;
 
     fn new(
         id: String,
-        source: Rc<SourceObject>,
-        target: Rc<TargetObject>,
-        mappings: HashMap<Rc<SourceObject::Morphism>, Rc<TargetObject::Morphism>>,
+        source: Arc<SourceObject>,
+        target: Arc<TargetObject>,
+        mappings: HashMap<Arc<SourceObject::Morphism>, Arc<TargetObject::Morphism>>,
     ) -> Self
     where
         Self: Sized;
 
     fn new_with_mappings(
-        source_object: Rc<SourceObject>,
-        target_object: Rc<TargetObject>,
-        mappings: HashMap<Rc<SourceObject::Morphism>, Rc<TargetObject::Morphism>>,
+        source_object: Arc<SourceObject>,
+        target_object: Arc<TargetObject>,
+        mappings: HashMap<Arc<SourceObject::Morphism>, Arc<TargetObject::Morphism>>,
     ) -> Self
     where
         Self: Sized,
@@ -48,13 +48,13 @@ pub trait ArrowTrait<SourceObject: CategoryTrait, TargetObject: CategoryTrait>: 
     fn compose(
         &self,
         other: &impl ArrowTrait<SourceObject, TargetObject>,
-    ) -> Result<Rc<impl ArrowTrait<SourceObject, TargetObject>>, Errors>;
+    ) -> Result<Arc<impl ArrowTrait<SourceObject, TargetObject>>, Errors>;
 
     // for handling composition of arrows
     // for single arrow just return itself
     fn arrows(&self) -> Vec<&impl ArrowTrait<SourceObject, TargetObject>>;
 
-    fn arrow_mappings(&self) -> &HashMap<Rc<SourceObject::Morphism>, Rc<TargetObject::Morphism>>;
+    fn arrow_mappings(&self) -> &HashMap<Arc<SourceObject::Morphism>, Arc<TargetObject::Morphism>>;
 
     fn validate_composition(&self) -> Result<(), Errors> {
         todo!()
@@ -67,7 +67,7 @@ pub trait ArrowTrait<SourceObject: CategoryTrait, TargetObject: CategoryTrait>: 
         todo!()
     }
 
-    fn validate_mappings(&self) -> Result<(), Errors>;
+    async fn validate_mappings(&self) -> Result<(), Errors>;
 
     fn is_isomorphism(&self) -> bool {
         todo!()

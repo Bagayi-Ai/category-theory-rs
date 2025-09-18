@@ -2,13 +2,14 @@ use crate::core::arrow::{Arrow, Functor, Morphism};
 use crate::core::errors::Errors;
 use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::traits::category_trait::{CategoryFromObjects, CategoryTrait};
 use crate::core::traits::factorization_system_trait::FactorizationSystemTrait;
 use crate::core::utils;
+use async_trait::async_trait;
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::hash::Hash;
-use std::rc::Rc;
+use std::sync::Arc;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EpicMonicCategory<InnerCategory>
@@ -17,10 +18,10 @@ where
 {
     category: InnerCategory,
     morphism_factors: HashMap<
-        Rc<Morphism<InnerCategory::Object>>,
+        Arc<Morphism<InnerCategory::Object>>,
         (
-            Rc<Morphism<InnerCategory::Object>>,
-            Rc<Morphism<InnerCategory::Object>>,
+            Arc<Morphism<InnerCategory::Object>>,
+            Arc<Morphism<InnerCategory::Object>>,
         ),
     >,
 }
@@ -49,16 +50,16 @@ where
         &self.category
     }
 
-    fn factorize(
+    async fn factorize(
         &mut self,
         morphism: &Morphism<InnerCategory::Object>,
-    ) -> Result<(Rc<InnerCategory::Morphism>, Rc<InnerCategory::Morphism>), Errors> {
+    ) -> Result<(Arc<InnerCategory::Morphism>, Arc<InnerCategory::Morphism>), Errors> {
         // we factorize to image of f and from image of f to target object
         let source_object = morphism.source_object();
         let target_object = morphism.target_object();
         let mappings = morphism.arrow_mappings();
 
-        let mut all_target_objects = target_object.get_all_objects()?.clone();
+        let mut all_target_objects = target_object.get_all_objects().await?.clone();
 
         let mut image_object = InnerCategory::Object::new();
         let mut image_mapping = HashMap::new();
@@ -80,11 +81,16 @@ where
                 }
 
                 // if object has already been added to image_object
-                if let Ok(object) = image_object.get_object(&**target_morphism.target_object()) {
-                    let target_morphism = image_object.get_identity_morphism(&**object)?;
+                if let Ok(object) = image_object
+                    .get_object(&**target_morphism.target_object())
+                    .await
+                {
+                    let target_morphism = image_object.get_identity_morphism(&**object).await?;
                     image_mapping.insert((*source_morphism).clone(), target_morphism.clone());
                 } else {
-                    image_object.add_object(target_morphism.target_object().clone())?;
+                    image_object
+                        .add_object(target_morphism.target_object().clone())
+                        .await?;
                     image_mapping.insert((*source_morphism).clone(), (*target_morphism).clone());
                 }
             } else {
@@ -94,15 +100,15 @@ where
         // let image_object = if target_as_image && !all_target_objects.is_empty() {
         //     target_object.clone()
         // } else {
-        //     let result = Rc::new(image_object);
+        //     let result = Arc::new(image_object);
         //     self.category.add_object(result.clone())?;
         //     result
         // };
 
         // add the image object to the category
-        let image_object = Rc::new(image_object);
-        self.category.add_object(image_object.clone())?;
-        let epic_morphism = Rc::new(InnerCategory::Morphism::new_with_mappings(
+        let image_object = Arc::new(image_object);
+        self.category.add_object(image_object.clone()).await?;
+        let epic_morphism = Arc::new(InnerCategory::Morphism::new_with_mappings(
             source_object.clone(),
             image_object.clone(),
             image_mapping,
@@ -111,15 +117,15 @@ where
         // now mapping from image to target object
         let monic_mapping = {
             let mut monic_mapping = HashMap::new();
-            for obj in image_object.get_all_objects()? {
-                let source_morphism = image_object.get_identity_morphism(&**obj)?;
-                let target_morphism = target_object.get_identity_morphism(&**obj)?;
+            for obj in image_object.get_all_objects().await? {
+                let source_morphism = image_object.get_identity_morphism(&**obj).await?;
+                let target_morphism = target_object.get_identity_morphism(&**obj).await?;
                 monic_mapping.insert(source_morphism.clone(), target_morphism.clone());
             }
             monic_mapping
         };
 
-        let monic_morphism = Rc::new(InnerCategory::Morphism::new_with_mappings(
+        let monic_morphism = Arc::new(InnerCategory::Morphism::new_with_mappings(
             image_object.clone(),
             target_object.clone(),
             monic_mapping,
@@ -130,6 +136,7 @@ where
     }
 }
 
+#[async_trait]
 impl<InnerCategory> CategoryTrait for EpicMonicCategory<InnerCategory>
 where
     InnerCategory: CategoryTrait<
@@ -166,46 +173,51 @@ where
         self.category.update_category_id(new_id);
     }
 
-    fn add_object(&mut self, object: Rc<Self::Object>) -> Result<Rc<Self::Morphism>, Errors> {
-        self.category.add_object(object)
+    async fn add_object(
+        &mut self,
+        object: Arc<Self::Object>,
+    ) -> Result<Arc<Self::Morphism>, Errors> {
+        self.category.add_object(object).await
     }
 
-    fn add_morphism(
+    async fn add_morphism(
         &mut self,
-        morphism: Rc<Morphism<InnerCategory::Object>>,
-    ) -> Result<&Rc<Morphism<InnerCategory::Object>>, Errors> {
+        morphism: Arc<Morphism<InnerCategory::Object>>,
+    ) -> Result<&Arc<Morphism<InnerCategory::Object>>, Errors> {
         // here we need to factor it to epic and monic morphisms
-        let (epic, monic) = self.factorize(&morphism)?;
+        let (epic, monic) = self.factorize(&morphism).await?;
         // self.hash_map.insert(morphism.id().clone(), (epic, monic));
         self.morphism_factors
             .insert(morphism.clone(), (epic.into(), monic.into()));
-        self.category.add_morphism(morphism)
+        self.category.add_morphism(morphism).await
     }
 
-    fn get_object(&self, object: &Self::Object) -> Result<&Rc<Self::Object>, Errors> {
-        self.category.get_object(object)
+    async fn get_object(&self, object: &Self::Object) -> Result<&Arc<Self::Object>, Errors> {
+        self.category.get_object(object).await
     }
 
-    fn get_all_objects(&self) -> Result<HashSet<&Rc<Self::Object>>, Errors> {
-        self.category.get_all_objects()
+    async fn get_all_objects(&self) -> Result<HashSet<&Arc<Self::Object>>, Errors> {
+        self.category.get_all_objects().await
     }
 
-    fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Morphism<InnerCategory::Object>>>, Errors> {
-        self.category.get_all_morphisms()
+    async fn get_all_morphisms(
+        &self,
+    ) -> Result<HashSet<&Arc<Morphism<InnerCategory::Object>>>, Errors> {
+        self.category.get_all_morphisms().await
     }
 
-    fn get_hom_set_x(
+    async fn get_hom_set_x(
         &self,
         source_object: &Self::Object,
-    ) -> Result<HashSet<&Rc<Morphism<InnerCategory::Object>>>, Errors> {
-        self.category.get_hom_set_x(source_object)
+    ) -> Result<HashSet<&Arc<Morphism<InnerCategory::Object>>>, Errors> {
+        self.category.get_hom_set_x(source_object).await
     }
 
-    fn get_object_morphisms(
+    async fn get_object_morphisms(
         &self,
         object_id: &Self::Object,
-    ) -> Result<Vec<&Rc<Morphism<InnerCategory::Object>>>, Errors> {
-        self.category.get_object_morphisms(object_id)
+    ) -> Result<Vec<&Arc<Morphism<InnerCategory::Object>>>, Errors> {
+        self.category.get_object_morphisms(object_id).await
     }
 }
 
@@ -227,8 +239,8 @@ where
         morphism: &Morphism<InnerCategory::Object>,
     ) -> Result<
         &(
-            Rc<Morphism<InnerCategory::Object>>,
-            Rc<Morphism<InnerCategory::Object>>,
+            Arc<Morphism<InnerCategory::Object>>,
+            Arc<Morphism<InnerCategory::Object>>,
         ),
         Errors,
     > {
@@ -251,16 +263,18 @@ mod tests {
     use super::*;
     use crate::core::base_category::BaseCategory;
     use crate::core::dynamic_category::DynamicCategory;
-    use std::rc::Rc;
+    use std::sync::Arc;
 
-    #[test]
-    fn test_epic_monic_category() {
+    #[tokio::test]
+    async fn test_epic_monic_category() {
         let mut epic_monic_category = EpicMonicCategory::<DynamicCategory>::new();
 
-        let object_ab: Rc<DynamicCategory> = Rc::new(vec!["a", "b"].into());
+        let object_ab: Arc<DynamicCategory> =
+            Arc::new(DynamicCategory::from_objects(vec!["a", "b"]).await.unwrap());
 
         epic_monic_category
             .add_object(object_ab.clone())
+            .await
             .expect("Failed to add object A");
     }
 }

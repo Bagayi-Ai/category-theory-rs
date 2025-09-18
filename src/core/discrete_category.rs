@@ -69,23 +69,17 @@ impl CategoryTrait for DiscreteCategory {
 
     type Morphism = Morphism<Self::Object>;
 
-    fn new() -> Self {
-        DiscreteCategory::new()
-    }
-
-    fn new_with_id(id: &ObjectId) -> Self
-    where
-        Self: Sized,
-    {
-        DiscreteCategory::new_with_id(id.clone())
+    async fn new() -> Result<Self, Errors> {
+        Ok(DiscreteCategory::new())
     }
 
     fn category_id(&self) -> &ObjectId {
         &self.category_id
     }
 
-    fn update_category_id(&mut self, new_id: ObjectId) {
+    async fn update_category_id(&mut self, new_id: ObjectId) -> Result<(), Errors> {
         self.category_id = new_id;
+        Ok(())
     }
 
     async fn add_object(
@@ -108,10 +102,7 @@ impl CategoryTrait for DiscreteCategory {
         Ok(identity_morphism)
     }
 
-    async fn add_morphism(
-        &mut self,
-        morphism: Arc<Morphism<Self::Object>>,
-    ) -> Result<&Arc<Morphism<Self::Object>>, Errors> {
+    async fn add_morphism(&mut self, morphism: Arc<Morphism<Self::Object>>) -> Result<(), Errors> {
         Err(Errors::CannotAddMorphismToDiscreteCategory)
     }
 

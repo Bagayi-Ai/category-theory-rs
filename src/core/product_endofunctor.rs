@@ -14,8 +14,9 @@ This is useful for creating new categories that are derived from the original ca
 use crate::core::arrow::{Arrow, Functor, Morphism};
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
+use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::traits::category_trait::{CategoryFromObjects, CategoryTrait};
 use std::collections::HashMap;
 use std::hash::Hash;
 use std::sync::Arc;
@@ -26,11 +27,12 @@ pub async fn apply_product<Category: CategoryTrait + Eq + Hash>(
     fixed_object: Arc<Category::Object>,
 ) -> Result<HashMap<Arc<Category::Morphism>, Arc<Category::Morphism>>, Errors>
 where
-    // <SourCategory as CategoryTrait>::Object: CategoryTrait<Identifier = String>,
+    <<<Category as CategoryTrait>::Object as CategoryTrait>::Object as CategoryTrait>::Object:
+        for<'a> From<&'a ObjectId>, // <SourCategory as CategoryTrait>::Object: CategoryTrait<Identifier = String>,
 {
     // we take a product of the source category and the fixed category
     // and map the objects and morphisms of the source category to the target category
-    let mut target_object = Category::Object::new();
+    let mut target_object = Category::Object::new().await?;
 
     let fixed_objects = fixed_object.get_all_objects().await?;
 
@@ -44,7 +46,8 @@ where
                 .category_id()
                 .to_owned()
                 + (*fixed_sub_object).clone().category_id().clone();
-            let new_category = <Category::Object as CategoryTrait>::Object::new_with_id(&new_value);
+            let new_category =
+                <Category::Object as CategoryTrait>::Object::from_object(&new_value).await?;
             let new_category_rc = Arc::new(new_category);
 
             let target_sub_identity_morphism =
@@ -81,7 +84,7 @@ where
         }
         let arrow_mapping = morphism.arrow_mappings();
         let mut new_mapping = HashMap::new();
-        let mut target_object = Category::Object::new();
+        let mut target_object = Category::Object::new().await?;
         for (source_sub_morphism, target_sub_morphism) in arrow_mapping {
             let mut mapped_objects = Vec::new();
             for fixed_sub_object in &fixed_objects {
@@ -91,7 +94,7 @@ where
                     .to_owned()
                     + (*fixed_sub_object).clone().category_id().clone();
                 let new_category =
-                    <Category::Object as CategoryTrait>::Object::new_with_id(&new_value);
+                    <Category::Object as CategoryTrait>::Object::from_object(&new_value).await?;
                 let new_category_rc = Arc::new(new_category);
                 target_object.add_object(new_category_rc.clone()).await?;
                 let mapped_morphism = target_object

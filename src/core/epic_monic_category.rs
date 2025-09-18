@@ -9,7 +9,11 @@ use async_trait::async_trait;
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::hash::Hash;
-use std::sync::Arc;
+use std::sync::{Arc, LazyLock};
+use surrealdb::Surreal;
+use surrealdb::engine::remote::ws::Client;
+
+static DB: LazyLock<Surreal<Client>> = LazyLock::new(Surreal::init);
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EpicMonicCategory<InnerCategory>
@@ -26,24 +30,15 @@ where
     >,
 }
 
-impl<InnerCategory> Default for EpicMonicCategory<InnerCategory>
-where
-    InnerCategory: CategoryTrait + Hash + Eq + 'static,
-{
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl<InnerCategory> EpicMonicCategory<InnerCategory>
 where
     InnerCategory: CategoryTrait + Hash + Eq + 'static,
 {
-    pub fn new() -> Self {
-        EpicMonicCategory {
-            category: InnerCategory::new(),
+    pub async fn new() -> Result<Self, Errors> {
+        Ok(EpicMonicCategory {
+            category: InnerCategory::new().await?,
             morphism_factors: HashMap::new(),
-        }
+        })
     }
 
     pub fn category(&self) -> &InnerCategory {
@@ -61,7 +56,7 @@ where
 
         let mut all_target_objects = target_object.get_all_objects().await?.clone();
 
-        let mut image_object = InnerCategory::Object::new();
+        let mut image_object = InnerCategory::Object::new().await?;
         let mut image_mapping = HashMap::new();
         // possibility the target object is the image of source object
         let mut target_as_image = false;
@@ -154,14 +149,7 @@ where
 
     type Morphism = Morphism<Self::Object>;
 
-    fn new() -> Self {
-        todo!()
-    }
-
-    fn new_with_id(id: &ObjectId) -> Self
-    where
-        Self: Sized,
-    {
+    async fn new() -> Result<Self, Errors> {
         todo!()
     }
 
@@ -169,8 +157,8 @@ where
         self.category.category_id()
     }
 
-    fn update_category_id(&mut self, new_id: ObjectId) {
-        self.category.update_category_id(new_id);
+    async fn update_category_id(&mut self, new_id: ObjectId) -> Result<(), Errors> {
+        self.category.update_category_id(new_id).await
     }
 
     async fn add_object(
@@ -183,7 +171,7 @@ where
     async fn add_morphism(
         &mut self,
         morphism: Arc<Morphism<InnerCategory::Object>>,
-    ) -> Result<&Arc<Morphism<InnerCategory::Object>>, Errors> {
+    ) -> Result<(), Errors> {
         // here we need to factor it to epic and monic morphisms
         let (epic, monic) = self.factorize(&morphism).await?;
         // self.hash_map.insert(morphism.id().clone(), (epic, monic));
@@ -267,7 +255,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_epic_monic_category() {
-        let mut epic_monic_category = EpicMonicCategory::<DynamicCategory>::new();
+        let mut epic_monic_category = EpicMonicCategory::<DynamicCategory>::new().await.unwrap();
 
         let object_ab: Arc<DynamicCategory> =
             Arc::new(DynamicCategory::from_objects(vec!["a", "b"]).await.unwrap());

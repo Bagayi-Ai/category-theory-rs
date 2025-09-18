@@ -23,11 +23,7 @@ pub trait CategoryTrait: Debug + Any + DynClone + Send + Sync {
 
     type Morphism: ArrowTrait<Self::Object, Self::Object> + Debug + Send + Sync;
 
-    fn new() -> Self
-    where
-        Self: Sized;
-
-    fn new_with_id(id: &ObjectId) -> Self
+    async fn new() -> Result<Self, Errors>
     where
         Self: Sized;
 
@@ -38,29 +34,16 @@ pub trait CategoryTrait: Debug + Any + DynClone + Send + Sync {
         Self::nested_level()
     }
 
-    fn new_instance(&self) -> Self
-    where
-        Self: Sized,
-    {
-        Self::new()
-    }
-
-    fn new_instance_with_id(&self, id: &ObjectId) -> Self
-    where
-        Self: Sized,
-    {
-        Self::new_with_id(id)
-    }
-
     fn category_id(&self) -> &ObjectId;
 
     /*
     This should be used very carefully, as changing the category ID might lead to inconsistencies
     it should only be used in scenarios of creating a new category based on an existing
      */
-    fn update_category_id(&mut self, new_id: ObjectId);
-    fn update_category_id_generate(&mut self) {
-        self.update_category_id(ObjectId::generate())
+    async fn update_category_id(&mut self, new_id: ObjectId) -> Result<(), Errors>;
+
+    async fn update_category_id_generate(&mut self) -> Result<(), Errors> {
+        self.update_category_id(ObjectId::generate()).await
     }
 
     fn equal_to(&self, other: &Self::Object) -> bool {
@@ -72,10 +55,7 @@ pub trait CategoryTrait: Debug + Any + DynClone + Send + Sync {
         object: Arc<Self::Object>,
     ) -> Result<Arc<Self::Morphism>, Errors>;
 
-    async fn add_morphism(
-        &mut self,
-        morphism: Arc<Self::Morphism>,
-    ) -> Result<&Arc<Self::Morphism>, Errors>;
+    async fn add_morphism(&mut self, morphism: Arc<Self::Morphism>) -> Result<(), Errors>;
 
     async fn get_identity_morphism(
         &self,
@@ -231,6 +211,14 @@ pub trait CategoryFromObjects: CategoryTrait {
     where
         T: Into<Self::Object> + Send,
         Self: Sized;
+
+    async fn from_object<T>(object: T) -> Result<Self, Errors>
+    where
+        T: Into<Self::Object> + Send,
+        Self: Sized,
+    {
+        Self::from_objects(vec![object]).await
+    }
 }
 
 #[async_trait]
@@ -242,7 +230,7 @@ where
     where
         T: Into<C::Object> + Send,
     {
-        let mut category = Self::new();
+        let mut category = Self::new().await?;
         for object in objects {
             category.add_object(Arc::new(object.into())).await?;
         }

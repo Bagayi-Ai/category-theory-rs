@@ -97,8 +97,8 @@ impl DynamicCategory {
         Self::new_with_id(ObjectId::Str(uuid::Uuid::new_v4().to_string()))
     }
 
-    pub fn new_epic_monic_category(id: ObjectId) -> Result<Self, Errors> {
-        let epic_monic_category = EpicMonicCategory::<DynamicCategory>::new();
+    pub async fn new_epic_monic_category(id: ObjectId) -> Result<Self, Errors> {
+        let epic_monic_category = EpicMonicCategory::<DynamicCategory>::new().await?;
         let mut result = DynamicCategory::new_with_id(id);
         result.dynamic_type = DynamicType::EpicMonicCategory;
         result.inner_category =
@@ -171,26 +171,19 @@ impl CategoryTrait for DynamicCategory {
 
     type Morphism = Morphism<DynamicCategory>;
 
-    fn new() -> Self
+    async fn new() -> Result<Self, Errors>
     where
         Self: Sized,
     {
-        DynamicCategory::new()
-    }
-
-    fn new_with_id(id: &ObjectId) -> Self
-    where
-        Self: Sized,
-    {
-        DynamicCategory::new_with_id(id.clone())
+        Ok(DynamicCategory::new())
     }
 
     fn category_id(&self) -> &ObjectId {
         self.id()
     }
 
-    fn update_category_id(&mut self, new_id: ObjectId) {
-        self.inner_category_mut().update_category_id(new_id);
+    async fn update_category_id(&mut self, new_id: ObjectId) -> Result<(), Errors> {
+        self.inner_category_mut().update_category_id(new_id).await
     }
 
     async fn add_object(
@@ -200,10 +193,7 @@ impl CategoryTrait for DynamicCategory {
         self.inner_category_mut().add_object(object).await
     }
 
-    async fn add_morphism(
-        &mut self,
-        morphism: Arc<Morphism<Self::Object>>,
-    ) -> Result<&Arc<Morphism<Self::Object>>, Errors> {
+    async fn add_morphism(&mut self, morphism: Arc<Morphism<Self::Object>>) -> Result<(), Errors> {
         self.inner_category_mut().add_morphism(morphism).await
     }
 

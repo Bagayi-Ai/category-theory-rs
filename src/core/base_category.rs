@@ -70,23 +70,17 @@ impl<Object: CategoryTrait + Hash + Eq + DynClone + Clone> CategoryTrait for Bas
 
     type Morphism = Morphism<Self::Object>;
 
-    fn new() -> Self {
-        BaseCategory::new()
-    }
-
-    fn new_with_id(id: &ObjectId) -> Self
-    where
-        Self: Sized,
-    {
-        BaseCategory::new_with_id(id.clone())
+    async fn new() -> Result<Self, Errors> {
+        Ok(BaseCategory::new())
     }
 
     fn category_id(&self) -> &ObjectId {
         &self.id
     }
 
-    fn update_category_id(&mut self, new_id: ObjectId) {
+    async fn update_category_id(&mut self, new_id: ObjectId) -> Result<(), Errors> {
         self.id = new_id;
+        Ok(())
     }
 
     async fn add_object(
@@ -107,10 +101,7 @@ impl<Object: CategoryTrait + Hash + Eq + DynClone + Clone> CategoryTrait for Bas
         Ok(identity_cell)
     }
 
-    async fn add_morphism(
-        &mut self,
-        morphism: Arc<Morphism<Self::Object>>,
-    ) -> Result<&Arc<Morphism<Self::Object>>, Errors> {
+    async fn add_morphism(&mut self, morphism: Arc<Morphism<Self::Object>>) -> Result<(), Errors> {
         if self.morphism.contains_key(morphism.arrow_id()) {
             return Err(Errors::MorphismAlreadyExists);
         }
@@ -134,7 +125,7 @@ impl<Object: CategoryTrait + Hash + Eq + DynClone + Clone> CategoryTrait for Bas
             .morphism
             .entry(morphism.arrow_id().clone())
             .or_insert(morphism);
-        Ok(cell)
+        Ok(())
     }
 
     async fn get_object(&self, object: &Self::Object) -> Result<&Arc<Self::Object>, Errors> {

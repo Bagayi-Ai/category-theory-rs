@@ -1,3 +1,8 @@
+use std::sync::LazyLock;
+use surrealdb::Surreal;
+use surrealdb::engine::remote::ws::{Client, Ws};
+use surrealdb::opt::auth::Root;
+
 pub mod core {
     pub mod discrete_category;
 
@@ -32,6 +37,34 @@ pub mod core {
 
         pub mod test_dynamic_category;
     }
+}
+
+pub static DB: LazyLock<Surreal<Client>> = LazyLock::new(Surreal::init);
+
+pub async fn init_db() -> surrealdb::Result<()> {
+    DB.connect::<Ws>("localhost:8000").await?;
+    DB.signin(Root {
+        username: "root",
+        password: "root",
+    })
+    .await?;
+    DB.use_ns("namespace").use_db("database").await?;
+
+    DB.query(
+        "
+        DEFINE TABLE object SCHEMALESS;
+        DEFINE INDEX unique_object_id ON object FIELDS category, object_id UNIQUE;
+
+        DEFINE TABLE morphism SCHEMALESS;
+        DEFINE INDEX unique_morphism_name ON morphism FIELDS category, arrow_id UNIQUE;
+
+        DEFINE TABLE functor SCHEMALESS;
+        DEFINE INDEX unique_functor_id ON functor FIELDS category, arrow_id UNIQUE;
+        ",
+    )
+    .await?;
+
+    Ok(())
 }
 
 pub fn add(left: u64, right: u64) -> u64 {

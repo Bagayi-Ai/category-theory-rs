@@ -531,6 +531,7 @@ dependencies = [
  "dyn-clone",
  "rand 0.8.5",
  "serde",
+ "serde_json",
  "surrealdb",
  "tokio",
  "uuid",

@@ -1,7 +1,9 @@
+use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use std::ops::Add;
 
-#[derive(Debug, Clone, Eq, Hash)]
+#[derive(Debug, Clone, Eq, Hash, Serialize, Deserialize)]
+#[serde(tag = "type", content = "value")]
 pub enum ObjectId {
     Int(i32),
     Str(String),

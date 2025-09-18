@@ -275,14 +275,7 @@ where
     type Object = TargetObject;
     type Morphism = Morphism<Self::Object>;
 
-    fn new() -> Self
-    where
-        Self: Sized,
-    {
-        todo!()
-    }
-
-    fn new_with_id(id: &ObjectId) -> Self
+    async fn new() -> Result<Self, Errors>
     where
         Self: Sized,
     {
@@ -293,7 +286,7 @@ where
         &self.id
     }
 
-    fn update_category_id(&mut self, new_id: ObjectId) {
+    async fn update_category_id(&mut self, new_id: ObjectId) -> Result<(), Errors> {
         todo!()
     }
 
@@ -304,10 +297,7 @@ where
         todo!()
     }
 
-    async fn add_morphism(
-        &mut self,
-        morphism: Arc<Self::Morphism>,
-    ) -> Result<&Arc<Self::Morphism>, Errors> {
+    async fn add_morphism(&mut self, morphism: Arc<Self::Morphism>) -> Result<(), Errors> {
         todo!()
     }
 

@@ -802,7 +802,7 @@ pub async fn test_nested_category() {
         "natural_transformation_lower_to_upper".to_string(),
         functor_lower_to_upper.clone(),
         functor_lower_to_upper_reverse.clone(),
-        None
+        None,
     );
     let natural_transformation_morphism = Arc::new(natural_transformation_morphism);
 

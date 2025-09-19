@@ -144,25 +144,28 @@ impl CategoryTrait for PersistableCategory {
         dbg!(record);
 
         // if it's not identity morphism there is a functor that needs to be created
-        if !morphism.is_identity() && morphism.source_object().is_category {
-            let record: Option<Record> = DB
-                .create(Self::FUNCTOR_TABLE_NAME)
-                .content(
-                    morphism
-                        .arrow_mappings()
-                        .iter()
-                        .map(|(source_morphism, target_morphism)| PersistableArrow {
-                            arrow_id: morphism.arrow_id().clone(),
-                            source: Thing::from(self.morphism_resource(&*source_morphism)),
-                            target: Thing::from(self.morphism_resource(&*target_morphism)),
-                            category: Thing::from(self.resource()),
-                            is_identity: false,
-                        })
-                        .collect::<Vec<_>>(),
-                )
-                .await
-                .unwrap();
-            dbg!(record);
+        if let Some(functor) = morphism.get_functor() {
+            let arrow_mappings = functor.arrow_mappings();
+            if !arrow_mappings.is_empty() {
+                let record: Option<Record> = DB
+                    .create(Self::FUNCTOR_TABLE_NAME)
+                    .content(
+                        functor
+                            .arrow_mappings()
+                            .iter()
+                            .map(|(source_morphism, target_morphism)| PersistableArrow {
+                                arrow_id: functor.arrow_id().clone(),
+                                source: Thing::from(self.morphism_resource(&*source_morphism)),
+                                target: Thing::from(self.morphism_resource(&*target_morphism)),
+                                category: Thing::from(self.resource()),
+                                is_identity: false,
+                            })
+                            .collect::<Vec<_>>(),
+                    )
+                    .await
+                    .unwrap();
+                dbg!(record);
+            }
         }
         Ok(())
     }

@@ -28,7 +28,7 @@ pub async fn apply_product<Category: CategoryTrait + Eq + Hash>(
 ) -> Result<HashMap<Arc<Category::Morphism>, Arc<Category::Morphism>>, Errors>
 where
     <<<Category as CategoryTrait>::Object as CategoryTrait>::Object as CategoryTrait>::Object:
-        for<'a> From<&'a ObjectId>, // <SourCategory as CategoryTrait>::Object: CategoryTrait<Identifier = String>,
+        From<ObjectId>, // <SourCategory as CategoryTrait>::Object: CategoryTrait<Identifier = String>,
 {
     // we take a product of the source category and the fixed category
     // and map the objects and morphisms of the source category to the target category
@@ -47,7 +47,7 @@ where
                 .to_owned()
                 + (*fixed_sub_object).clone().category_id().clone();
             let new_category =
-                <Category::Object as CategoryTrait>::Object::from_object(&new_value).await?;
+                <Category::Object as CategoryTrait>::Object::from_object(new_value).await?;
             let new_category_rc = Arc::new(new_category);
 
             let target_sub_identity_morphism =
@@ -75,6 +75,7 @@ where
         .collect::<Vec<_>>();
 
     for morphism in object_morphisms {
+        dbg!(&morphism);
         if morphism.is_identity() {
             let identity_mapped_object = category
                 .get_identity_morphism(&*source_object_mapped_product)
@@ -94,7 +95,7 @@ where
                     .to_owned()
                     + (*fixed_sub_object).clone().category_id().clone();
                 let new_category =
-                    <Category::Object as CategoryTrait>::Object::from_object(&new_value).await?;
+                    <Category::Object as CategoryTrait>::Object::from_object(new_value).await?;
                 let new_category_rc = Arc::new(new_category);
                 target_object.add_object(new_category_rc.clone()).await?;
                 let mapped_morphism = target_object

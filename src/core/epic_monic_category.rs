@@ -1,19 +1,14 @@
-use crate::core::arrow::{Arrow, Functor, Morphism};
+use crate::core::arrow::{Arrow, Morphism};
 use crate::core::errors::Errors;
 use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::{CategoryFromObjects, CategoryTrait};
+use crate::core::traits::category_trait::{CategoryTrait};
 use crate::core::traits::factorization_system_trait::FactorizationSystemTrait;
-use crate::core::utils;
 use async_trait::async_trait;
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::hash::Hash;
-use std::sync::{Arc, LazyLock};
-use surrealdb::Surreal;
-use surrealdb::engine::remote::ws::Client;
-
-static DB: LazyLock<Surreal<Client>> = LazyLock::new(Surreal::init);
+use std::sync::{Arc};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EpicMonicCategory<InnerCategory>
@@ -125,8 +120,8 @@ where
             target_object.clone(),
             monic_mapping,
         ));
-        self.category.add_morphism(epic_morphism.clone());
-        self.category.add_morphism(monic_morphism.clone());
+        self.category.add_morphism(epic_morphism.clone()).await?;
+        self.category.add_morphism(monic_morphism.clone()).await?;
         Ok((epic_morphism, monic_morphism))
     }
 }
@@ -249,8 +244,8 @@ impl<Object: CategoryTrait + Hash + Eq> Hash for EpicMonicCategory<Object> {
 
 mod tests {
     use super::*;
-    use crate::core::base_category::BaseCategory;
     use crate::core::dynamic_category::DynamicCategory;
+    use crate::core::traits::category_trait::CategoryFromObjects;
     use std::sync::Arc;
 
     #[tokio::test]

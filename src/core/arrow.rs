@@ -40,8 +40,8 @@ impl<SourceObject: CategoryTrait, TargetObject: CategoryTrait> Debug
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Arrow")
             .field("id", &self.id)
-            .field("source_object", &self.source_object)
-            .field("target_object", &self.target_object)
+            .field("source_object", self.source_object.category_id())
+            .field("target_object", self.target_object.category_id())
             .field("is_identity", &self.is_identity)
             .finish()
     }

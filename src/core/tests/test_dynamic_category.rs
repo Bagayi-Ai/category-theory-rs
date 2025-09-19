@@ -157,8 +157,7 @@ pub async fn test_base_scenario() {
 
     // let functor = Arc::new(functor);
 
-    let morphism_a_num = Arc::new(Morphism::new(
-        "morphism_a_num".into(),
+    let morphism_a_num = Arc::new(Morphism::new_with_mappings(
         object_a.clone(),
         object_num.clone(),
         functor,
@@ -215,8 +214,7 @@ pub async fn test_base_scenario() {
         ),
     ]);
 
-    let morphism_a_num_2 = Arc::new(Morphism::new(
-        "morphism_a_num_2".into(),
+    let morphism_a_num_2 = Arc::new(Morphism::new_with_mappings(
         object_a.clone(),
         object_num.clone(),
         functor_2.clone(),

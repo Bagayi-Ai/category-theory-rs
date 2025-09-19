@@ -357,8 +357,7 @@ pub async fn test_identity_cell_tree() {
     );
 
     // now add morphism from lower to upper
-    let morphism = Arc::new(Morphism::new(
-        "lower_to_upper".to_string(),
+    let morphism = Arc::new(Morphism::new_with_mappings(
         discreteCategoryALower.clone(),
         discreteCategoryAUpper.clone(),
         lower_to_upper_mappings,
@@ -803,7 +802,7 @@ pub async fn test_nested_category() {
         "natural_transformation_lower_to_upper".to_string(),
         functor_lower_to_upper.clone(),
         functor_lower_to_upper_reverse.clone(),
-        HashMap::new(),
+        None
     );
     let natural_transformation_morphism = Arc::new(natural_transformation_morphism);
 

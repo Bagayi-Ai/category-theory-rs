@@ -93,18 +93,13 @@ impl<SourceObject: CategoryTrait, TargetObject: CategoryTrait> Arrow<SourceObjec
         id: String,
         source_object: Arc<SourceObject>,
         target_object: Arc<TargetObject>,
-        mappings: HashMap<Arc<SourceObject::Morphism>, Arc<TargetObject::Morphism>>,
+        functor: Option<Arc<Functor<SourceObject, TargetObject>>>,
     ) -> Self {
         Arrow {
             id: ObjectId::Str(id),
-            source_object: source_object.clone(),
-            target_object: target_object.clone(),
-            functor: Some(Arc::new(Functor::new(
-                String::generate(),
-                source_object.clone(),
-                target_object.clone(),
-                mappings,
-            ))),
+            source_object,
+            target_object,
+            functor,
             is_identity: false,
             empty_map: HashMap::new(),
         }

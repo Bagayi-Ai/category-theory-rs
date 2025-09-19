@@ -230,6 +230,7 @@ pub async fn test_base_scenario() {
     // now create a category of the functor category
     let mut functor_category = DynamicCategory::new_with_id("FunctorCategory".into());
     functor_category.add_object(Arc::new(
-        DynamicCategory::functor_to_category(morphism_a_num).expect("Expecting category"),
+        DynamicCategory::functor_to_category(morphism_a_num.get_functor().unwrap().clone())
+            .expect("Expecting category"),
     ));
 }

@@ -1,5 +1,6 @@
 use crate::DB;
 use crate::core::arrow::Morphism;
+use crate::core::dynamic_category::DynamicCategory;
 use crate::core::errors::Errors;
 use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
@@ -143,7 +144,7 @@ impl CategoryTrait for PersistableCategory {
         dbg!(record);
 
         // if it's not identity morphism there is a functor that needs to be created
-        if !morphism.is_identity() {
+        if !morphism.is_identity() && morphism.source_object().is_category {
             let record: Option<Record> = DB
                 .create(Self::FUNCTOR_TABLE_NAME)
                 .content(
@@ -193,29 +194,55 @@ impl CategoryTrait for PersistableCategory {
     }
 }
 
-impl From<&str> for PersistableCategory {
-    fn from(s: &str) -> Self {
+impl From<ObjectId> for PersistableCategory {
+    fn from(value: ObjectId) -> Self {
         PersistableCategory {
-            category_id: ObjectId::Str(s.to_string()),
+            category_id: value,
             is_category: false,
         }
+    }
+}
+
+impl From<String> for PersistableCategory {
+    fn from(s: String) -> Self {
+        ObjectId::Str(s).into()
+    }
+}
+
+impl From<&str> for PersistableCategory {
+    fn from(s: &str) -> Self {
+        s.to_string().into()
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::collections::HashMap;
     #[tokio::test]
     async fn test_persistable_category() {
         crate::init_db().await.unwrap();
         let mut category = PersistableCategory::new().await.unwrap();
 
-        category
+        let identity_morphism1 = category
             .add_object(Arc::new("TestObject".into()))
             .await
             .unwrap();
+        let identity_morphism2 = category
+            .add_object(Arc::new("TestObject2".into()))
+            .await
+            .unwrap();
+
+        // add morphism between the two objects
+        let morphism = Arc::new(Morphism::new_with_mappings(
+            identity_morphism1.source_object().clone(),
+            identity_morphism2.source_object().clone(),
+            HashMap::new(),
+        ));
+        category.add_morphism(morphism).await.unwrap();
 
         let mut category2 = PersistableCategory::new().await.unwrap();
+        // create same object as in category 2 to make sure they are independent
         category2
             .add_object(Arc::new("TestObject".into()))
             .await

@@ -1,7 +1,8 @@
-use crate::core::arrow::{Arrow, Functor, Morphism};
+use crate::core::arrow::{Arrow, Morphism};
 use crate::core::base_category::BaseCategory;
 use crate::core::epic_monic_category::EpicMonicCategory;
 use crate::core::errors::Errors;
+use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
@@ -51,7 +52,7 @@ impl Clone for DynamicCategoryEnum {
 pub struct DynamicCategory {
     inner_category: DynamicCategoryEnum,
     dynamic_type: DynamicType,
-    functor: Option<Arc<Arrow<DynamicCategory, DynamicCategory>>>,
+    functor: Option<Arc<Functor<DynamicCategory, DynamicCategory>>>,
 }
 
 impl Debug for DynamicCategory {

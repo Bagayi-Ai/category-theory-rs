@@ -1,4 +1,5 @@
 use crate::core::errors::Errors;
+use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
@@ -7,22 +8,22 @@ use async_trait::async_trait;
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
-use std::sync::Arc;
+use std::rc::Rc;
+use std::sync::{Arc, LazyLock};
 
 pub type Morphism<Object: CategoryTrait> = Arrow<Object, Object>;
 
-pub type Functor<SourceCategory, TargetCategory> = Arrow<SourceCategory, TargetCategory>;
+// pub type Functor<SourceCategory, TargetCategory> = Arrow<SourceCategory, TargetCategory>;
 
 pub struct Arrow<SourceObject: CategoryTrait, TargetObject: CategoryTrait> {
     id: ObjectId,
     source_object: Arc<SourceObject>,
     target_object: Arc<TargetObject>,
-    // map arrows in source category to arrows in target category
-    mappings: HashMap<
-        Arc<SourceObject::Morphism>, // indirection avoids infinite size
-        Arc<TargetObject::Morphism>,
-    >,
     is_identity: bool,
+    functor: Option<Arc<Functor<SourceObject, TargetObject>>>,
+    // place holder for empty mapping
+    // in case the functor is None
+    empty_map: HashMap<Arc<SourceObject::Morphism>, Arc<TargetObject::Morphism>>,
 }
 
 impl<SourceObject: CategoryTrait, TargetObject: CategoryTrait> Clone
@@ -81,8 +82,9 @@ impl<Object: CategoryTrait> Arrow<Object, Object> {
             id: ObjectId::Str(String::generate()),
             source_object: object.clone(),
             target_object: object,
-            mappings: HashMap::new(),
+            functor: None,
             is_identity: true,
+            empty_map: HashMap::new(),
         })
     }
 }
@@ -95,10 +97,16 @@ impl<SourceObject: CategoryTrait, TargetObject: CategoryTrait> Arrow<SourceObjec
     ) -> Self {
         Arrow {
             id: ObjectId::Str(id),
-            source_object,
-            target_object,
-            mappings,
+            source_object: source_object.clone(),
+            target_object: target_object.clone(),
+            functor: Some(Arc::new(Functor::new(
+                String::generate(),
+                source_object.clone(),
+                target_object.clone(),
+                mappings,
+            ))),
             is_identity: false,
+            empty_map: HashMap::new(),
         }
     }
 
@@ -109,11 +117,21 @@ impl<SourceObject: CategoryTrait, TargetObject: CategoryTrait> Arrow<SourceObjec
     ) -> Self {
         Arrow {
             id: ObjectId::Str(String::generate()),
-            source_object,
-            target_object,
-            mappings,
+            source_object: source_object.clone(),
+            target_object: target_object.clone(),
+            functor: Some(Arc::new(Functor::new(
+                String::generate(),
+                source_object.clone(),
+                target_object.clone(),
+                mappings.clone(),
+            ))),
             is_identity: false,
+            empty_map: HashMap::new(),
         }
+    }
+
+    pub fn get_functor(&self) -> Option<&Arc<Functor<SourceObject, TargetObject>>> {
+        self.functor.as_ref()
     }
 }
 
@@ -153,11 +171,17 @@ where
         Self: Sized,
     {
         Arrow {
-            id: ObjectId::Str(String::generate()),
-            source_object: source,
-            target_object: target,
-            mappings,
+            id: ObjectId::Str(id),
+            source_object: source.clone(),
+            target_object: target.clone(),
+            functor: Some(Arc::new(Functor::new(
+                String::generate(),
+                source.clone(),
+                target.clone(),
+                mappings.clone(),
+            ))),
             is_identity: false,
+            empty_map: HashMap::new(),
         }
     }
 
@@ -189,7 +213,10 @@ where
         // but this is not very efficient
         // A better way would be to use a wrapper type that implements the required trait
         // but for simplicity we will use the first approach here
-        &self.mappings
+        match &self.functor {
+            Some(functor) => functor.arrow_mappings(),
+            None => &self.empty_map,
+        }
     }
 
     async fn validate_mappings(&self) -> Result<(), Errors> {

@@ -1,4 +1,4 @@
-use crate::core::arrow::{Arrow, Functor, Morphism};
+use crate::core::arrow::Morphism;
 use crate::core::dynamic_category::DynamicCategory;
 use crate::core::object_id::ObjectId;
 use crate::core::traits::category_trait::{CategoryFromObjects, CategoryTrait};

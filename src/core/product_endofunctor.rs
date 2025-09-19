@@ -11,7 +11,6 @@ For instance if category A has objects {a, b} and morphisms {f: a -> b, g: b -> 
 an endo functor F would map these to a new category B with objects {F(a), F(b)} and morphisms {F(f): F(a) -> F(b), F(g): F(b) -> F(a)}.
 This is useful for creating new categories that are derived from the original category, such as the category of sets or the category of groups.
  */
-use crate::core::arrow::{Arrow, Functor, Morphism};
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::object_id::ObjectId;

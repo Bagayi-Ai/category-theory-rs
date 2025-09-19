@@ -1,9 +1,7 @@
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
-use crate::core::traits::category_trait::{CategorySubObjectAlias, CategoryTrait};
-use std::borrow::Borrow;
+use crate::core::traits::category_trait::CategoryTrait;
 use std::collections::HashMap;
-use std::fmt::Debug;
 use std::hash::Hash;
 use std::sync::Arc;
 

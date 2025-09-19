@@ -5,15 +5,13 @@ use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::{CategorySubObjectAlias, CategoryTrait};
+use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::factorization_system_trait::FactorizationSystemTrait;
 use async_trait::async_trait;
-use std::any::Any;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 use std::fmt::{Debug, Formatter};
 use std::hash::{Hash, Hasher};
 use std::sync::Arc;
-use tokio::runtime::Runtime;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DynamicType {

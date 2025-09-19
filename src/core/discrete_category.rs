@@ -1,5 +1,4 @@
-use crate::core::arrow::{Arrow, Functor, Morphism};
-use crate::core::dynamic_category::DynamicCategory;
+use crate::core::arrow::Morphism;
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::object_id::ObjectId;
@@ -7,10 +6,9 @@ use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
 use async_trait::async_trait;
 use std::collections::{HashMap, HashSet};
-use std::fmt::{Debug, Display};
+use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 use std::sync::Arc;
-use tokio::runtime::Runtime;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct DiscreteCategory {

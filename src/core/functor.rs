@@ -8,6 +8,7 @@ use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Formatter};
 use std::hash::{Hash, Hasher};
 use std::sync::Arc;
+use crate::core::traits::functor_trait::FunctorTrait;
 
 pub struct Functor<SourceCategory, TargetCategory>
 where
@@ -149,14 +150,20 @@ where
         todo!()
     }
 
-    fn arrow_mappings(
-        &self,
-    ) -> &HashMap<Arc<SourceCategory::Morphism>, Arc<TargetCategory::Morphism>> {
-        &self.morphism_mapping
+    fn functor(&self) -> Option<&Functor<SourceCategory, TargetCategory>> {
+        None
     }
+}
 
-    async fn validate_mappings(&self) -> Result<(), Errors> {
-        todo!()
+
+impl<SourceCategory, TargetCategory> FunctorTrait<SourceCategory, TargetCategory>
+for Functor<SourceCategory, TargetCategory>
+where
+    SourceCategory: CategoryTrait,
+    TargetCategory: CategoryTrait,
+{
+    fn morphisms_mappings(&self) -> &HashMap<Arc<SourceCategory::Morphism>, Arc<TargetCategory::Morphism>> {
+        &self.morphism_mapping
     }
 }
 

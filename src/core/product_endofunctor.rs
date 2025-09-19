@@ -19,6 +19,7 @@ use crate::core::traits::category_trait::{CategoryFromObjects, CategoryTrait};
 use std::collections::HashMap;
 use std::hash::Hash;
 use std::sync::Arc;
+use crate::core::traits::functor_trait::FunctorTrait;
 
 pub async fn apply_product<Category: CategoryTrait + Eq + Hash>(
     category: &mut Category,
@@ -85,7 +86,7 @@ where
         let arrow_mapping = morphism.arrow_mappings();
         let mut new_mapping = HashMap::new();
         let mut target_object = Category::Object::new().await?;
-        for (source_sub_morphism, target_sub_morphism) in arrow_mapping {
+        for (source_sub_morphism, target_sub_morphism) in arrow_mapping.into_iter().flatten() {
             let mut mapped_objects = Vec::new();
             for fixed_sub_object in &fixed_objects {
                 // product object (_) * fixed_object

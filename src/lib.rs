@@ -27,6 +27,9 @@ pub mod core {
 
     pub mod traits {
         pub mod arrow_trait;
+
+        pub mod functor_trait;
+
         pub mod category_trait;
 
         pub mod factorization_system_trait;

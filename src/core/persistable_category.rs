@@ -1,32 +1,54 @@
 use crate::DB;
 use crate::core::arrow::Morphism;
-use crate::core::dynamic_category::DynamicCategory;
 use crate::core::errors::Errors;
 use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
+use std::hash::{Hash, Hasher};
 use std::string::ToString;
 use std::sync::Arc;
 use surrealdb::RecordId;
 use surrealdb::sql::Thing;
+use crate::core::dynamic_category::DynamicCategory;
+use crate::core::traits::functor_trait::FunctorTrait;
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct PersistableCategory {
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct PersistableCategory<InnerCategory>
+where
+    InnerCategory: CategoryTrait + Hash + Eq,
+{
+    category: InnerCategory
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct PersistableCategoryResource {
     category_id: ObjectId,
-    #[serde(skip)]
-    is_category: bool,
+}
+
+impl PersistableCategoryResource {
+
+    const TABLE_NAME: &'static str = "category";
+
+    fn resource<Category: CategoryTrait>(category: &Category) -> (String, String) {
+        (
+            Self::TABLE_NAME.to_string(),
+            category.category_id().clone().to_string(),
+        )
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 struct PersistableCategoryObject {
     object_id: ObjectId,
     category: Thing,
-    is_category: bool,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    reference_category: Option<Thing>,
+}
+
+impl PersistableCategoryObject
+{
+    const TABLE_NAME: &'static str = "object";
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -38,54 +60,73 @@ struct PersistableArrow {
     is_identity: bool,
 }
 
+impl PersistableArrow
+{
+    const MORPHISM_TABLE_NAME: &'static str = "morphism";
+
+    const FUNCTOR_TABLE_NAME: &'static str = "functor";
+
+    fn morphism_resource<Category: CategoryTrait, Morphism: ArrowTrait<Category, Category>>(morphism: &Morphism) -> (String, String) {
+        (
+            Self::MORPHISM_TABLE_NAME.to_string(),
+            morphism.arrow_id().clone(),
+        )
+    }
+
+    fn functor_resource<Category: CategoryTrait, Functor: FunctorTrait<Category, Category>>(functor: &Functor) -> (String, String) {
+        (
+            Self::FUNCTOR_TABLE_NAME.to_string(),
+            functor.arrow_id().clone(),
+        )
+    }
+}
+
 #[derive(Debug, Deserialize)]
 struct Record {
     id: RecordId,
 }
 
-impl PersistableCategory {
-    const TABLE_NAME: &'static str = "category";
+impl <InnerCategory> PersistableCategory<InnerCategory>
+where
+    InnerCategory: CategoryTrait + Hash + Eq
+{
 
-    const OBJECT_TABLE_NAME: &'static str = "object";
-
-    const MORPHISM_TABLE_NAME: &'static str = "morphism";
-
-    const FUNCTOR_TABLE_NAME: &'static str = "functor";
-
-    pub async fn new() -> Result<Self, surrealdb::Error> {
+    pub async fn new() -> Result<Self, Errors> {
         let category = PersistableCategory {
-            category_id: ObjectId::Str(uuid::Uuid::new_v4().to_string()),
-            is_category: true,
+            category: InnerCategory::new().await?,
         };
         category.persist().await?;
         Ok(category)
     }
 
-    pub async fn persist(&self) -> Result<(), surrealdb::Error> {
-        let record: Option<Record> = DB.create(self.resource()).content(self.clone()).await?;
+    pub async fn persist(&self) -> Result<(), Errors> {
+        let record: Option<Record> = DB.create(self.resource()).content(PersistableCategoryResource{
+            category_id: self.category.category_id().clone(),
+        })
+            .await.map_err(|e| Errors::DatabaseError(e.to_string()))?;
         dbg!(record);
         Ok(())
     }
 
     fn resource(&self) -> (String, String) {
         (
-            Self::TABLE_NAME.to_string(),
-            self.category_id.clone().to_string(),
+            PersistableCategoryResource::TABLE_NAME.to_string(),
+            self.category.category_id().clone().to_string(),
         )
     }
 
-    fn morphism_resource(&self, morphism: &Morphism<PersistableCategory>) -> (String, String) {
-        (
-            Self::MORPHISM_TABLE_NAME.to_string(),
-            morphism.arrow_id().clone(),
-        )
+    pub fn inner_category(&self) -> &InnerCategory {
+        &self.category
     }
 }
 
 #[async_trait]
-impl CategoryTrait for PersistableCategory {
-    type Object = PersistableCategory;
-    type Morphism = Morphism<PersistableCategory>;
+impl<InnerCategory> CategoryTrait for PersistableCategory<InnerCategory>
+where
+    InnerCategory: CategoryTrait + Hash + Eq + Clone,
+{
+    type Object = InnerCategory::Object;
+    type Morphism = InnerCategory::Morphism;
 
     async fn new() -> Result<Self, Errors>
     where
@@ -95,12 +136,12 @@ impl CategoryTrait for PersistableCategory {
     }
 
     fn category_id(&self) -> &ObjectId {
-        &self.category_id
+        &self.category.category_id()
     }
 
     async fn update_category_id(&mut self, new_id: ObjectId) -> Result<(), Errors> {
         // updating category id should result in a new record in the database
-        self.category_id = new_id;
+        self.category.update_category_id(new_id).await?;
         self.persist().await.unwrap();
         Ok(())
     }
@@ -109,33 +150,32 @@ impl CategoryTrait for PersistableCategory {
         &mut self,
         object: Arc<Self::Object>,
     ) -> Result<Arc<Self::Morphism>, Errors> {
+        // create object in the inner category before persisting
+        let morphism_created = self.category.add_object(object.clone()).await?;
+
+        // now persist the object
         let record: Option<Record> = DB
-            .create(Self::OBJECT_TABLE_NAME)
+            .create(PersistableCategoryObject::TABLE_NAME)
             .content(PersistableCategoryObject {
-                object_id: object.category_id.clone(),
+                object_id: object.category_id().clone(),
                 category: Thing::from(self.resource()),
-                is_category: object.is_category,
-                reference_category: if object.is_category {
-                    Some(Thing::from(object.resource()))
-                } else {
-                    None
-                },
             })
             .await
             .unwrap();
+        dbg!(record);
 
-        let morphism = Morphism::new_identity(object.clone());
-        self.add_morphism(morphism.clone()).await?;
-        Ok(morphism)
+        Ok(morphism_created)
     }
 
     async fn add_morphism(&mut self, morphism: Arc<Self::Morphism>) -> Result<(), Errors> {
+        // create morphism in the inner category before persisting
+        self.category.add_morphism(morphism.clone()).await?;
         let record: Option<Record> = DB
-            .create(Self::MORPHISM_TABLE_NAME)
+            .create(PersistableArrow::MORPHISM_TABLE_NAME)
             .content(PersistableArrow {
                 arrow_id: morphism.arrow_id().to_string(),
-                source: Thing::from(morphism.source_object().resource()),
-                target: Thing::from(morphism.target_object().resource()),
+                source: Thing::from(PersistableCategoryResource::resource(&**morphism.source_object())),
+                target: Thing::from(PersistableCategoryResource::resource(&**morphism.target_object())),
                 category: Thing::from(self.resource()),
                 is_identity: morphism.is_identity(),
             })
@@ -144,19 +184,19 @@ impl CategoryTrait for PersistableCategory {
         dbg!(record);
 
         // if it's not identity morphism there is a functor that needs to be created
-        if let Some(functor) = morphism.get_functor() {
-            let arrow_mappings = functor.arrow_mappings();
-            if !arrow_mappings.is_empty() {
+        if let Some(functor) = morphism.functor() {
+            let morphism_mapping = functor.morphisms_mappings();
+            if !morphism_mapping.is_empty() {
                 let record: Option<Record> = DB
-                    .create(Self::FUNCTOR_TABLE_NAME)
+                    .create(PersistableArrow::FUNCTOR_TABLE_NAME)
                     .content(
                         functor
-                            .arrow_mappings()
+                            .morphisms_mappings()
                             .iter()
                             .map(|(source_morphism, target_morphism)| PersistableArrow {
                                 arrow_id: functor.arrow_id().clone(),
-                                source: Thing::from(self.morphism_resource(&*source_morphism)),
-                                target: Thing::from(self.morphism_resource(&*target_morphism)),
+                                source: Thing::from(PersistableArrow::morphism_resource(&**source_morphism)),
+                                target: Thing::from(PersistableArrow::morphism_resource(&**target_morphism)),
                                 category: Thing::from(self.resource()),
                                 is_identity: false,
                             })
@@ -171,50 +211,40 @@ impl CategoryTrait for PersistableCategory {
     }
 
     async fn get_object(&self, object: &Self::Object) -> Result<&Arc<Self::Object>, Errors> {
-        todo!()
+        self.category.get_object(object).await
     }
 
     async fn get_all_objects(&self) -> Result<HashSet<&Arc<Self::Object>>, Errors> {
-        todo!()
+        self.category.get_all_objects().await
     }
 
     async fn get_all_morphisms(&self) -> Result<HashSet<&Arc<Self::Morphism>>, Errors> {
-        todo!()
+        self.category.get_all_morphisms().await
     }
 
     async fn get_hom_set_x(
         &self,
         source_object: &Self::Object,
     ) -> Result<HashSet<&Arc<Self::Morphism>>, Errors> {
-        todo!()
+        self.category.get_hom_set_x(source_object).await
     }
 
     async fn get_object_morphisms(
         &self,
         object: &Self::Object,
     ) -> Result<Vec<&Arc<Self::Morphism>>, Errors> {
-        todo!()
+        self.category.get_object_morphisms(object).await
     }
 }
 
-impl From<ObjectId> for PersistableCategory {
-    fn from(value: ObjectId) -> Self {
-        PersistableCategory {
-            category_id: value,
-            is_category: false,
-        }
-    }
-}
-
-impl From<String> for PersistableCategory {
+impl<InnerCategory> From<String> for PersistableCategory<InnerCategory>
+where
+    InnerCategory: CategoryTrait + Hash + Eq + From<String>,
+{
     fn from(s: String) -> Self {
-        ObjectId::Str(s).into()
-    }
-}
-
-impl From<&str> for PersistableCategory {
-    fn from(s: &str) -> Self {
-        s.to_string().into()
+        PersistableCategory{
+            category: s.into()
+        }
     }
 }
 
@@ -222,10 +252,12 @@ impl From<&str> for PersistableCategory {
 mod tests {
     use super::*;
     use std::collections::HashMap;
+    use crate::core::dynamic_category::DynamicCategory;
+
     #[tokio::test]
     async fn test_persistable_category() {
         crate::init_db().await.unwrap();
-        let mut category = PersistableCategory::new().await.unwrap();
+        let mut category: PersistableCategory<DynamicCategory> = PersistableCategory::new().await.unwrap();
 
         let identity_morphism1 = category
             .add_object(Arc::new("TestObject".into()))
@@ -244,21 +276,29 @@ mod tests {
         ));
         category.add_morphism(morphism).await.unwrap();
 
-        let mut category2 = PersistableCategory::new().await.unwrap();
+        // try get the first object
+        let obj = category
+            .get_object(&"TestObject".into())
+            .await;
+        assert!(obj.is_ok());
+        let obj = obj.unwrap();
+        assert_eq!(obj.category_id(), &ObjectId::Str("TestObject".to_string()));
+
+        let mut category2: PersistableCategory<DynamicCategory> = PersistableCategory::new().await.unwrap();
         // create same object as in category 2 to make sure they are independent
         category2
             .add_object(Arc::new("TestObject".into()))
             .await
             .unwrap();
 
-        // // now create a higher category that contains the two previous categories as objects
-        let mut higher_category = PersistableCategory::new().await.unwrap();
+        // now create a higher category that contains the two previous categories as objects
+        let mut higher_category: PersistableCategory<DynamicCategory> = PersistableCategory::new().await.unwrap();
         higher_category
-            .add_object(Arc::new(category))
+            .add_object(Arc::new(category.inner_category().clone()))
             .await
             .unwrap();
         higher_category
-            .add_object(Arc::new(category2))
+            .add_object(Arc::new(category2.inner_category().clone()))
             .await
             .unwrap();
     }

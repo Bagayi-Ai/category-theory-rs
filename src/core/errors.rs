@@ -26,4 +26,5 @@ pub enum Errors {
     InvalidDynamicType(String),
     InvalidMorphismCoercion,
     ConversionError,
+    DatabaseError(String)
 }

@@ -3,7 +3,8 @@ use crate::core::identifier::Identifier;
 use crate::core::traits::category_trait::CategoryTrait;
 use std::collections::HashMap;
 use std::hash::Hash;
-use std::sync::Arc;
+use std::sync::{Arc, LazyLock};
+use crate::core::traits::functor_trait::FunctorTrait;
 
 pub trait ArrowTrait<SourceObject: CategoryTrait, TargetObject: CategoryTrait>: Eq + Hash {
     fn source_object(&self) -> &Arc<SourceObject>;
@@ -52,7 +53,12 @@ pub trait ArrowTrait<SourceObject: CategoryTrait, TargetObject: CategoryTrait>: 
     // for single arrow just return itself
     fn arrows(&self) -> Vec<&impl ArrowTrait<SourceObject, TargetObject>>;
 
-    fn arrow_mappings(&self) -> &HashMap<Arc<SourceObject::Morphism>, Arc<TargetObject::Morphism>>;
+    fn functor(&self) -> Option<&impl FunctorTrait<SourceObject, TargetObject>>;
+
+    fn arrow_mappings(&self) -> Option<&HashMap<Arc<SourceObject::Morphism>, Arc<TargetObject::Morphism>>>
+    {
+        self.functor().map(|f| f.morphisms_mappings())
+    }
 
     fn validate_composition(&self) -> Result<(), Errors> {
         todo!()
@@ -64,8 +70,6 @@ pub trait ArrowTrait<SourceObject: CategoryTrait, TargetObject: CategoryTrait>: 
     ) -> Result<(), Errors> {
         todo!()
     }
-
-    async fn validate_mappings(&self) -> Result<(), Errors>;
 
     fn is_isomorphism(&self) -> bool {
         todo!()

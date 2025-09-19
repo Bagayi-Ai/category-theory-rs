@@ -9,6 +9,7 @@ use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::hash::Hash;
 use std::sync::Arc;
+use crate::core::traits::functor_trait::FunctorTrait;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EpicMonicCategory<InnerCategory>
@@ -57,7 +58,7 @@ where
         let mut target_as_image = false;
 
         // epic can also be just the target object if all objects are in the image
-        for (source_morphism, target_morphism) in mappings {
+        for (source_morphism, target_morphism) in mappings.into_iter().flatten() {
             if source_morphism.is_identity() {
                 if !target_morphism.is_identity() {
                     return Err(Errors::InvalidArrowNoFunctorFound);

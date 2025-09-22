@@ -16,10 +16,10 @@ use crate::core::identifier::Identifier;
 use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::{CategoryFromObjects, CategoryTrait};
+use crate::core::traits::functor_trait::FunctorTrait;
 use std::collections::HashMap;
 use std::hash::Hash;
 use std::sync::Arc;
-use crate::core::traits::functor_trait::FunctorTrait;
 
 pub async fn apply_product<Category: CategoryTrait + Eq + Hash>(
     category: &mut Category,

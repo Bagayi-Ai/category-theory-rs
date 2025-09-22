@@ -55,20 +55,6 @@ pub async fn init_db() -> surrealdb::Result<()> {
     .await?;
     DB.use_ns("namespace").use_db("database").await?;
 
-    DB.query(
-        "
-        DEFINE TABLE object SCHEMALESS;
-        DEFINE INDEX unique_object_id ON object FIELDS category, object_id UNIQUE;
-
-        DEFINE TABLE morphism SCHEMALESS;
-        DEFINE INDEX unique_morphism_name ON morphism FIELDS category, arrow_id UNIQUE;
-
-        DEFINE TABLE functor SCHEMALESS;
-        DEFINE INDEX unique_functor_id ON functor FIELDS category, arrow_id UNIQUE;
-        ",
-    )
-    .await?;
-
     Ok(())
 }
 

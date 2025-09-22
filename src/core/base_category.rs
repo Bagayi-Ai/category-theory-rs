@@ -21,7 +21,11 @@ pub struct BaseCategory<Object: CategoryTrait> {
 
 impl<Object: CategoryTrait> Debug for BaseCategory<Object> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        todo!()
+        f.debug_struct("BaseCategory")
+            .field("id", &self.id)
+            .field("objects", &self.objects.keys())
+            .field("morphism_count", &self.morphism.iter().count())
+            .finish()
     }
 }
 

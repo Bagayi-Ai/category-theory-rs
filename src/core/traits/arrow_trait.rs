@@ -1,12 +1,14 @@
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::traits::functor_trait::FunctorTrait;
 use std::collections::HashMap;
 use std::hash::Hash;
 use std::sync::{Arc, LazyLock};
-use crate::core::traits::functor_trait::FunctorTrait;
 
-pub trait ArrowTrait<SourceObject: CategoryTrait, TargetObject: CategoryTrait>: Eq + Hash {
+pub trait ArrowTrait<SourceObject: CategoryTrait, TargetObject: CategoryTrait>:
+    Eq + Hash + Send + Sync
+{
     fn source_object(&self) -> &Arc<SourceObject>;
 
     fn target_object(&self) -> &Arc<TargetObject>;
@@ -55,8 +57,9 @@ pub trait ArrowTrait<SourceObject: CategoryTrait, TargetObject: CategoryTrait>: 
 
     fn functor(&self) -> Option<&impl FunctorTrait<SourceObject, TargetObject>>;
 
-    fn arrow_mappings(&self) -> Option<&HashMap<Arc<SourceObject::Morphism>, Arc<TargetObject::Morphism>>>
-    {
+    fn arrow_mappings(
+        &self,
+    ) -> Option<&HashMap<Arc<SourceObject::Morphism>, Arc<TargetObject::Morphism>>> {
         self.functor().map(|f| f.morphisms_mappings())
     }
 

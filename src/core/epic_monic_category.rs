@@ -4,12 +4,12 @@ use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::factorization_system_trait::FactorizationSystemTrait;
+use crate::core::traits::functor_trait::FunctorTrait;
 use async_trait::async_trait;
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::hash::Hash;
 use std::sync::Arc;
-use crate::core::traits::functor_trait::FunctorTrait;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EpicMonicCategory<InnerCategory>

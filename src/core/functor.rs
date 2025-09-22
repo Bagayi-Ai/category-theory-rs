@@ -3,12 +3,12 @@ use crate::core::errors::Errors;
 use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::traits::functor_trait::FunctorTrait;
 use async_trait::async_trait;
 use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Formatter};
 use std::hash::{Hash, Hasher};
 use std::sync::Arc;
-use crate::core::traits::functor_trait::FunctorTrait;
 
 pub struct Functor<SourceCategory, TargetCategory>
 where
@@ -155,14 +155,15 @@ where
     }
 }
 
-
 impl<SourceCategory, TargetCategory> FunctorTrait<SourceCategory, TargetCategory>
-for Functor<SourceCategory, TargetCategory>
+    for Functor<SourceCategory, TargetCategory>
 where
     SourceCategory: CategoryTrait,
     TargetCategory: CategoryTrait,
 {
-    fn morphisms_mappings(&self) -> &HashMap<Arc<SourceCategory::Morphism>, Arc<TargetCategory::Morphism>> {
+    fn morphisms_mappings(
+        &self,
+    ) -> &HashMap<Arc<SourceCategory::Morphism>, Arc<TargetCategory::Morphism>> {
         &self.morphism_mapping
     }
 }

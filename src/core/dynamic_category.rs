@@ -21,6 +21,7 @@ pub enum DynamicType {
     EpicMonicCategory,
 }
 
+#[derive(Debug)]
 pub enum DynamicCategoryEnum {
     Category(
         Box<dyn CategoryTrait<Object = DynamicCategory, Morphism = Morphism<DynamicCategory>>>,
@@ -57,7 +58,10 @@ pub struct DynamicCategory {
 
 impl Debug for DynamicCategory {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        todo!()
+        f.debug_struct("DynamicCategory")
+            .field("inner_category", &self.inner_category)
+            .field("dynamic_type", &self.dynamic_type)
+            .finish()
     }
 }
 

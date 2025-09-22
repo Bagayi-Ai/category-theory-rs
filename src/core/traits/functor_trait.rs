@@ -1,12 +1,15 @@
-use std::collections::HashMap;
-use std::sync::Arc;
 use crate::core::errors::Errors;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
+use std::collections::HashMap;
+use std::sync::Arc;
 
-pub trait FunctorTrait<SourceCategory: CategoryTrait, TargetCategory: CategoryTrait>: ArrowTrait<SourceCategory, TargetCategory>
+pub trait FunctorTrait<SourceCategory: CategoryTrait, TargetCategory: CategoryTrait>:
+    ArrowTrait<SourceCategory, TargetCategory>
 {
-    fn morphisms_mappings(&self) -> &HashMap<Arc<SourceCategory::Morphism>, Arc<TargetCategory::Morphism>>;
+    fn morphisms_mappings(
+        &self,
+    ) -> &HashMap<Arc<SourceCategory::Morphism>, Arc<TargetCategory::Morphism>>;
 
     async fn validate_mappings(&self) -> Result<(), Errors> {
         /*

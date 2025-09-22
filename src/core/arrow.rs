@@ -4,13 +4,13 @@ use crate::core::identifier::Identifier;
 use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::traits::functor_trait::FunctorTrait;
 use async_trait::async_trait;
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 use std::rc::Rc;
 use std::sync::{Arc, LazyLock};
-use crate::core::traits::functor_trait::FunctorTrait;
 
 pub type Morphism<Object: CategoryTrait> = Arrow<Object, Object>;
 

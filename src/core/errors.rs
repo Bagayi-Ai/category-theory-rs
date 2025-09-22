@@ -26,5 +26,11 @@ pub enum Errors {
     InvalidDynamicType(String),
     InvalidMorphismCoercion,
     ConversionError,
-    DatabaseError(String)
+    DatabaseError(String),
+}
+
+impl From<surrealdb::Error> for Errors {
+    fn from(e: surrealdb::Error) -> Self {
+        Errors::DatabaseError(e.to_string())
+    }
 }

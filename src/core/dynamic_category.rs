@@ -185,10 +185,6 @@ impl CategoryTrait for DynamicCategory {
         self.id()
     }
 
-    async fn update_category_id(&mut self, new_id: ObjectId) -> Result<(), Errors> {
-        self.inner_category_mut().update_category_id(new_id).await
-    }
-
     async fn add_object(
         &mut self,
         object: Arc<DynamicCategory>,

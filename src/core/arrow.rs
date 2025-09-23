@@ -230,10 +230,6 @@ where
         &self.id
     }
 
-    async fn update_category_id(&mut self, new_id: ObjectId) -> Result<(), Errors> {
-        todo!()
-    }
-
     async fn add_object(
         &mut self,
         object: Arc<Self::Object>,

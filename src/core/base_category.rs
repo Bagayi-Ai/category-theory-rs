@@ -77,11 +77,6 @@ impl<Object: CategoryTrait + Hash + Eq + DynClone + Clone> CategoryTrait for Bas
         &self.id
     }
 
-    async fn update_category_id(&mut self, new_id: ObjectId) -> Result<(), Errors> {
-        self.id = new_id;
-        Ok(())
-    }
-
     async fn add_object(
         &mut self,
         object: Arc<Self::Object>,

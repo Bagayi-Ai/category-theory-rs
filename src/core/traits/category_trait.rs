@@ -35,16 +35,6 @@ pub trait CategoryTrait: Debug + Any + DynClone + Send + Sync {
 
     fn category_id(&self) -> &ObjectId;
 
-    /*
-    This should be used very carefully, as changing the category ID might lead to inconsistencies
-    it should only be used in scenarios of creating a new category based on an existing
-     */
-    async fn update_category_id(&mut self, new_id: ObjectId) -> Result<(), Errors>;
-
-    async fn update_category_id_generate(&mut self) -> Result<(), Errors> {
-        self.update_category_id(ObjectId::generate()).await
-    }
-
     fn equal_to(&self, other: &Self::Object) -> bool {
         self.category_id() == other.category_id()
     }
@@ -235,4 +225,11 @@ where
         }
         Ok(category)
     }
+}
+
+#[async_trait]
+pub trait CategoryCloneWithNewId: CategoryTrait {
+    async fn clone_with_new_id(&self) -> Result<Self, Errors>
+    where
+        Self: Sized;
 }

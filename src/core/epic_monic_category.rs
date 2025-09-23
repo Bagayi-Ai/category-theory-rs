@@ -153,10 +153,6 @@ where
         self.category.category_id()
     }
 
-    async fn update_category_id(&mut self, new_id: ObjectId) -> Result<(), Errors> {
-        self.category.update_category_id(new_id).await
-    }
-
     async fn add_object(
         &mut self,
         object: Arc<Self::Object>,

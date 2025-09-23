@@ -5,7 +5,7 @@ use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::traits::category_trait::{CategoryCloneWithNewId, CategoryTrait};
 use crate::core::traits::functor_trait::FunctorTrait;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
@@ -40,10 +40,7 @@ impl PersistableCategoryObject {
     }
 
     fn resource(&self) -> (String, String) {
-        (
-            Self::TABLE_NAME.to_string(),
-            self.object_id.to_string(),
-        )
+        (Self::TABLE_NAME.to_string(), self.object_id.to_string())
     }
 
     pub async fn persist(&self) -> Result<(), Errors> {
@@ -241,8 +238,14 @@ where
         let response = DB
             .query(sql)
             .bind(("rel_id", Self::arrow_thing(&*morphism)))
-            .bind(("src", PersistableCategoryObject::object_thing(&**morphism.source_object())))
-            .bind(("dst", PersistableCategoryObject::object_thing(&**morphism.target_object())))
+            .bind((
+                "src",
+                PersistableCategoryObject::object_thing(&**morphism.source_object()),
+            ))
+            .bind((
+                "dst",
+                PersistableCategoryObject::object_thing(&**morphism.target_object()),
+            ))
             .bind(("category", self.category.category_id().to_string()))
             .bind(("is_identity", morphism.is_identity()))
             .await
@@ -260,7 +263,6 @@ where
     ) -> Thing {
         Thing::from(PersistableArrow::functor_resource(functor))
     }
-
 }
 
 #[async_trait]
@@ -280,15 +282,6 @@ where
 
     fn category_id(&self) -> &ObjectId {
         &self.category.category_id()
-    }
-
-    async fn update_category_id(&mut self, new_id: ObjectId) -> Result<(), Errors> {
-        // updating category id should result in a new record in the database
-        self.category.update_category_id(new_id).await?;
-        PersistableCategoryObject {
-            object_id: self.category_id().clone(),
-        }.persist().await?;
-        Ok(())
     }
 
     async fn add_object(
@@ -344,6 +337,33 @@ where
         object: &Self::Object,
     ) -> Result<Vec<&Arc<Self::Morphism>>, Errors> {
         self.category.get_object_morphisms(object).await
+    }
+}
+
+#[async_trait]
+impl<InnerCategory> CategoryCloneWithNewId for PersistableCategory<InnerCategory>
+where
+    InnerCategory: CategoryTrait + Hash + Eq + Clone + Send + Sync,
+{
+    async fn clone_with_new_id(&self) -> Result<Self, Errors>
+    where
+        Self: Sized,
+    {
+        // for persistable category we need to create a new record in the database
+        // so we clone the inner category with a new id and then create a new persistable
+        // category with that inner category
+        let mut category = InnerCategory::new().await?;
+        // populate all the objects and morphisms from self to category
+        for object in self.get_all_objects().await? {
+            category.add_object(object.clone()).await?;
+        }
+
+        for morphism in self.get_all_morphisms().await? {
+            category.add_morphism(morphism.clone()).await?;
+        }
+
+        let persistable_category = PersistableCategory { category };
+        Ok(persistable_category)
     }
 }
 

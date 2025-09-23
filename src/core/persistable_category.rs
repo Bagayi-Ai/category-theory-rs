@@ -25,28 +25,38 @@ where
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct PersistableCategoryResource {
-    category_id: ObjectId,
-}
-
-impl PersistableCategoryResource {
-    const TABLE_NAME: &'static str = "category";
-
-    fn resource<Category: CategoryTrait>(category: &Category) -> (String, String) {
-        (
-            Self::TABLE_NAME.to_string(),
-            category.category_id().clone().to_string(),
-        )
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize)]
 struct PersistableCategoryObject {
     object_id: ObjectId,
 }
 
 impl PersistableCategoryObject {
     const TABLE_NAME: &'static str = "object";
+
+    fn object_thing<Category: CategoryTrait>(category: &Category) -> Thing {
+        Thing::from((
+            Self::TABLE_NAME.to_string(),
+            category.category_id().to_string(),
+        ))
+    }
+
+    fn resource(&self) -> (String, String) {
+        (
+            Self::TABLE_NAME.to_string(),
+            self.object_id.to_string(),
+        )
+    }
+
+    pub async fn persist(&self) -> Result<(), Errors> {
+        let record: Option<Record> = DB
+            .create(self.resource())
+            .content(PersistableCategoryObject {
+                object_id: self.object_id.clone(),
+            })
+            .await
+            .map_err(|e| Errors::DatabaseError(e.to_string()))?;
+        dbg!(record);
+        Ok(())
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -101,12 +111,8 @@ impl PersistableArrow {
             .create(PersistableArrow::functor_resource(functor))
             .content(PersistableCategoryFunctor {
                 id: None,
-                source: Thing::from(PersistableCategoryResource::resource(
-                    &**functor.source_object(),
-                )),
-                target: Thing::from(PersistableCategoryResource::resource(
-                    &**functor.target_object(),
-                )),
+                source: PersistableCategoryObject::object_thing(&**functor.source_object()),
+                target: PersistableCategoryObject::object_thing(&**functor.target_object()),
                 is_identity: functor.is_identity(),
             })
             .await?;
@@ -186,27 +192,11 @@ where
         let category = PersistableCategory {
             category: InnerCategory::new().await?,
         };
-        category.persist().await?;
+        let object = PersistableCategoryObject {
+            object_id: category.category.category_id().clone(),
+        };
+        object.persist().await?;
         Ok(category)
-    }
-
-    pub async fn persist(&self) -> Result<(), Errors> {
-        let record: Option<Record> = DB
-            .create(self.resource())
-            .content(PersistableCategoryResource {
-                category_id: self.category.category_id().clone(),
-            })
-            .await
-            .map_err(|e| Errors::DatabaseError(e.to_string()))?;
-        dbg!(record);
-        Ok(())
-    }
-
-    fn resource(&self) -> (String, String) {
-        (
-            PersistableCategoryResource::TABLE_NAME.to_string(),
-            self.category.category_id().clone().to_string(),
-        )
     }
 
     pub fn inner_category(&self) -> &InnerCategory {
@@ -214,7 +204,7 @@ where
     }
 
     fn thing(&self) -> Thing {
-        Self::category_thing(&self.category)
+        PersistableCategoryObject::object_thing(&self.category)
     }
 
     async fn create_record<Category: CategoryTrait>(
@@ -223,7 +213,7 @@ where
     ) -> Result<(), Errors> {
         // now persist the object
         let sql = r#"
-        LET $object = (UPSERT type::thing($table_name, $id) CONTENT { name: $id });
+        LET $object = (UPSERT type::thing($table_name, $id));
         RELATE $object ->object_in-> $category_id;
         RETURN $object;
         "#;
@@ -251,8 +241,8 @@ where
         let response = DB
             .query(sql)
             .bind(("rel_id", Self::arrow_thing(&*morphism)))
-            .bind(("src", Self::object_thing(&**morphism.source_object())))
-            .bind(("dst", Self::object_thing(&**morphism.target_object())))
+            .bind(("src", PersistableCategoryObject::object_thing(&**morphism.source_object())))
+            .bind(("dst", PersistableCategoryObject::object_thing(&**morphism.target_object())))
             .bind(("category", self.category.category_id().to_string()))
             .bind(("is_identity", morphism.is_identity()))
             .await
@@ -271,19 +261,6 @@ where
         Thing::from(PersistableArrow::functor_resource(functor))
     }
 
-    fn category_thing<Category: CategoryTrait>(category: &Category) -> Thing {
-        Thing::from((
-            PersistableCategoryResource::TABLE_NAME.to_string(),
-            category.category_id().to_string(),
-        ))
-    }
-
-    fn object_thing<Category: CategoryTrait>(category: &Category) -> Thing {
-        Thing::from((
-            PersistableCategoryObject::TABLE_NAME.to_string(),
-            category.category_id().to_string(),
-        ))
-    }
 }
 
 #[async_trait]
@@ -308,7 +285,9 @@ where
     async fn update_category_id(&mut self, new_id: ObjectId) -> Result<(), Errors> {
         // updating category id should result in a new record in the database
         self.category.update_category_id(new_id).await?;
-        self.persist().await.unwrap();
+        PersistableCategoryObject {
+            object_id: self.category_id().clone(),
+        }.persist().await?;
         Ok(())
     }
 

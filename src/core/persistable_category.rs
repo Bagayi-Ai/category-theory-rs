@@ -25,12 +25,12 @@ where
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct PersistableCategoryObject {
+pub(crate) struct PersistableCategoryObject {
     object_id: ObjectId,
 }
 
 impl PersistableCategoryObject {
-    const TABLE_NAME: &'static str = "object";
+    pub const TABLE_NAME: &'static str = "object";
 
     fn object_thing<Category: CategoryTrait>(category: &Category) -> Thing {
         Thing::from((
@@ -138,24 +138,6 @@ impl PersistableArrow {
         dbg!(record);
         Ok(Thing::from(Self::functor_resource(functor)))
     }
-
-    async fn create_morphism<Category: CategoryTrait, Morphism: ArrowTrait<Category, Category>>(
-        morphism: &Morphism,
-        category: &Category,
-    ) -> Result<Thing, Errors> {
-        // create morphism using relate query as using create relations are not visible
-
-        let sql = r#"
-            RELATE $src->$rel_id->$dst
-            SET category = $category,
-                is_identity = $is_identity,
-                functor = $functor,
-                created_at = time::now(),
-                weight = $weight;
-        "#;
-        // let res =
-        todo!()
-    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -200,7 +182,7 @@ where
         &self.category
     }
 
-    fn thing(&self) -> Thing {
+    pub fn thing(&self) -> Thing {
         PersistableCategoryObject::object_thing(&self.category)
     }
 
@@ -254,7 +236,7 @@ where
         Ok(())
     }
 
-    fn arrow_thing(morphism: &InnerCategory::Morphism) -> Thing {
+    pub fn arrow_thing(morphism: &InnerCategory::Morphism) -> Thing {
         Thing::from(PersistableArrow::morphism_resource(morphism))
     }
 
@@ -388,7 +370,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_persistable_category() {
-        crate::init_db().await.unwrap();
+        crate::init_db(None).await.unwrap();
         let mut category: PersistableCategory<DynamicCategory> =
             PersistableCategory::new().await.unwrap();
 

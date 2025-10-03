@@ -2,18 +2,19 @@
 Functor that takes an object and create a new object with the same structure as the original object
 but with more objects and morphisms.
  */
-use std::sync::Arc;
 use crate::core::errors::Errors;
 use crate::core::functor::Functor;
+use crate::core::identifier::Identifier;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::{CategoryCloneWithNewId, CategoryTrait};
-use crate::core::identifier::Identifier;
+use std::sync::Arc;
 
 pub async fn inclusion_functor<Category>(
     category: Arc<Category>,
-    objects: Vec<Arc<Category::Object>>) -> Result<Functor<Category, Category>, Errors>
+    objects: Vec<Arc<Category::Object>>,
+) -> Result<Arc<Functor<Category, Category>>, Errors>
 where
-    Category: CategoryTrait + CategoryCloneWithNewId
+    Category: CategoryTrait + CategoryCloneWithNewId,
 {
     let mut new_category = category.clone_with_new_id().await?;
     for object in objects {
@@ -29,5 +30,10 @@ where
         morphism_mapping.insert(morphism.clone(), target_morphism.clone());
     }
 
-    Ok(Functor::new(String::generate(), category, Arc::new(new_category), morphism_mapping))
+    Ok(Arc::new(Functor::new(
+        String::generate(),
+        category,
+        Arc::new(new_category),
+        morphism_mapping,
+    )))
 }

@@ -25,6 +25,8 @@ pub mod core {
 
     pub mod persistable_category;
 
+    pub mod persistable_factorization_category;
+
     pub mod functors {
         pub mod inclusion_functor;
     }
@@ -50,14 +52,16 @@ pub mod core {
 
 pub static DB: LazyLock<Surreal<Client>> = LazyLock::new(Surreal::init);
 
-pub async fn init_db() -> surrealdb::Result<()> {
+pub async fn init_db(db_name: Option<&str>) -> surrealdb::Result<()> {
     DB.connect::<Ws>("localhost:8000").await?;
     DB.signin(Root {
         username: "root",
         password: "root",
     })
     .await?;
-    DB.use_ns("namespace").use_db("database").await?;
+    DB.use_ns("namespace")
+        .use_db(db_name.unwrap_or("database"))
+        .await?;
 
     Ok(())
 }

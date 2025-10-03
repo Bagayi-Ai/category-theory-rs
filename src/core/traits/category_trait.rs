@@ -77,6 +77,8 @@ pub trait CategoryTrait: Debug + Any + DynClone + Send + Sync {
 
     async fn get_all_objects(&self) -> Result<HashSet<&Arc<Self::Object>>, Errors>;
 
+    async fn get_morphism(&self, morphism_id: &String) -> Result<&Arc<Self::Morphism>, Errors>;
+
     async fn get_all_morphisms(&self) -> Result<HashSet<&Arc<Self::Morphism>>, Errors>;
 
     async fn get_hom_set_x(

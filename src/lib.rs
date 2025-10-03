@@ -25,6 +25,10 @@ pub mod core {
 
     pub mod persistable_category;
 
+    pub mod functors {
+        pub mod inclusion_functor;
+    }
+
     pub mod traits {
         pub mod arrow_trait;
 

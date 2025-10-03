@@ -132,6 +132,12 @@ impl<Object: CategoryTrait + Hash + Eq + DynClone + Clone> CategoryTrait for Bas
         Ok(self.objects.values().collect())
     }
 
+    async fn get_morphism(&self, morphism_id: &String) -> Result<&Arc<Self::Morphism>, Errors> {
+        self.morphism
+            .get(morphism_id)
+            .ok_or(Errors::MorphismNotFound)
+    }
+
     async fn get_all_morphisms(&self) -> Result<HashSet<&Arc<Morphism<Self::Object>>>, Errors> {
         // Todo needs optimization
         // Ok(self.cells.values().collect())

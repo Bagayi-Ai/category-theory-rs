@@ -321,6 +321,10 @@ where
         self.category.get_all_objects().await
     }
 
+    async fn get_morphism(&self, morphism_id: &String) -> Result<&Arc<Self::Morphism>, Errors> {
+        self.category.get_morphism(morphism_id).await
+    }
+
     async fn get_all_morphisms(&self) -> Result<HashSet<&Arc<Self::Morphism>>, Errors> {
         self.category.get_all_morphisms().await
     }

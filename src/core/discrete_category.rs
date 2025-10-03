@@ -138,6 +138,10 @@ impl CategoryTrait for DiscreteCategory {
         Ok(result)
     }
 
+    async fn get_morphism(&self, morphism_id: &String) -> Result<&Arc<Self::Morphism>, Errors> {
+        todo!()
+    }
+
     async fn get_all_morphisms(&self) -> Result<HashSet<&Arc<Morphism<Self::Object>>>, Errors> {
         let result = if let Some(cells) = &self.cells {
             cells.values().collect()

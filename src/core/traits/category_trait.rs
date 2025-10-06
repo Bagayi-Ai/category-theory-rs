@@ -24,6 +24,14 @@ pub trait CategoryTrait: Debug + Any + DynClone + Send + Sync {
 
     async fn new() -> Result<Self, Errors>
     where
+        Self: Sized,
+    {
+        let id = ObjectId::generate();
+        Self::new_with_id(id).await
+    }
+
+    async fn new_with_id(id: ObjectId) -> Result<Self, Errors>
+    where
         Self: Sized;
 
     fn level(&self) -> usize
@@ -201,25 +209,7 @@ pub trait CategoryFromObjects: CategoryTrait {
     async fn from_objects<T>(objects: Vec<T>) -> Result<Self, Errors>
     where
         T: Into<Self::Object> + Send,
-        Self: Sized;
-
-    async fn from_object<T>(object: T) -> Result<Self, Errors>
-    where
-        T: Into<Self::Object> + Send,
         Self: Sized,
-    {
-        Self::from_objects(vec![object]).await
-    }
-}
-
-#[async_trait]
-impl<C> CategoryFromObjects for C
-where
-    C: CategoryTrait + Sized,
-{
-    async fn from_objects<T>(objects: Vec<T>) -> Result<Self, Errors>
-    where
-        T: Into<C::Object> + Send,
     {
         let mut category = Self::new().await?;
         for object in objects {
@@ -227,7 +217,17 @@ where
         }
         Ok(category)
     }
+
+    async fn from_object(object: ObjectId) -> Result<Self, Errors>
+    where
+        Self: Sized,
+    {
+        Self::new_with_id(object).await
+    }
 }
+
+#[async_trait]
+impl<C> CategoryFromObjects for C where C: CategoryTrait + Sized {}
 
 #[async_trait]
 pub trait CategoryCloneWithNewId: CategoryTrait {

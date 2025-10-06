@@ -174,11 +174,11 @@ impl CategoryTrait for DynamicCategory {
 
     type Morphism = Morphism<DynamicCategory>;
 
-    async fn new() -> Result<Self, Errors>
+    async fn new_with_id(object_id: ObjectId) -> Result<Self, Errors>
     where
         Self: Sized,
     {
-        Ok(DynamicCategory::new())
+        Ok(DynamicCategory::new_with_id(object_id))
     }
 
     fn category_id(&self) -> &ObjectId {

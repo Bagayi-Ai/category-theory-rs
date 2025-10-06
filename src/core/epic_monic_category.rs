@@ -37,6 +37,13 @@ where
         })
     }
 
+    pub async fn new_with_id(object_id: ObjectId) -> Result<Self, Errors> {
+        Ok(EpicMonicCategory {
+            category: InnerCategory::new_with_id(object_id).await?,
+            morphism_factors: HashMap::new(),
+        })
+    }
+
     pub fn category(&self) -> &InnerCategory {
         &self.category
     }
@@ -145,8 +152,8 @@ where
 
     type Morphism = Morphism<Self::Object>;
 
-    async fn new() -> Result<Self, Errors> {
-        todo!()
+    async fn new_with_id(object_id: ObjectId) -> Result<Self, Errors> {
+        Self::new_with_id(object_id).await
     }
 
     fn category_id(&self) -> &ObjectId {

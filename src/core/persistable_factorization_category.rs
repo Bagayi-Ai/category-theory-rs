@@ -7,6 +7,7 @@ use crate::core::persistable_category::{PersistableCategory, PersistableCategory
 use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::factorization_system_trait::FactorizationSystemTrait;
 use async_trait::async_trait;
+use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use std::fmt::Debug;
 use std::hash::Hash;
@@ -14,13 +15,19 @@ use std::sync::Arc;
 use surrealdb::opt::auth::Record;
 use surrealdb::rpc::format::cbor::res;
 use surrealdb::sql::Thing;
+use surrealdb::sql::Value as SurrealValue;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PersistableFactorizationCategory<InnerCategory>
 where
     InnerCategory: FactorizationSystemTrait + Clone + Hash + Eq,
 {
     category: PersistableCategory<InnerCategory>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct PersistableFactorizationCategoryRecord {
+    isFactorizationSystemColumn: bool,
 }
 
 impl<InnerCategory> PersistableFactorizationCategory<InnerCategory>
@@ -37,11 +44,11 @@ where
     }
 
     pub async fn persist(&self) -> Result<(), Errors> {
-        let record: Option<serde_json::Value> = DB
+        let _: Option<PersistableFactorizationCategoryRecord> = DB
             .update(self.resource())
-            .merge(serde_json::json!({
-                Self::IsFactorizationSystemColumn: true,
-            }))
+            .merge(PersistableFactorizationCategoryRecord {
+                isFactorizationSystemColumn: true,
+            })
             .await?;
         Ok(())
     }
@@ -90,11 +97,11 @@ where
     type Object = InnerCategory::Object;
     type Morphism = InnerCategory::Morphism;
 
-    async fn new() -> Result<Self, Errors>
+    async fn new_with_id(object_id: ObjectId) -> Result<Self, Errors>
     where
         Self: Sized,
     {
-        let persistable_category = PersistableCategory::new().await?;
+        let persistable_category = PersistableCategory::new_with_id(object_id).await?;
         let result = Self {
             category: persistable_category,
         };

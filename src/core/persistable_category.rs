@@ -75,7 +75,7 @@ impl PersistableArrow {
 
     const FUNCTOR_TABLE_NAME: &'static str = "functor";
 
-    const ARROW_MAPPING_TABLE_NAME: &'static str = "arrow_mapping";
+    const ARROW_MAPPING_TABLE_NAME: &'static str = "functor_mapping";
 
     fn morphism_resource<Category: CategoryTrait, Morphism: ArrowTrait<Category, Category>>(
         morphism: &Morphism,
@@ -101,41 +101,74 @@ impl PersistableArrow {
         Thing::from(Self::functor_resource(functor))
     }
 
+    fn functor_mapping_thing<Category: CategoryTrait, Functor: FunctorTrait<Category, Category>>(
+        functor: &Functor,
+    ) -> Thing {
+        Thing::from((
+            Self::ARROW_MAPPING_TABLE_NAME.to_string(),
+            functor.arrow_id().clone(),
+        ))
+    }
+
+    pub fn arrow_thing<Category: CategoryTrait>(morphism: &Category::Morphism) -> Thing {
+        Thing::from(PersistableArrow::morphism_resource(morphism))
+    }
+
     async fn create_functor<Category: CategoryTrait, Functor: FunctorTrait<Category, Category>>(
         functor: &Functor,
     ) -> Result<Thing, Errors> {
-        let functor_record: Option<Record> = DB
-            .create(PersistableArrow::functor_resource(functor))
-            .content(PersistableCategoryFunctor {
-                id: None,
-                source: PersistableCategoryObject::object_thing(&**functor.source_object()),
-                target: PersistableCategoryObject::object_thing(&**functor.target_object()),
-                is_identity: functor.is_identity(),
-            })
-            .await?;
-        dbg!(&functor_record);
+        let functor_query = r#"
+        RELATE $source_category -> $functor_id -> $target_category
+        RETURN *
+        "#;
 
-        let record: Option<Record> = DB
-            .create(PersistableArrow::ARROW_MAPPING_TABLE_NAME)
-            .content(
-                functor
-                    .morphisms_mappings()
-                    .iter()
-                    .map(
-                        |(source_morphism, target_morphism)| PersistableCategoryFunctorMapping {
-                            functor_id: Thing::from(PersistableArrow::functor_resource(functor)),
-                            source_morphism: Thing::from(PersistableArrow::morphism_resource(
-                                &**source_morphism,
-                            )),
-                            target_morphism: Thing::from(PersistableArrow::morphism_resource(
-                                &**target_morphism,
-                            )),
-                        },
-                    )
-                    .collect::<Vec<_>>(),
-            )
-            .await?;
-        dbg!(record);
+        println!(
+            "Source category id: {:?}",
+            functor.source_object().category_id()
+        );
+        println!(
+            "Target category id: {:?}",
+            functor.target_object().category_id()
+        );
+        let response = DB
+            .query(functor_query)
+            .bind(("functor_id", Self::functor_thing(functor)))
+            .bind((
+                "source_category",
+                PersistableCategoryObject::object_thing(&**functor.source_object()),
+            ))
+            .bind((
+                "target_category",
+                PersistableCategoryObject::object_thing(&**functor.target_object()),
+            ))
+            .await
+            .map_err(|e| Errors::DatabaseError(e.to_string()))?;
+        println!("{:?}", response);
+        dbg!(&response);
+
+        let query = r#"
+        RELATE $source_morphism -> functor_mapping -> $target_morphisms
+        SET functor = $functor,
+            created_at = time::now()
+        RETURN *
+        "#;
+
+        for (source_morphism, target_morphism) in functor.morphisms_mappings() {
+            let response = DB
+                .query(query)
+                .bind((
+                    "source_morphism",
+                    Self::arrow_thing::<Category>(&**source_morphism),
+                ))
+                .bind((
+                    "target_morphisms",
+                    Self::arrow_thing::<Category>(&**target_morphism),
+                ))
+                .bind(("functor", Self::functor_thing(functor)))
+                .await
+                .map_err(|e| Errors::DatabaseError(e.to_string()))?;
+            dbg!(&response);
+        }
         Ok(Thing::from(Self::functor_resource(functor)))
     }
 }
@@ -178,6 +211,17 @@ where
         Ok(category)
     }
 
+    pub async fn new_with_id(id: ObjectId) -> Result<Self, Errors> {
+        let category = PersistableCategory {
+            category: InnerCategory::new_with_id(id.into()).await?,
+        };
+        let object = PersistableCategoryObject {
+            object_id: category.category.category_id().clone(),
+        };
+        object.persist().await?;
+        Ok(category)
+    }
+
     pub fn inner_category(&self) -> &InnerCategory {
         &self.category
     }
@@ -193,7 +237,6 @@ where
         // now persist the object
         let sql = r#"
         LET $object = (UPSERT type::thing($table_name, $id));
-        RELATE $object ->object_in-> $category_id;
         RETURN $object;
         "#;
 
@@ -201,7 +244,6 @@ where
             .query(sql)
             .bind(("table_name", PersistableCategoryObject::TABLE_NAME))
             .bind(("id", object.category_id().to_string()))
-            .bind(("category_id", self.thing()))
             .await
             .map_err(|e| Errors::DatabaseError(e.to_string()))?;
         dbg!(response);
@@ -210,11 +252,13 @@ where
 
     async fn create_morphism(&self, morphism: &InnerCategory::Morphism) -> Result<(), Errors> {
         let sql = r#"
-        RELATE $src->$rel_id->$dst
-        SET category = $category,
-            is_identity = $is_identity,
-            created_at = time::now()
-        RETURN *
+            LET $m = (RELATE $src->$rel_id->$dst
+                SET is_identity = $is_identity,
+                    functor = $functor,
+                    created_at = time::now()
+                RETURN id);
+            RELATE $m -> morphism_in -> $category;
+            RETURN $m;
         "#;
 
         let response = DB
@@ -228,8 +272,14 @@ where
                 "dst",
                 PersistableCategoryObject::object_thing(&**morphism.target_object()),
             ))
-            .bind(("category", self.category.category_id().to_string()))
             .bind(("is_identity", morphism.is_identity()))
+            .bind(("category", self.thing()))
+            .bind((
+                "functor",
+                morphism
+                    .functor()
+                    .map(|f| PersistableArrow::functor_thing(f)),
+            ))
             .await
             .map_err(|e| Errors::DatabaseError(e.to_string()))?;
         dbg!(response);
@@ -255,11 +305,11 @@ where
     type Object = InnerCategory::Object;
     type Morphism = InnerCategory::Morphism;
 
-    async fn new() -> Result<Self, Errors>
+    async fn new_with_id(object_id: ObjectId) -> Result<Self, Errors>
     where
         Self: Sized,
     {
-        Ok(PersistableCategory::new().await.unwrap())
+        Ok(PersistableCategory::new_with_id(object_id).await.unwrap())
     }
 
     fn category_id(&self) -> &ObjectId {
@@ -271,7 +321,9 @@ where
         object: Arc<Self::Object>,
     ) -> Result<Arc<Self::Morphism>, Errors> {
         self.create_record(&*object).await?;
-        Ok(self.category.add_object(object.clone()).await?)
+        let identity_morphism = self.category.add_object(object.clone()).await?;
+        self.create_morphism(&*identity_morphism).await?;
+        Ok(identity_morphism)
     }
 
     async fn add_morphism(&mut self, morphism: Arc<Self::Morphism>) -> Result<(), Errors> {
@@ -366,11 +418,25 @@ where
 mod tests {
     use super::*;
     use crate::core::dynamic_category::DynamicCategory;
+    use crate::core::functor::Functor;
+    use crate::core::traits::category_trait::CategoryFromObjects;
     use std::collections::HashMap;
+    use tokio::sync::OnceCell;
+
+    static TEST_DB_INIT: OnceCell<()> = OnceCell::const_new();
+
+    pub async fn init_db_once() {
+        TEST_DB_INIT
+            .get_or_init(|| async {
+                // Your existing initialization
+                crate::init_db(None).await.expect("DB init failed");
+            })
+            .await;
+    }
 
     #[tokio::test]
     async fn test_persistable_category() {
-        crate::init_db(None).await.unwrap();
+        init_db_once().await;
         let mut category: PersistableCategory<DynamicCategory> =
             PersistableCategory::new().await.unwrap();
 
@@ -417,5 +483,102 @@ mod tests {
             .add_object(Arc::new(category2.inner_category().clone()))
             .await
             .unwrap();
+    }
+
+    #[tokio::test]
+    async fn test_persistable_morphisms() {
+        init_db_once().await;
+        let mut category_abc: PersistableCategory<DynamicCategory> =
+            PersistableCategory::new_with_id("abc".into())
+                .await
+                .unwrap();
+
+        // PersistableCategory::from_objectdo()
+        // let catb: PersistableCategory<DynamicCategory> = PersistableCategory::from_objects::<DynamicCategory>(vec!["1".into(), "2".into(), "3".into()]).await.unwrap();
+
+        // objects a, b and c.
+        let object_a = Arc::new(DynamicCategory::new_with_id("a".into()));
+        category_abc.add_object(object_a.clone()).await.unwrap();
+        let object_b = Arc::new(DynamicCategory::new_with_id("b".into()));
+        category_abc.add_object(object_b.clone()).await.unwrap();
+        let object_c = Arc::new(DynamicCategory::new_with_id("c".into()));
+        category_abc.add_object(object_c.clone()).await.unwrap();
+        let category_abc = Arc::new(category_abc.inner_category().clone());
+
+        // objects A, B and C.
+        let mut category_ABC: PersistableCategory<DynamicCategory> =
+            PersistableCategory::new_with_id("ABC".into())
+                .await
+                .unwrap();
+        let object_A = Arc::new(DynamicCategory::new_with_id("A".into()));
+        category_ABC.add_object(object_A.clone()).await.unwrap();
+        let object_B = Arc::new(DynamicCategory::new_with_id("B".into()));
+        category_ABC.add_object(object_B.clone()).await.unwrap();
+        let object_C = Arc::new(DynamicCategory::new_with_id("C".into()));
+        category_ABC.add_object(object_C.clone()).await.unwrap();
+        let category_ABC = Arc::new(category_ABC.inner_category().clone());
+
+        // functor from objectabc to objectABC
+        let mut mapping = HashMap::new();
+        mapping.insert(
+            category_abc
+                .get_identity_morphism(&"a".into())
+                .await
+                .unwrap()
+                .clone(),
+            category_ABC
+                .get_identity_morphism(&"A".into())
+                .await
+                .unwrap()
+                .clone(),
+        );
+        mapping.insert(
+            category_abc
+                .get_identity_morphism(&"b".into())
+                .await
+                .unwrap()
+                .clone(),
+            category_ABC
+                .get_identity_morphism(&"B".into())
+                .await
+                .unwrap()
+                .clone(),
+        );
+        mapping.insert(
+            category_abc
+                .get_identity_morphism(&"c".into())
+                .await
+                .unwrap()
+                .clone(),
+            category_ABC
+                .get_identity_morphism(&"C".into())
+                .await
+                .unwrap()
+                .clone(),
+        );
+
+        let functor = Arc::new(Functor::new(
+            String::generate(),
+            category_abc.clone(),
+            category_ABC.clone(),
+            mapping,
+        ));
+
+        // morphism from objectabc to objectABC
+        let morphism = Arc::new(Morphism::new(
+            String::generate(),
+            category_abc.clone(),
+            category_ABC.clone(),
+            Some(functor.clone()),
+        ));
+
+        let mut category: PersistableCategory<DynamicCategory> =
+            PersistableCategory::new_with_id("ABCabc".into())
+                .await
+                .unwrap();
+
+        category.add_object(category_abc.clone()).await.unwrap();
+        category.add_object(category_ABC.clone()).await.unwrap();
+        category.add_morphism(morphism.clone()).await.unwrap();
     }
 }

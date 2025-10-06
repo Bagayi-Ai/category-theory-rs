@@ -67,8 +67,8 @@ impl CategoryTrait for DiscreteCategory {
 
     type Morphism = Morphism<Self::Object>;
 
-    async fn new() -> Result<Self, Errors> {
-        Ok(DiscreteCategory::new())
+    async fn new_with_id(object_id: ObjectId) -> Result<Self, Errors> {
+        Ok(DiscreteCategory::new_with_id(object_id))
     }
 
     fn category_id(&self) -> &ObjectId {

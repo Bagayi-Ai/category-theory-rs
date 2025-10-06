@@ -69,8 +69,8 @@ impl<Object: CategoryTrait + Hash + Eq + DynClone + Clone> CategoryTrait for Bas
 
     type Morphism = Morphism<Self::Object>;
 
-    async fn new() -> Result<Self, Errors> {
-        Ok(BaseCategory::new())
+    async fn new_with_id(object_id: ObjectId) -> Result<Self, Errors> {
+        Ok(BaseCategory::new_with_id(object_id))
     }
 
     fn category_id(&self) -> &ObjectId {

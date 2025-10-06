@@ -184,6 +184,13 @@ where
         todo!()
     }
 
+    async fn new_with_id(id: ObjectId) -> Result<Self, Errors>
+    where
+        Self: Sized,
+    {
+        todo!()
+    }
+
     fn category_id(&self) -> &ObjectId {
         &self.id
     }

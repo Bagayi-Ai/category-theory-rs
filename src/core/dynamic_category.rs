@@ -6,13 +6,14 @@ use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::traits::category_trait::{CategoryCloneWithNewId, CategoryTrait};
 use crate::core::traits::factorization_system_trait::FactorizationSystemTrait;
 use async_trait::async_trait;
 use std::collections::HashSet;
 use std::fmt::{Debug, Formatter};
 use std::hash::{Hash, Hasher};
 use std::sync::Arc;
+use crate::core::persistable_category::PersistableCategory;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DynamicType {
@@ -239,6 +240,31 @@ impl FactorizationSystemTrait for DynamicCategory {
                 "This category does not support factorization systems".to_string(),
             ))
         }
+    }
+}
+
+
+#[async_trait]
+impl CategoryCloneWithNewId for DynamicCategory
+{
+    async fn clone_with_new_id(&self) -> Result<Self, Errors>
+    where
+        Self: Sized,
+    {
+        // for persistable category we need to create a new record in the database
+        // so we clone the inner category with a new id and then create a new persistable
+        // category with that inner category
+        let mut category = DynamicCategory::new();
+        // populate all the objects and morphisms from self to category
+        for object in self.get_all_objects().await? {
+            category.add_object(object.clone()).await?;
+        }
+
+        for morphism in self.get_all_morphisms().await? {
+            category.add_morphism(morphism.clone()).await?;
+        }
+
+        Ok(category)
     }
 }
 

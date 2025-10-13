@@ -3,7 +3,7 @@ use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::CategoryTrait;
+use crate::core::traits::category_trait::{CategoryCloneWithNewId, CategoryTrait};
 use async_trait::async_trait;
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
@@ -139,7 +139,14 @@ impl CategoryTrait for DiscreteCategory {
     }
 
     async fn get_morphism(&self, morphism_id: &String) -> Result<&Arc<Self::Morphism>, Errors> {
-        todo!()
+        if let Some(cells) = &self.cells {
+            for cell in cells.values() {
+                if cell.arrow_id() == morphism_id {
+                    return Ok(cell);
+                }
+            }
+        }
+        Err(Errors::MorphismNotFound)
     }
 
     async fn get_all_morphisms(&self) -> Result<HashSet<&Arc<Morphism<Self::Object>>>, Errors> {
@@ -171,6 +178,18 @@ impl CategoryTrait for DiscreteCategory {
 
     fn nested_level() -> usize {
         1
+    }
+}
+
+
+#[async_trait]
+impl CategoryCloneWithNewId for DiscreteCategory
+{
+    async fn clone_with_new_id(&self) -> Result<Self, Errors>
+    where
+        Self: Sized,
+    {
+        Ok(self.clone_with_new_id())
     }
 }
 

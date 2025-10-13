@@ -87,6 +87,14 @@ where
 
         Ok(())
     }
+    
+    pub fn peristed_category(&self) -> &PersistableCategory<InnerCategory> {
+        &self.category
+    }
+    
+    pub fn inner_category(&self) -> &InnerCategory {
+        self.category.inner_category()
+    }
 }
 
 #[async_trait]

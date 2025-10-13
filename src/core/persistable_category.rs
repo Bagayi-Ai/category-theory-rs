@@ -422,6 +422,7 @@ mod tests {
     use crate::core::traits::category_trait::CategoryFromObjects;
     use std::collections::HashMap;
     use tokio::sync::OnceCell;
+    use crate::core::cytosjsexport::save_category_to_cytoscape_json_file;
 
     static TEST_DB_INIT: OnceCell<()> = OnceCell::const_new();
 
@@ -580,5 +581,14 @@ mod tests {
         category.add_object(category_abc.clone()).await.unwrap();
         category.add_object(category_ABC.clone()).await.unwrap();
         category.add_morphism(morphism.clone()).await.unwrap();
+
+
+        // export to cytosjs
+        save_category_to_cytoscape_json_file(
+            &category,
+            true,
+            10,
+            "/Users/mwas/RustroverProjects/CategoryTheory/persistable_category_test.json",
+        ).await.expect("failed to save category");
     }
 }

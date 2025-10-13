@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Category Network (Cytoscape.js)</title>
+    <style>
+        html,body,#cy { height: 100%; margin: 0; font-family: system-ui, Arial; }
+        #cy { position: absolute; inset: 0; }
+        header { position: absolute; z-index: 10; left: 12px; top: 12px; background: rgba(255,255,255,0.95); padding: 8px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
+        header button { margin-right: 6px; }
+        .legend { margin-top: 6px; font-size: 12px; }
+    </style>
+</head>
+<body>
+<header>
+    <button id="fit">Fit</button>
+    <button id="layout">Layout</button>
+    <button id="export">Export PNG</button>
+    <button id="showAll">Show All</button>
+    <div class="legend">
+        • compound = category (click to focus) • solid edges = internal arrows • dashed = functor mapping
+    </div>
+</header>
+
+<div id="cy"></div>
+
+<script src="https://unpkg.com/cytoscape@3.24.0/dist/cytoscape.min.js"></script>
+<script>
+    // Load Cytoscape elements from external JSON file instead of hardcoded array.
+    // The JSON must be served via HTTP(S); opening this HTML with file:// may block fetch due to CORS/FS restrictions.
+    const dataFile = new URL(window.location.href).searchParams.get('data') || 'persistable_category_test.json';
+
+    fetch(dataFile)
+        .then(r => {
+            if (!r.ok) throw new Error(`Failed to load elements file ${dataFile}: ${r.status}`);
+            return r.json();
+        })
+        .then(elements => initCytoscape(elements))
+        .catch(err => {
+            console.error(err);
+            const fallback = [ { data: { id: 'Error', label: 'Load failed' } } ];
+            initCytoscape(fallback);
+        });
+
+    function initCytoscape(elements){
+        const cy = cytoscape({
+            container: document.getElementById('cy'),
+            elements,
+            style: [
+                { selector: 'node', style: { 'label': 'data(label)', 'text-valign': 'center', 'text-halign': 'center', 'background-color': '#eee', 'shape': 'roundrectangle', 'width': 'label', 'padding': '6px' } },
+                { selector: 'node[functor]', style: { 'background-color': '#ffd480', 'shape': 'ellipse', 'border-width': 2, 'border-color': '#c68a00' } },
+                { selector: ':parent', style: { 'background-opacity': 0.07, 'border-width': 2, 'border-style': 'double', 'padding': '18px', 'text-valign': 'top', 'text-margin-y': 6, 'label': 'data(label)' } },
+                { selector: 'edge', style: { 'curve-style': 'bezier', 'target-arrow-shape': 'triangle', 'width': 2, 'label': 'data(label)', 'font-size': 10, 'text-rotation': 'autorotate', 'text-margin-y': -6 } },
+                { selector: 'edge[functorEdge]', style: { 'line-style': 'dashed', 'target-arrow-shape': 'triangle', 'line-color': '#888', 'target-arrow-color': '#888' } },
+                { selector: 'edge[functorMorphismEdge]', style: { 'line-style': 'dotted', 'target-arrow-shape': 'triangle', 'line-color': '#ff9800', 'target-arrow-color': '#ff9800', 'width': 2, 'font-size': 10 } },
+                { selector: 'node:selected', style: { 'background-color': '#bbdefb' } },
+                { selector: 'edge:selected', style: { 'line-color': '#1976d2', 'target-arrow-color': '#1976d2' } }
+            ],
+            // First layout: non-animated for instant positioning (prevents off-center initial view)
+            layout: { name: 'cose', animate: false, randomize: false }
+        });
+
+        // Run initial (instant) layout & fit immediately once ready
+        cy.ready(() => {
+            // In case another layout starts automatically, force a synchronous layout run
+            cy.layout({ name: 'cose', animate: false, randomize: false }).run();
+            cy.resize();
+            cy.fit(undefined, 80); // slightly smaller padding now that we positioned instantly
+            showDefaultFunctorCatEdges();
+            // Optional: kick off a gentle animated refinement after a tick (uncomment if desired)
+            // setTimeout(() => cy.layout({ name: 'cose', animate: true, randomize: false }).run(), 50);
+        });
+
+        // EXTRA ROBUST CENTERING:
+        // Some browsers may adjust font metrics or scrollbars after initial script execution, slightly shifting
+        // available space. We perform an additional center pass after the full window load (all resources) and
+        // again after a short timeout to catch any async font/style settling.
+        window.addEventListener('load', () => {
+            requestAnimationFrame(() => {
+                cy.resize();
+                cy.fit(cy.elements(), 80);
+                setTimeout(() => { cy.resize(); cy.fit(cy.elements(), 80); }, 120);
+            });
+        });
+
+        // Show only the first mapping edge for each functor by default
+        function showDefaultFunctorEdges() {
+            cy.edges('[functorEdge]').hide();
+            ['F', 'G', 'H'].forEach(functorId => {
+                let found = false;
+                cy.edges('[functorEdge]').forEach(edge => {
+                    if (!found && edge.data('label').startsWith(functorId + '(')) {
+                        edge.show();
+                        edge.style({ 'line-color': '#888', 'target-arrow-color': '#888', 'width': 2 });
+                        found = true;
+                    } else {
+                        edge.hide();
+                    }
+                });
+            });
+        }
+
+        // Show only the functor edge between categories by default
+        function showDefaultFunctorCatEdges() {
+            cy.edges('[functorCatEdge]').show();
+            cy.edges('[functorEdge]').hide();
+        }
+
+        // Removed duplicate cy.ready() that referenced an undefined initialFitted variable.
+        // Initial centering and showDefaultFunctorCatEdges() are already handled in the first cy.ready() above.
+
+        // Helper: show only the focused category, other categories as boxes, and functor arrows from focused
+        function focusCategoryWithFunctors(catId) {
+            // Show all category boxes (parents)
+            cy.nodes(':parent').forEach(cat => {
+                cat.show();
+            });
+            // Collect target objects for functor arrows from focused category
+            const functorTargets = new Set();
+            cy.edges('[functorEdge]').forEach(edge => {
+                const src = edge.source();
+                const tgt = edge.target();
+                if (src.parent().id() === catId) {
+                    functorTargets.add(tgt.id());
+                }
+            });
+            // Show only children of focused category and functor targets
+            cy.nodes().forEach(node => {
+                if (node.parent().id() === catId || node.id() === catId || functorTargets.has(node.id())) {
+                    node.show();
+                } else if (node.isParent()) {
+                    node.show(); // show category box
+                } else {
+                    node.hide(); // hide other objects
+                }
+            });
+            // Show internal morphisms of focused category
+            cy.edges().forEach(edge => {
+                const src = edge.source();
+                const tgt = edge.target();
+                if (src.parent().id() === catId && tgt.parent().id() === catId && !edge.data('functorEdge')) {
+                    edge.show();
+                } else if (edge.data('functorEdge')) {
+                    // Show functor arrows only if source is in focused category
+                    if (src.parent().id() === catId) {
+                        edge.show();
+                        edge.style({ 'line-color': '#1976d2', 'target-arrow-color': '#1976d2', 'width': 3 });
+                    } else {
+                        edge.hide();
+                    }
+                } else {
+                    edge.hide();
+                }
+            });
+            // Hide functorCatEdge arrows for clarity
+            cy.edges('[functorCatEdge]').hide();
+            // Make other category boxes smaller and visually distinct
+            cy.nodes(':parent').forEach(cat => {
+                if (cat.id() !== catId) {
+                    cat.style({ 'width': 60, 'height': 40, 'font-size': 14, 'background-opacity': 0.18 });
+                } else {
+                    cat.style({ 'width': '', 'height': '', 'font-size': '', 'background-opacity': 0.07 });
+                }
+            });
+            // Fit to focused category
+            cy.fit(cy.getElementById(catId), 50);
+        }
+
+        // Helper: show only the focused category as a box, and functor arrows to other categories
+        function focusCategoryBoxesWithFunctorArrows(catId) {
+            // 1. Show all category boxes (parents) and reset their styles
+            cy.nodes(':parent').forEach(cat => {
+                cat.show();
+                if (cat.id() === catId) {
+                    cat.style({ 'background-color': '#bbdefb', 'border-color': '#1976d2', 'border-width': 4 });
+                } else {
+                    cat.style({ 'background-color': '#eee', 'border-color': '#888', 'border-width': 2 });
+                }
+                cat.style({ 'width': '', 'height': '', 'font-size': '', 'background-opacity': 0.07 });
+            });
+            // 2. Hide all non-parent nodes (objects/morphisms)
+            cy.nodes().forEach(node => {
+                if (!node.isParent()) node.hide();
+            });
+            // 3. Show all functorCatEdge edges, highlight only those outgoing from the selected category
+            cy.edges('[functorCatEdge]').forEach(edge => {
+                edge.show();
+                if (edge.source().id() === catId) {
+                    edge.style({ 'line-color': '#1976d2', 'target-arrow-color': '#1976d2', 'width': 4 });
+                } else {
+                    edge.style({ 'line-color': '#888', 'target-arrow-color': '#888', 'width': 2 });
+                }
+            });
+            // 4. Show functor mapping edges outgoing from the selected category, and show their source and target nodes
+            let functorEdgeCount = 0;
+            cy.edges('[functorEdge]').forEach(edge => {
+                if (edge.source().parent().id() === catId) {
+                    edge.show();
+                    edge.style({ 'line-color': '#1976d2', 'target-arrow-color': '#1976d2', 'width': 3 });
+                    edge.source().show();
+                    edge.target().show();
+                    functorEdgeCount++;
+                } else {
+                    edge.hide();
+                }
+            });
+            // 5. Hide all other edges (internal morphisms)
+            cy.edges().forEach(edge => {
+                if (!edge.data('functorCatEdge') && !edge.data('functorEdge')) edge.hide();
+            });
+            // 6. If no functor mapping edges, show only category boxes and functorCatEdge arrows
+            if (functorEdgeCount === 0) {
+                cy.nodes().forEach(node => {
+                    if (!node.isParent()) node.hide();
+                });
+                cy.edges('[functorEdge]').hide();
+                cy.edges().forEach(edge => {
+                    if (!edge.data('functorCatEdge')) edge.hide();
+                });
+                console.log('No functor mapping edges for category', catId);
+            } else {
+                console.log('Showing', functorEdgeCount, 'functor mapping edges for category', catId);
+            }
+            // 7. Run layout and fit to all visible parent nodes with reasonable padding
+            cy.layout({ name: 'cose', animate: true }).run();
+            const visibleParents = cy.nodes(':parent').filter(n => n.visible());
+            if (visibleParents.length > 0) {
+                cy.fit(visibleParents, 100);
+            }
+        }
+
+        // Interactions: click compound (category) to focus on that category and show only functor arrows from it
+        // Simplified: show only the selected category, its objects, and internal morphisms
+        function focusSingleCategory(catId) {
+            // Hide all nodes and edges
+            cy.nodes().hide();
+            cy.edges().hide();
+            // Show the selected category box
+            const catNode = cy.getElementById(catId);
+            catNode.show();
+            catNode.style({
+                'background-color': '#bbdefb',
+                'border-color': '#1976d2',
+                'border-width': 4,
+                'width': '',
+                'height': '',
+                'font-size': '',
+                'background-opacity': 0.07
+            });
+            // Show its child objects
+            cy.nodes().forEach(node => {
+                if (node.parent().id() === catId) {
+                    node.show();
+                }
+            });
+            // Show internal morphisms (edges between objects in this category)
+            cy.edges().forEach(edge => {
+                const src = edge.source();
+                const tgt = edge.target();
+                if (src.parent().id() === catId && tgt.parent().id() === catId && !edge.data('functorEdge') && !edge.data('functorCatEdge')) {
+                    edge.show();
+                }
+            });
+            // Hide all functor mapping edges
+            cy.edges('[functorEdge]').hide();
+            // Hide all functor nodes
+            cy.nodes().forEach(node => {
+                if (node.data('functor')) node.hide();
+            });
+            // Zoom to fit the selected category
+            cy.fit(catNode, 80);
+        }
+
+        cy.on('tap', 'node', (evt) => {
+            const node = evt.target;
+            if (node.isParent()) {
+                focusSingleCategory(node.id());
+            }
+        });
+
+        // Restore default on background click or Show All button
+        function resetAllVisibilityAndStyles() {
+            // Show all nodes and edges
+            cy.nodes().show();
+            cy.edges().show();
+            // Reset styles for category boxes
+            cy.nodes(':parent').forEach(cat => {
+                cat.style({
+                    'background-color': '#eee',
+                    'border-color': '#888',
+                    'border-width': 2,
+                    'width': '',
+                    'height': '',
+                    'font-size': '',
+                    'background-opacity': 0.07
+                });
+            });
+            // Reset styles for functorCatEdge edges
+            cy.edges('[functorCatEdge]').forEach(edge => {
+                edge.style({
+                    'line-color': '#888',
+                    'target-arrow-color': '#888',
+                    'width': 2
+                });
+            });
+            // Reset styles for functorEdge edges
+            cy.edges('[functorEdge]').forEach(edge => {
+                edge.style({
+                    'line-color': '#888',
+                    'target-arrow-color': '#888',
+                    'width': 2
+                });
+            });
+            // Reset styles for all other edges
+            cy.edges().forEach(edge => {
+                if (!edge.data('functorCatEdge') && !edge.data('functorEdge')) {
+                    edge.style({
+                        'line-color': '',
+                        'target-arrow-color': '',
+                        'width': 2
+                    });
+                }
+            });
+            // Run layout and fit to all nodes
+            cy.layout({ name: 'cose', animate: true, randomize: false }).run();
+            cy.fit(undefined, 100);
+        }
+
+        cy.on('tap', (evt) => {
+            if (evt.target === cy) {
+                resetAllVisibilityAndStyles();
+            }
+        });
+        document.getElementById('showAll').addEventListener('click', () => {
+            resetAllVisibilityAndStyles();
+        });
+
+        // UI buttons
+        document.getElementById('fit').addEventListener('click', () => cy.fit());
+        document.getElementById('layout').addEventListener('click', () => cy.layout({ name: 'cose', animate: true, randomize: false }).run());
+        document.getElementById('export').addEventListener('click', () => {
+            const png64 = cy.png({ full: true, scale: 2 });
+            const w = window.open('');
+            w.document.write(`<img src="${png64}"/>`);
+        });
+
+        // Helper: function to convert a higher-level "category-of-categories" concept into visual nodes
+        // Example: if you had a category whose objects are categories themselves, you'd create parent nodes
+        // and optionally group them (compound parents of parents). Cytoscape supports nested parents.
+
+        // Example: programmatic API for adding a new category with objects and internal arrows
+        function addCategory(catId, label, objects = [], arrows = []){
+            cy.add({ data: { id: catId, label } });
+            for(const o of objects) cy.add({ data: { id: o.id, label: o.label || o.id, parent: catId } });
+            for(const ar of arrows) cy.add({ data: { id: `${ar.source}_${ar.target}`, source: ar.source, target: ar.target, label: ar.label || '' } });
+            const l = cy.layout({ name: 'cose', animate: true, randomize: false });
+            l.run();
+            l.on('layoutstop', () => cy.fit(undefined, 100));
+        }
+
+        // Expose for debugging in console
+        window.cy = cy; window.addCategory = addCategory;
+
+        // Show functor mapping edges and their endpoints on hover/click of functor node
+        cy.on('mouseover', 'node[functor]', (evt) => {
+            const functorId = evt.target.id();
+            evt.target.show();
+            // Show object mapping edges
+            cy.edges('[functorEdge]').forEach(edge => {
+                if (edge.data('functorEdge') === functorId) {
+                    edge.show();
+                    edge.source().show();
+                    edge.target().show();
+                } else {
+                    edge.hide();
+                }
+            });
+            // Morphism mapping edges removed (edge-to-edge not supported); leaving logic harmless
+            cy.edges('[functorMorphismEdge]').hide();
+        });
+        cy.on('mouseout', 'node[functor]', (evt) => {
+            cy.edges('[functorEdge]').hide();
+            cy.edges('[functorMorphismEdge]').hide();
+            cy.nodes().forEach(node => {
+                if (node.data('functor')) node.hide();
+            });
+        });
+        cy.on('tap', 'node[functor]', (evt) => {
+            const functorId = evt.target.id();
+            evt.target.show();
+            cy.edges('[functorEdge]').forEach(edge => {
+                if (edge.data('functorEdge') === functorId) {
+                    edge.show();
+                    edge.source().show();
+                    edge.target().show();
+                } else {
+                    edge.hide();
+                }
+            });
+            cy.edges('[functorMorphismEdge]').hide();
+        });
+    }
+</script>
+</body>
+</html>

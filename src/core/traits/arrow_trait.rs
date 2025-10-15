@@ -3,11 +3,12 @@ use crate::core::identifier::Identifier;
 use crate::core::traits::category_trait::CategoryTrait;
 use crate::core::traits::functor_trait::FunctorTrait;
 use std::collections::HashMap;
+use std::fmt::Debug;
 use std::hash::Hash;
 use std::sync::{Arc, LazyLock};
 
 pub trait ArrowTrait<SourceObject: CategoryTrait, TargetObject: CategoryTrait>:
-    Eq + Hash + Send + Sync
+    Eq + Hash + Send + Sync + Debug
 {
     fn source_object(&self) -> &Arc<SourceObject>;
 

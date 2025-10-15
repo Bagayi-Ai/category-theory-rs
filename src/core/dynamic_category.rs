@@ -1,17 +1,19 @@
-use crate::core::arrow::{Arrow, Functor, Morphism};
+use crate::core::arrow::{Arrow, Morphism};
 use crate::core::base_category::BaseCategory;
 use crate::core::epic_monic_category::EpicMonicCategory;
 use crate::core::errors::Errors;
+use crate::core::functor::Functor;
 use crate::core::identifier::Identifier;
 use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
-use crate::core::traits::category_trait::{CategorySubObjectAlias, CategoryTrait};
+use crate::core::traits::category_trait::{CategoryCloneWithNewId, CategoryTrait};
 use crate::core::traits::factorization_system_trait::FactorizationSystemTrait;
-use std::any::Any;
-use std::collections::{HashMap, HashSet};
+use async_trait::async_trait;
+use std::collections::HashSet;
 use std::fmt::{Debug, Formatter};
 use std::hash::{Hash, Hasher};
-use std::rc::Rc;
+use std::sync::Arc;
+use crate::core::persistable_category::PersistableCategory;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DynamicType {
@@ -20,6 +22,7 @@ pub enum DynamicType {
     EpicMonicCategory,
 }
 
+#[derive(Debug)]
 pub enum DynamicCategoryEnum {
     Category(
         Box<dyn CategoryTrait<Object = DynamicCategory, Morphism = Morphism<DynamicCategory>>>,
@@ -51,12 +54,15 @@ impl Clone for DynamicCategoryEnum {
 pub struct DynamicCategory {
     inner_category: DynamicCategoryEnum,
     dynamic_type: DynamicType,
-    functor: Option<Rc<Arrow<DynamicCategory, DynamicCategory>>>,
+    functor: Option<Arc<Functor<DynamicCategory, DynamicCategory>>>,
 }
 
 impl Debug for DynamicCategory {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        todo!()
+        f.debug_struct("DynamicCategory")
+            .field("inner_category", &self.inner_category)
+            .field("dynamic_type", &self.dynamic_type)
+            .finish()
     }
 }
 
@@ -95,8 +101,8 @@ impl DynamicCategory {
         Self::new_with_id(ObjectId::Str(uuid::Uuid::new_v4().to_string()))
     }
 
-    pub fn new_epic_monic_category(id: ObjectId) -> Result<Self, Errors> {
-        let epic_monic_category = EpicMonicCategory::<DynamicCategory>::new();
+    pub async fn new_epic_monic_category(id: ObjectId) -> Result<Self, Errors> {
+        let epic_monic_category = EpicMonicCategory::<DynamicCategory>::new().await?;
         let mut result = DynamicCategory::new_with_id(id);
         result.dynamic_type = DynamicType::EpicMonicCategory;
         result.inner_category =
@@ -105,7 +111,7 @@ impl DynamicCategory {
     }
 
     pub fn functor_to_category(
-        functor: Rc<Functor<DynamicCategory, DynamicCategory>>,
+        functor: Arc<Functor<DynamicCategory, DynamicCategory>>,
     ) -> Result<Self, Errors> {
         let mut result = DynamicCategory::new_with_id(functor.arrow_id().clone().into());
         result.dynamic_type = DynamicType::Functor;
@@ -163,68 +169,62 @@ impl DynamicCategory {
     }
 }
 
+#[async_trait]
 impl CategoryTrait for DynamicCategory {
     type Object = DynamicCategory;
 
     type Morphism = Morphism<DynamicCategory>;
 
-    fn new() -> Self
+    async fn new_with_id(object_id: ObjectId) -> Result<Self, Errors>
     where
         Self: Sized,
     {
-        DynamicCategory::new()
-    }
-
-    fn new_with_id(id: &ObjectId) -> Self
-    where
-        Self: Sized,
-    {
-        DynamicCategory::new_with_id(id.clone())
+        Ok(DynamicCategory::new_with_id(object_id))
     }
 
     fn category_id(&self) -> &ObjectId {
         self.id()
     }
 
-    fn update_category_id(&mut self, new_id: ObjectId) {
-        self.inner_category_mut().update_category_id(new_id);
-    }
-
-    fn add_object(&mut self, object: Rc<DynamicCategory>) -> Result<Rc<Self::Morphism>, Errors> {
-        self.inner_category_mut().add_object(object)
-    }
-
-    fn add_morphism(
+    async fn add_object(
         &mut self,
-        morphism: Rc<Morphism<Self::Object>>,
-    ) -> Result<&Rc<Morphism<Self::Object>>, Errors> {
-        self.inner_category_mut().add_morphism(morphism)
+        object: Arc<DynamicCategory>,
+    ) -> Result<Arc<Self::Morphism>, Errors> {
+        self.inner_category_mut().add_object(object).await
     }
 
-    fn get_object(&self, object: &DynamicCategory) -> Result<&Rc<DynamicCategory>, Errors> {
-        self.inner_category().get_object(object)
+    async fn add_morphism(&mut self, morphism: Arc<Morphism<Self::Object>>) -> Result<(), Errors> {
+        self.inner_category_mut().add_morphism(morphism).await
     }
 
-    fn get_all_objects(&self) -> Result<HashSet<&Rc<DynamicCategory>>, Errors> {
-        self.inner_category().get_all_objects()
+    async fn get_object(&self, object: &DynamicCategory) -> Result<&Arc<DynamicCategory>, Errors> {
+        self.inner_category().get_object(object).await
     }
 
-    fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Morphism<Self::Object>>>, Errors> {
-        self.inner_category().get_all_morphisms()
+    async fn get_all_objects(&self) -> Result<HashSet<&Arc<DynamicCategory>>, Errors> {
+        self.inner_category().get_all_objects().await
     }
 
-    fn get_hom_set_x(
+    async fn get_morphism(&self, morphism_id: &String) -> Result<&Arc<Self::Morphism>, Errors> {
+        self.inner_category().get_morphism(morphism_id).await
+    }
+
+    async fn get_all_morphisms(&self) -> Result<HashSet<&Arc<Morphism<Self::Object>>>, Errors> {
+        self.inner_category().get_all_morphisms().await
+    }
+
+    async fn get_hom_set_x(
         &self,
         source_object: &DynamicCategory,
-    ) -> Result<HashSet<&Rc<Morphism<Self::Object>>>, Errors> {
-        self.inner_category().get_hom_set_x(source_object)
+    ) -> Result<HashSet<&Arc<Morphism<Self::Object>>>, Errors> {
+        self.inner_category().get_hom_set_x(source_object).await
     }
 
-    fn get_object_morphisms(
+    async fn get_object_morphisms(
         &self,
         object: &DynamicCategory,
-    ) -> Result<Vec<&Rc<Morphism<Self::Object>>>, Errors> {
-        self.inner_category().get_object_morphisms(object)
+    ) -> Result<Vec<&Arc<Morphism<Self::Object>>>, Errors> {
+        self.inner_category().get_object_morphisms(object).await
     }
 }
 
@@ -232,7 +232,7 @@ impl FactorizationSystemTrait for DynamicCategory {
     fn morphism_factors(
         &self,
         morphism: &Morphism<Self::Object>,
-    ) -> Result<&(Rc<Morphism<Self::Object>>, Rc<Morphism<Self::Object>>), Errors> {
+    ) -> Result<&(Arc<Morphism<Self::Object>>, Arc<Morphism<Self::Object>>), Errors> {
         if let Some(factorization_system) = &self.inner_factorization_system() {
             factorization_system.morphism_factors(morphism)
         } else {
@@ -240,6 +240,31 @@ impl FactorizationSystemTrait for DynamicCategory {
                 "This category does not support factorization systems".to_string(),
             ))
         }
+    }
+}
+
+
+#[async_trait]
+impl CategoryCloneWithNewId for DynamicCategory
+{
+    async fn clone_with_new_id(&self) -> Result<Self, Errors>
+    where
+        Self: Sized,
+    {
+        // for persistable category we need to create a new record in the database
+        // so we clone the inner category with a new id and then create a new persistable
+        // category with that inner category
+        let mut category = DynamicCategory::new();
+        // populate all the objects and morphisms from self to category
+        for object in self.get_all_objects().await? {
+            category.add_object(object.clone()).await?;
+        }
+
+        for morphism in self.get_all_morphisms().await? {
+            category.add_morphism(morphism.clone()).await?;
+        }
+
+        Ok(category)
     }
 }
 
@@ -267,45 +292,8 @@ impl From<i32> for DynamicCategory {
     }
 }
 
-impl<T: Eq + Clone + Hash + Debug> From<Vec<T>> for DynamicCategory
-where
-    T: Into<ObjectId>,
-{
-    fn from(objects: Vec<T>) -> Self {
-        let mut category = DynamicCategory::new();
-        for object in objects {
-            let object = DynamicCategory::new_with_id(object.into());
-            category.add_object(Rc::new(object)).unwrap();
-        }
-        category
-    }
-}
-
-impl From<Rc<DynamicCategory>> for DynamicCategory {
-    fn from(rc: Rc<DynamicCategory>) -> Self {
+impl From<Arc<DynamicCategory>> for DynamicCategory {
+    fn from(rc: Arc<DynamicCategory>) -> Self {
         (*rc).clone()
     }
 }
-
-impl From<Vec<Rc<DynamicCategory>>> for DynamicCategory {
-    fn from(value: Vec<Rc<DynamicCategory>>) -> Self {
-        let mut category = DynamicCategory::new();
-        for object in value {
-            category.add_object(object).unwrap();
-        }
-        category
-    }
-}
-
-// impl<C> From<C> for DynamicCategory
-// where
-//     BaseCategory: From<C>,
-// {
-//     fn from(value: C) -> Self {
-//         // First convert to the inner Category to obtain its id
-//         let inner: BaseCategory = value.into();
-//         let mut category = DynamicCategory::new_with_id(inner.id().clone());
-//         category.inner_category = DynamicCategoryEnum::Category(Box::new(inner));
-//         category
-//     }
-// }

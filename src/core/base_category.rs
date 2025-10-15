@@ -1,30 +1,31 @@
-use crate::core::arrow::{Arrow, Functor, Morphism};
-use crate::core::discrete_category;
-use crate::core::discrete_category::DiscreteCategory;
-use crate::core::dynamic_category::DynamicCategory;
+use crate::core::arrow::Morphism;
 use crate::core::errors::Errors;
 use crate::core::identifier::Identifier;
 use crate::core::object_id::ObjectId;
 use crate::core::traits::arrow_trait::ArrowTrait;
 use crate::core::traits::category_trait::CategoryTrait;
+use async_trait::async_trait;
 use dyn_clone::DynClone;
-use std::borrow::Borrow;
 use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Formatter};
 use std::hash::Hash;
-use std::rc::Rc;
+use std::sync::Arc;
 
 #[derive(Clone, PartialEq, Eq)]
 pub struct BaseCategory<Object: CategoryTrait> {
     id: ObjectId,
-    objects: HashMap<ObjectId, Rc<Object>>,
+    objects: HashMap<ObjectId, Arc<Object>>,
     object_mappings: HashMap<ObjectId, HashSet<String>>,
-    morphism: HashMap<String, Rc<Morphism<Object>>>,
+    morphism: HashMap<String, Arc<Morphism<Object>>>,
 }
 
 impl<Object: CategoryTrait> Debug for BaseCategory<Object> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        todo!()
+        f.debug_struct("BaseCategory")
+            .field("id", &self.id)
+            .field("objects", &self.objects.keys())
+            .field("morphism_count", &self.morphism.iter().count())
+            .finish()
     }
 }
 
@@ -62,33 +63,24 @@ impl<Object: CategoryTrait> BaseCategory<Object> {
     }
 }
 
-impl<Object: CategoryTrait + Hash + Eq + DynClone + std::clone::Clone> CategoryTrait
-    for BaseCategory<Object>
-{
+#[async_trait]
+impl<Object: CategoryTrait + Hash + Eq + DynClone + Clone> CategoryTrait for BaseCategory<Object> {
     type Object = Object;
 
     type Morphism = Morphism<Self::Object>;
 
-    fn new() -> Self {
-        BaseCategory::new()
-    }
-
-    fn new_with_id(id: &ObjectId) -> Self
-    where
-        Self: Sized,
-    {
-        BaseCategory::new_with_id(id.clone())
+    async fn new_with_id(object_id: ObjectId) -> Result<Self, Errors> {
+        Ok(BaseCategory::new_with_id(object_id))
     }
 
     fn category_id(&self) -> &ObjectId {
         &self.id
     }
 
-    fn update_category_id(&mut self, new_id: ObjectId) {
-        self.id = new_id;
-    }
-
-    fn add_object(&mut self, object: Rc<Self::Object>) -> Result<Rc<Self::Morphism>, Errors> {
+    async fn add_object(
+        &mut self,
+        object: Arc<Self::Object>,
+    ) -> Result<Arc<Self::Morphism>, Errors> {
         if self.objects.contains_key(object.category_id()) {
             return Err(Errors::ObjectAlreadyExists);
         }
@@ -99,14 +91,11 @@ impl<Object: CategoryTrait + Hash + Eq + DynClone + std::clone::Clone> CategoryT
             .entry(object_id.clone())
             .or_default()
             .insert(identity_cell.arrow_id().to_string());
-        self.add_morphism(identity_cell.clone())?;
+        self.add_morphism(identity_cell.clone()).await?;
         Ok(identity_cell)
     }
 
-    fn add_morphism(
-        &mut self,
-        morphism: Rc<Morphism<Self::Object>>,
-    ) -> Result<&Rc<Morphism<Self::Object>>, Errors> {
+    async fn add_morphism(&mut self, morphism: Arc<Morphism<Self::Object>>) -> Result<(), Errors> {
         if self.morphism.contains_key(morphism.arrow_id()) {
             return Err(Errors::MorphismAlreadyExists);
         }
@@ -130,78 +119,61 @@ impl<Object: CategoryTrait + Hash + Eq + DynClone + std::clone::Clone> CategoryT
             .morphism
             .entry(morphism.arrow_id().clone())
             .or_insert(morphism);
-        Ok(cell)
+        Ok(())
     }
 
-    fn get_object(&self, object: &Self::Object) -> Result<&Rc<Self::Object>, Errors> {
+    async fn get_object(&self, object: &Self::Object) -> Result<&Arc<Self::Object>, Errors> {
         self.objects
             .get(object.category_id())
             .ok_or(Errors::ObjectNotFound)
     }
 
-    fn get_all_objects(&self) -> Result<HashSet<&Rc<Self::Object>>, Errors> {
+    async fn get_all_objects(&self) -> Result<HashSet<&Arc<Self::Object>>, Errors> {
         Ok(self.objects.values().collect())
     }
 
-    fn get_all_morphisms(&self) -> Result<HashSet<&Rc<Morphism<Self::Object>>>, Errors> {
+    async fn get_morphism(&self, morphism_id: &String) -> Result<&Arc<Self::Morphism>, Errors> {
+        self.morphism
+            .get(morphism_id)
+            .ok_or(Errors::MorphismNotFound)
+    }
+
+    async fn get_all_morphisms(&self) -> Result<HashSet<&Arc<Morphism<Self::Object>>>, Errors> {
         // Todo needs optimization
         // Ok(self.cells.values().collect())
 
-        let result: HashSet<&Rc<Morphism<Self::Object>>> = HashSet::new();
+        let result: HashSet<&Arc<Morphism<Self::Object>>> = HashSet::new();
         // for (_id, cell) in &self.cells {
         //     result.insert(cell);
         // }
         Ok(result)
     }
 
-    fn get_hom_set_x(
+    async fn get_hom_set_x(
         &self,
         source_object: &Self::Object,
-    ) -> Result<HashSet<&Rc<Morphism<Self::Object>>>, Errors> {
+    ) -> Result<HashSet<&Arc<Morphism<Self::Object>>>, Errors> {
         let result = self
             .object_mappings
             .get(source_object.category_id().into())
             .ok_or(Errors::ObjectNotFound)?
             .iter()
             .map(|item| self.morphism.get(item).ok_or(Errors::MorphismNotFound))
-            .collect::<Result<HashSet<&Rc<Morphism<Self::Object>>>, Errors>>()?;
+            .collect::<Result<HashSet<&Arc<Morphism<Self::Object>>>, Errors>>()?;
         Ok(result)
     }
 
-    fn get_object_morphisms(
+    async fn get_object_morphisms(
         &self,
         object: &Self::Object,
-    ) -> Result<Vec<&Rc<Morphism<Self::Object>>>, Errors> {
+    ) -> Result<Vec<&Arc<Morphism<Self::Object>>>, Errors> {
         let result = self
             .object_mappings
             .get(object.category_id().into())
             .ok_or(Errors::ObjectNotFound)?
             .iter()
             .map(|item| self.morphism.get(item).ok_or(Errors::MorphismNotFound))
-            .collect::<Result<Vec<&Rc<Morphism<Self::Object>>>, Errors>>()?;
+            .collect::<Result<Vec<&Arc<Morphism<Self::Object>>>, Errors>>()?;
         Ok(result)
-    }
-}
-
-impl<T: Eq + Clone + Hash + Debug> From<Vec<T>> for BaseCategory<DiscreteCategory>
-where
-    T: Into<ObjectId>,
-{
-    fn from(objects: Vec<T>) -> Self {
-        let mut category = BaseCategory::new();
-        for object in objects {
-            let object = DiscreteCategory::new_with_id(object.into());
-            category.add_object(Rc::new(object)).unwrap();
-        }
-        category
-    }
-}
-
-impl From<String> for BaseCategory<DiscreteCategory> {
-    fn from(object: String) -> Self {
-        let discrete_category = DiscreteCategory::new_with_id(object.into());
-        let mut category = BaseCategory::new();
-        category.add_object(Rc::new(discrete_category)).unwrap();
-        category
     }
 }

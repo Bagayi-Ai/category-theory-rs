@@ -3,7 +3,20 @@ name = "category_theory"
 version = "0.1.0"
 edition = "2024"
 
+
+[profile.dev]
+opt-level = 0
+debug = true
+debug-assertions = true
+
+
 [dependencies]
 uuid = { version = "1.17.0", features = ["v4"] }
 rand = "0.8.5"
 dyn-clone = "1.0.20"
+surrealdb = "2.2.3"
+tokio = { version = "1.47.1", features = ["macros", "rt-multi-thread"] }
+serde = { version = "1.0.225", features = ["derive"] }
+serde_json = "1.0.145"
+async-trait = "0.1.89"
+futures = "0.3"

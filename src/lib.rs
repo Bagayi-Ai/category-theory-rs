@@ -1,3 +1,8 @@
+use std::sync::LazyLock;
+use surrealdb::Surreal;
+use surrealdb::engine::remote::ws::{Client, Ws};
+use surrealdb::opt::auth::Root;
+
 pub mod core {
     pub mod discrete_category;
 
@@ -6,8 +11,6 @@ pub mod core {
     pub mod errors;
 
     pub mod product_endofunctor;
-
-    pub mod expand_functor;
 
     pub mod base_category;
     pub mod dynamic_category;
@@ -18,20 +21,24 @@ pub mod core {
 
     pub mod arrow;
 
+    pub mod functor;
+
+    pub mod persistable_category;
+
+    pub mod persistable_factorization_category;
+
+    pub mod functors {
+        pub mod inclusion_functor;
+    }
+
     pub mod traits {
         pub mod arrow_trait;
+
+        pub mod functor_trait;
+
         pub mod category_trait;
 
         pub mod factorization_system_trait;
-    }
-
-    pub mod concrete_category {}
-
-    pub mod unit {
-        pub mod unit_category;
-        pub mod unit_morphism;
-
-        pub mod unit_identifier;
     }
 
     #[cfg(test)]
@@ -41,6 +48,24 @@ pub mod core {
 
         pub mod test_dynamic_category;
     }
+
+    pub mod cytosjsexport; // added for cytoscape export
+}
+
+pub static DB: LazyLock<Surreal<Client>> = LazyLock::new(Surreal::init);
+
+pub async fn init_db(db_name: Option<&str>) -> surrealdb::Result<()> {
+    DB.connect::<Ws>("localhost:8000").await?;
+    DB.signin(Root {
+        username: "root",
+        password: "root",
+    })
+    .await?;
+    DB.use_ns("namespace")
+        .use_db(db_name.unwrap_or("database"))
+        .await?;
+
+    Ok(())
 }
 
 pub fn add(left: u64, right: u64) -> u64 {

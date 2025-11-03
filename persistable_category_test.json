@@ -1,0 +1,83 @@
+[
+  {
+    "data": {
+      "label": "abc",
+      "id": "abc"
+    }
+  },
+  {
+    "data": {
+      "parent": "abc",
+      "id": "b",
+      "label": "b"
+    }
+  },
+  {
+    "data": {
+      "label": "c",
+      "parent": "abc",
+      "id": "c"
+    }
+  },
+  {
+    "data": {
+      "label": "a",
+      "parent": "abc",
+      "id": "a"
+    }
+  },
+  {
+    "data": {
+      "id": "ABC",
+      "label": "ABC"
+    }
+  },
+  {
+    "data": {
+      "id": "B",
+      "parent": "ABC",
+      "label": "B"
+    }
+  },
+  {
+    "data": {
+      "label": "A",
+      "parent": "ABC",
+      "id": "A"
+    }
+  },
+  {
+    "data": {
+      "id": "C",
+      "label": "C",
+      "parent": "ABC"
+    }
+  },
+  {
+    "data": {
+      "target": "abc",
+      "id": "2d2da378-1efb-4f82-bdc7-268a03c02693",
+      "label": "id",
+      "identity": true,
+      "source": "abc"
+    }
+  },
+  {
+    "data": {
+      "functorEdge": true,
+      "source": "abc",
+      "label": "06dff8ee-e2ef-4957-83d6-7d814385d116",
+      "id": "06dff8ee-e2ef-4957-83d6-7d814385d116",
+      "target": "ABC"
+    }
+  },
+  {
+    "data": {
+      "id": "7c25f66c-5dbc-4599-a7a0-ab6fe3f7555e",
+      "label": "id",
+      "identity": true,
+      "source": "ABC",
+      "target": "ABC"
+    }
+  }
+]

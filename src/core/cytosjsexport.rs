@@ -28,7 +28,7 @@ impl CytoscapeElement {
     fn node(id: &str, label: &str, parent: Option<&str>) -> Self {
         let mut data = HashMap::new();
         data.insert("id".into(), json!(id));
-        data.insert("label".into(), json!(label));
+        data.insert("name".into(), json!(label));
         if let Some(p) = parent { data.insert("parent".into(), json!(p)); }
         CytoscapeElement::Node { data }
     }
